@@ -7,16 +7,18 @@ class Config(object):
     SECRET_KEY = APP_SESSION_SK
     TEMPLATES_AUTO_RELOAD = True
 
-    VERSION = '1.0'
+    VERSION = 'v1'
     API_BASE_URI = '/api/%s' % VERSION
 
 
 class ProductionConfig(Config):
-    pass
+    AUTH_SERVICE_URL = 'http://127.0.0.1:6000/api/v1/users'
 
 
 class DevelopmentConfig(Config):
     DEBUG = True
+
+    AUTH_SERVICE_URL = 'http://127.0.0.1:6000/api/v1/users'
 
 
 class TestingConfig(Config):
