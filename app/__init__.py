@@ -4,7 +4,7 @@ from pprint import pprint
 from flask import Flask
 
 from app.service import UserService
-from rrnuser import UserAPI
+from app.resource.rrnuser import UserAPI
 
 logging.basicConfig(level=logging.DEBUG)
 
