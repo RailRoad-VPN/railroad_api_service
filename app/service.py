@@ -1,8 +1,8 @@
 import sys
 
-sys.path.insert(1, '../rest_api_library')
-from services.rest import RESTService
-from services.response import APIResponse
+sys.path.insert(0, '../rest_api_library')
+from rest import RESTService
+from response import APIResponse
 
 
 class UserService(RESTService):

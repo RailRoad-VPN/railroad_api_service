@@ -7,11 +7,11 @@ from flask import make_response, request, Response
 from app.exception import RailRoadAPIError
 from app.service import UserService
 
-sys.path.insert(1, '../rest_api_library')
+sys.path.insert(0, '../rest_api_library')
 from utils import check_uuid
 from api import ResourceAPI
-from services.response import APIResponseStatus, APIResponse
-from services.rest import APIException
+from response import APIResponseStatus, APIResponse
+from rest import APIException
 
 
 class UserAPI(ResourceAPI):
