@@ -36,8 +36,47 @@ class VPNServersAPI(ResourceAPI):
     def get(self, uuid: str = None, status: str = None) -> Response:
         if 'version' in request.args:
             data = {
-                'version': 42
+                'version': 42,
+                'map_version': 24
             }
+            response_data = APIResponse(status=APIResponseStatus.success.value, code=HTTPStatus.OK,
+                                        data=data)
+            resp = make_response(json.dumps(response_data.serialize()), HTTPStatus.OK)
+            return resp
+        if 'map' in request.args:
+            data = [{
+                "id": "16fd2706-8baf-433b-82eb-8c7fada847da",
+                "version": "1",
+                "type": "1",
+                "status": "2",
+                "bandwidth": "123456",
+                "load": "30",
+                "geo": {
+                    "latitude": "55.7558",
+                    "longitude": "37.6173",
+                    "decode": {
+                        "country": 0,
+                        "state": 0,
+                        "city": 0
+                    }
+                }
+            }, {
+                "id": "8d0359a4-64d1-4906-b113-2e36259dd128",
+                "version": "2",
+                "type": "2",
+                "status": "3",
+                "bandwidth": "123456788",
+                "load": "10",
+                "geo": {
+                    "latitude": "55.7558",
+                    "longitude": "37.6173",
+                    "decode": {
+                        "country": 0,
+                        "state": 0,
+                        "city": 0
+                    }
+                }
+            }]
             response_data = APIResponse(status=APIResponseStatus.success.value, code=HTTPStatus.OK,
                                         data=data)
             resp = make_response(json.dumps(response_data.serialize()), HTTPStatus.OK)
@@ -49,7 +88,7 @@ class VPNServersAPI(ResourceAPI):
                 "version": "1",
                 "type": "1",
                 "status": "2",
-                "bandwidth": "40MBit",
+                "bandwidth": "123456223",
                 "load": "30",
                 "configuration": None,
                 "geo": {
@@ -75,7 +114,7 @@ class VPNServersAPI(ResourceAPI):
                 "version": "2",
                 "type": "2",
                 "status": "3",
-                "bandwidth": "23MBit",
+                "bandwidth": "123456431",
                 "load": "0",
                 "configuration": None,
                 "geo": {
@@ -116,7 +155,7 @@ class VPNServersAPI(ResourceAPI):
                 "version": "2",
                 "type": "2",
                 "status": "1",
-                "bandwidth": "100GBit",
+                "bandwidth": "123456123123",
                 "load": "0",
                 "configuration": None,
                 "geo": {
