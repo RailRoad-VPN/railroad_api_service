@@ -3,7 +3,7 @@ import sys
 import uuid as uuidlib
 from http import HTTPStatus
 
-from flask import make_response, Response
+from flask import make_response, Response, request
 
 from app.service import UserService
 
@@ -15,7 +15,7 @@ from response import APIResponseStatus, APIResponse
 class VPNServersAPI(ResourceAPI):
     __version__ = 1
 
-    __api_url__ = 'vpnc'
+    __api_url__ = 'vpn/servers'
 
     _config = None
 
@@ -32,18 +32,26 @@ class VPNServersAPI(ResourceAPI):
         return resp
 
     def get(self, uuid: str = None) -> Response:
+        if 'version' in request.args:
+            data = {
+                'version': 42
+            }
+            response_data = APIResponse(status=APIResponseStatus.success.value, code=HTTPStatus.OK,
+                                        data=data)
+            resp = make_response(json.dumps(response_data.serialize()), HTTPStatus.OK)
+            return resp
         if uuid is None:
             data = [{
                 "id": uuidlib.uuid4().__str__(),
                 "version": "1",
-                "type": "0x336BE3A6",
-                "status": "0x01",
-                "bandwidth": "239423",
+                "type": "1",
+                "status": "2",
+                "bandwidth": "40MBit",
                 "load": "30",
                 "configuration": None,
                 "geo": {
-                    "latitude": "1",
-                    "longtitude": "2",
+                    "latitude": "55.7558",
+                    "longitude": "37.6173",
                     "decode": {
                         "country": 0,
                         "state": 0,
@@ -62,14 +70,14 @@ class VPNServersAPI(ResourceAPI):
             }, {
                 "id": uuidlib.uuid4().__str__(),
                 "version": "2",
-                "type": "0x4E2AA4B7",
-                "status": "0x03",
-                "bandwidth": "23349423",
+                "type": "2",
+                "status": "3",
+                "bandwidth": "23MBit",
                 "load": "0",
-                "configration": None,
+                "configuration": None,
                 "geo": {
-                    "latitude": "2",
-                    "longtitude": "3",
+                    "latitude": "55.7558",
+                    "longitude": "37.6173",
                     "decode": {
                         "country": 0,
                         "state": 0,
@@ -86,18 +94,21 @@ class VPNServersAPI(ResourceAPI):
                     }
                 }
             }]
-        else:
+            response_data = APIResponse(status=APIResponseStatus.success.value, code=HTTPStatus.OK,
+                                        data=data)
+            resp = make_response(json.dumps(response_data.serialize()), HTTPStatus.OK)
+        elif uuid is not None:
             data = {
                 "id": uuidlib.uuid4().__str__(),
                 "version": "2",
-                "type": "0x4E2AA4B7",
-                "status": "0x03",
-                "bandwidth": "23349423",
+                "type": "2",
+                "status": "1",
+                "bandwidth": "100GBit",
                 "load": "0",
-                "configration": None,
+                "configuration": None,
                 "geo": {
-                    "latitude": "2",
-                    "longtitude": "3",
+                    "latitude": "55.7558",
+                    "longitude": "37.6173",
                     "decode": {
                         "country": 0,
                         "state": 0,
@@ -114,7 +125,10 @@ class VPNServersAPI(ResourceAPI):
                     }
                 }
             }
-        response_data = APIResponse(status=APIResponseStatus.success.value, code=HTTPStatus.OK,
-                                    data=data)
-        resp = make_response(json.dumps(response_data.serialize()), HTTPStatus.OK)
+            response_data = APIResponse(status=APIResponseStatus.success.value, code=HTTPStatus.OK,
+                                        data=data)
+            resp = make_response(json.dumps(response_data.serialize()), HTTPStatus.OK)
+        else:
+            response_data = APIResponse(status=APIResponseStatus.failed.value, code=HTTPStatus.BAD_REQUEST)
+            resp = make_response(json.dumps(response_data.serialize()), HTTPStatus.BAD_REQUEST)
         return resp

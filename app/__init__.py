@@ -30,6 +30,8 @@ app.add_url_rule('%s/%s/email/<string:email>' % (app.config['API_BASE_URI'], Use
 vpnc_api_view_func = VPNServersAPI.as_view('vpnc_api', app.config)
 app.add_url_rule('%s/%s' % (app.config['API_BASE_URI'], VPNServersAPI.__api_url__), view_func=vpnc_api_view_func,
                  methods=['GET'])
+app.add_url_rule('%s/%s?version' % (app.config['API_BASE_URI'], VPNServersAPI.__api_url__),
+                 view_func=vpnc_api_view_func, methods=['GET'])
 app.add_url_rule('%s/%s/<string:uuid>' % (app.config['API_BASE_URI'], VPNServersAPI.__api_url__),
                  view_func=vpnc_api_view_func, methods=['GET'])
 
