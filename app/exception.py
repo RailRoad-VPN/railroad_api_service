@@ -17,3 +17,5 @@ class RailRoadAPIError(IntEnum):
     BAD_USER_IDENTITY = (2, 'BAD_USER_IDENTITY phrase', 'BAD_USER_IDENTITY description')
     USER_EMAIL_BUSY = (3, 'USER_EMAIL_BUSY phrase', 'USER_EMAIL_BUSY description')
     USER_NOT_EXIST = (4, 'USER_NOT_EXIST phrase', 'USER_NOT_EXIST description')
+
+    BAD_SERVER_IDENTITY = (5, 'BAD_SERVER_IDENTITY phrase', 'BAD_SERVER_IDENTITY description')
