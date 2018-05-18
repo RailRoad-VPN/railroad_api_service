@@ -33,64 +33,44 @@ class VPNServersAPI(ResourceAPI):
         resp = make_response('', HTTPStatus.METHOD_NOT_ALLOWED)
         return resp
 
-    def get(self, uuid: str = None, status: str = None) -> Response:
+    def get(self, uuid: str = None) -> Response:
         if 'version' in request.args:
             data = {
                 'version': 42,
-                'map_version': 24
+                'state_version': 24
             }
             response_data = APIResponse(status=APIResponseStatus.success.value, code=HTTPStatus.OK,
                                         data=data)
             resp = make_response(json.dumps(response_data.serialize()), HTTPStatus.OK)
             return resp
-        if 'map' in request.args:
+        if 'state' in request.args:
             data = [{
                 "id": "16fd2706-8baf-433b-82eb-8c7fada847da",
-                "version": "1",
-                "type": "1",
+                "state_version": "2",
                 "status": "2",
                 "bandwidth": "123456",
                 "load": "30",
-                "geo": {
-                    "latitude": "55.7558",
-                    "longitude": "37.6173",
-                    "decode": {
-                        "country": 0,
-                        "state": 0,
-                        "city": 0
-                    }
-                }
             }, {
                 "id": "8d0359a4-64d1-4906-b113-2e36259dd128",
-                "version": "2",
-                "type": "2",
+                "state_version": "2",
                 "status": "3",
                 "bandwidth": "123456788",
                 "load": "10",
-                "geo": {
-                    "latitude": "55.7558",
-                    "longitude": "37.6173",
-                    "decode": {
-                        "country": 0,
-                        "state": 0,
-                        "city": 0
-                    }
-                }
             }]
             response_data = APIResponse(status=APIResponseStatus.success.value, code=HTTPStatus.OK,
                                         data=data)
             resp = make_response(json.dumps(response_data.serialize()), HTTPStatus.OK)
             return resp
-        if uuid is None and status is None:
+        if uuid is None:
             # list of all servers
             data = [{
                 "id": "16fd2706-8baf-433b-82eb-8c7fada847da",
                 "version": "1",
+                "state_version": "2",
                 "type": "1",
                 "status": "2",
                 "bandwidth": "123456223",
                 "load": "30",
-                "configuration": None,
                 "geo": {
                     "latitude": "55.7558",
                     "longitude": "37.6173",
@@ -112,11 +92,11 @@ class VPNServersAPI(ResourceAPI):
             }, {
                 "id": "8d0359a4-64d1-4906-b113-2e36259dd128",
                 "version": "2",
+                "state_version": "2",
                 "type": "2",
                 "status": "3",
                 "bandwidth": "123456431",
                 "load": "0",
-                "configuration": None,
                 "geo": {
                     "latitude": "55.7558",
                     "longitude": "37.6173",
@@ -157,87 +137,8 @@ class VPNServersAPI(ResourceAPI):
                 "status": "1",
                 "bandwidth": "123456123123",
                 "load": "0",
-                "configuration": None,
-                "geo": {
-                    "latitude": "55.7558",
-                    "longitude": "37.6173",
-                    "decode": {
-                        "country": 0,
-                        "state": 0,
-                        "city": 0,
-                        "region": {
-                            "common": 0,
-                            "dvd": 0,
-                            "xbox360": 0,
-                            "xboxone": 0,
-                            "playstation3": 0,
-                            "playstation4": 0,
-                            "nintendo": 0
-                        }
-                    }
-                }
+                "configuration": None
             }
-            response_data = APIResponse(status=APIResponseStatus.success.value, code=HTTPStatus.OK,
-                                        data=data)
-            resp = make_response(json.dumps(response_data.serialize()), HTTPStatus.OK)
-        elif status is not None:
-            # list of all servers by status
-            if status != 'new':
-                data = {}
-            else:
-                data = [{
-                    "id": "16fd2706-8baf-433b-82eb-8c7fada847da",
-                    "version": "1",
-                    "type": "1",
-                    "status": "1",
-                    "bandwidth": "40MBit",
-                    "load": "30",
-                    "configuration": None,
-                    "geo": {
-                        "latitude": "55.7558",
-                        "longitude": "37.6173",
-                        "decode": {
-                            "country": 0,
-                            "state": 0,
-                            "city": 0,
-                            "region": {
-                                "common": 0,
-                                "dvd": 0,
-                                "xbox360": 0,
-                                "xboxone": 0,
-                                "playstation3": 0,
-                                "playstation4": 0,
-                                "nintendo": 0
-                            }
-                        }
-                    }
-                }, {
-                    "id": "8d0359a4-64d1-4906-b113-2e36259dd128",
-                    "version": "2",
-                    "type": "2",
-                    "status": "1",
-                    "bandwidth": "23MBit",
-                    "load": "0",
-                    "configuration": None,
-                    "geo": {
-                        "latitude": "55.7558",
-                        "longitude": "37.6173",
-                        "decode": {
-                            "country": 0,
-                            "state": 0,
-                            "city": 0,
-                            "region": {
-                                "common": 0,
-                                "dvd": 0,
-                                "xbox360": 0,
-                                "xboxone": 0,
-                                "playstation3": 0,
-                                "playstation4": 0,
-                                "nintendo": 0
-                            }
-                        }
-                    }
-                }]
             response_data = APIResponse(status=APIResponseStatus.success.value, code=HTTPStatus.OK,
                                         data=data)
             resp = make_response(json.dumps(response_data.serialize()), HTTPStatus.OK)
