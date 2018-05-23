@@ -63,13 +63,12 @@ class UserAPI(ResourceAPI):
             resp.headers['Location'] = '%s/%s/uuid/%s' % (self._config['API_BASE_URI'], self.__api_url__, user_uuid)
         else:
             response_data = APIResponse(status=APIResponseStatus.failed.value, code=api_response.code,
-                                        error=api_response.error,
-                                        error_code=api_response.error_code, headers=api_response.headers)
+                                        errors=api_response.errors, headers=api_response.headers)
             resp = make_response(json.dumps(response_data.serialize()), api_response.code)
         return resp
 
     def put(self, uuid: str = None) -> Response:
-        b = check_uuid(uuid=uuid)
+        b = check_uuid(suuid=uuid)
         if not b:
             code = HTTPStatus.NOT_FOUND
             response_data = APIResponse(status=APIResponseStatus.failed.value, code=code,
@@ -115,10 +114,10 @@ class UserAPI(ResourceAPI):
         resp = make_response(json.dumps(response_data), api_response.code)
         return resp
 
-    def get(self, uuid: str = None, email: str = None) -> Response:
-        if uuid is not None:
-            b = check_uuid(uuid=uuid)
-            if not b:
+    def get(self, suuid: str = None, email: str = None) -> Response:
+        if suuid is not None:
+            is_valid = check_uuid(suuid=suuid)
+            if not is_valid:
                 code = HTTPStatus.NOT_FOUND
                 response_data = APIResponse(status=APIResponseStatus.failed.value, code=code,
                                             error=RailRoadAPIError.BAD_USER_IDENTITY.phrase,
@@ -127,7 +126,7 @@ class UserAPI(ResourceAPI):
                 resp = make_response(json.dumps(response_data.serialize()), code)
                 return resp
 
-        if uuid is None and email is None:
+        if suuid is None and email is None:
             # find all users - no parameters set
             code = HTTPStatus.METHOD_NOT_ALLOWED
             response_data = APIResponse(status=APIResponseStatus.failed.value, code=code,
@@ -138,7 +137,7 @@ class UserAPI(ResourceAPI):
             return resp
 
         try:
-            api_response = self._user_service.get_user(uuid=uuid, email=email)
+            api_response = self._user_service.get_user(suuid=suuid, email=email)
         except APIException as e:
             response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code,
                                         error=e.message,
@@ -146,15 +145,14 @@ class UserAPI(ResourceAPI):
             resp = make_response(json.dumps(response_data.serialize()), e.http_code)
             return resp
 
-        if api_response.code == HTTPStatus.OK:
-            response_data = APIResponse(status=APIResponseStatus.success.value, code=api_response.code,
+        if api_response.status == APIResponseStatus.success:
+            response_data = APIResponse(status=api_response.status, code=api_response.code,
                                         data=api_response.data,
                                         headers=api_response.headers)
             resp = make_response(json.dumps(response_data.serialize()), HTTPStatus.OK)
             return resp
         else:
-            response_data = APIResponse(status=APIResponseStatus.failed.value, code=HTTPStatus.BAD_REQUEST.phrase,
-                                        headers=api_response.headers, error=api_response.error,
-                                        error_code=api_response.error_code)
+            response_data = APIResponse(status=api_response.status, code=HTTPStatus.BAD_REQUEST.phrase,
+                                        headers=api_response.headers, errors=api_response.errors)
             resp = make_response(json.dumps(response_data.serialize()), HTTPStatus.BAD_REQUEST)
         return resp
