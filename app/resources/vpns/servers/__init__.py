@@ -2,7 +2,7 @@ import json
 from enum import Enum
 from http import HTTPStatus
 
-from flask import make_response, Response, request
+from flask import Response, request
 
 from app import *
 from app.exception import RailRoadAPIError
@@ -11,7 +11,7 @@ sys.path.insert(0, '../rest_api_library')
 from rest import APIException
 from api import ResourceAPI
 from response import APIResponseStatus, APIResponse
-from utils import check_uuid
+from utils import check_uuid, make_api_response
 
 
 class VPNServersRepr(Enum):
@@ -54,11 +54,11 @@ class VPNServersAPI(ResourceAPI):
         super().__init__()
 
     def post(self) -> Response:
-        resp = make_response('', HTTPStatus.METHOD_NOT_ALLOWED)
+        resp = make_api_response('', HTTPStatus.METHOD_NOT_ALLOWED)
         return resp
 
     def put(self) -> Response:
-        resp = make_response('', HTTPStatus.METHOD_NOT_ALLOWED)
+        resp = make_api_response('', HTTPStatus.METHOD_NOT_ALLOWED)
         return resp
 
     def get(self, suuid: str = None) -> Response:
@@ -70,13 +70,13 @@ class VPNServersAPI(ResourceAPI):
             except APIException as e:
                 response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code,
                                             error=e.message, error_code=e.code)
-                resp = make_response(json.dumps(response_data.serialize()), e.http_code)
+                resp = make_api_response(json.dumps(response_data.serialize()), e.http_code)
                 return resp
 
             if api_response.status == APIResponseStatus.failed.value:
                 response_data = APIResponse(status=APIResponseStatus.failed.value, code=HTTPStatus.BAD_REQUEST.phrase,
                                             headers=api_response.headers, errors=api_response.errors)
-                resp = make_response(json.dumps(response_data.serialize()), HTTPStatus.BAD_REQUEST)
+                resp = make_api_response(json.dumps(response_data.serialize()), HTTPStatus.BAD_REQUEST)
                 return resp
 
             servers_repr_list = []
@@ -135,23 +135,23 @@ class VPNServersAPI(ResourceAPI):
 
             response_data = APIResponse(status=api_response.status, code=api_response.code, data=servers_repr_list,
                                         headers=api_response.headers)
-            resp = make_response(json.dumps(response_data.serialize()), HTTPStatus.OK)
+            resp = make_api_response(json.dumps(response_data.serialize()), HTTPStatus.OK)
             return resp
 
         elif suuid is not None:
-            # specific server by uuid
+            # specific server by uuid TODO doit
             is_valid = check_uuid(suuid=suuid)
             if not is_valid:
                 code = HTTPStatus.NOT_FOUND
                 response_data = APIResponse(status=APIResponseStatus.failed.value, code=code,
                                             error=RailRoadAPIError.BAD_USER_IDENTITY.phrase,
                                             error_code=RailRoadAPIError.BAD_USER_IDENTITY)
-                resp = make_response(json.dumps(response_data.serialize()), code)
+                resp = make_api_response(json.dumps(response_data.serialize()), code)
                 return resp
 
             response_data = APIResponse(status=APIResponseStatus.success.value, data=data)
-            resp = make_response(json.dumps(response_data.serialize()), HTTPStatus.OK)
+            resp = make_api_response(json.dumps(response_data.serialize()), HTTPStatus.OK)
         else:
             response_data = APIResponse(status=APIResponseStatus.failed.value)
-            resp = make_response(json.dumps(response_data.serialize()), HTTPStatus.BAD_REQUEST)
+            resp = make_api_response(json.dumps(response_data.serialize()), HTTPStatus.BAD_REQUEST)
         return resp

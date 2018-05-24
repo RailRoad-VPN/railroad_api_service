@@ -3,10 +3,10 @@ from pprint import pprint
 
 from flask import Flask
 
-from app.resource.rrnuser import UserAPI
 from app.service import *
-from vpn.servers import VPNServersAPI
-from vpn.servers.meta import VPNServersMetaAPI
+from app.resources.users import UserAPI
+from app.resources.vpns.servers import VPNServersAPI
+from app.resources.vpns.servers.meta import VPNServersMetaAPI
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -22,8 +22,8 @@ user_service = UserService(api_url=app.config['AUTH_SERVICE_URL'],
 user_api_view_func = UserAPI.as_view('user_api', user_service, app.config)
 app.add_url_rule('%s/%s' % (app.config['API_BASE_URI'], UserAPI.__api_url__), view_func=user_api_view_func,
                  methods=['GET', 'POST', ])
-app.add_url_rule('%s/%s/uuid/<string:uuid>' % (app.config['API_BASE_URI'], UserAPI.__api_url__),
-                 view_func=user_api_view_func, methods=['GET', 'PUT'])
+app.add_url_rule('%s/%s/suuid/<string:uuid>' % (app.config['API_BASE_URI'], UserAPI.__api_url__),
+                 view_func=user_api_view_func, methods=['GET'])
 app.add_url_rule('%s/%s/email/<string:email>' % (app.config['API_BASE_URI'], UserAPI.__api_url__),
                  view_func=user_api_view_func, methods=['GET'])
 
