@@ -31,9 +31,9 @@ class ProductionConfig(Config):
 class DevelopmentConfig(Config):
     DEBUG = True
 
-    AUTH_SERVICE_URL = 'http://127.0.0.1:6000/api/v1/'
+    AUTH_SERVICE_URL = 'http://127.0.0.1:6000/api/v1'
 
-    VPNC_SERVICE_URL = 'http://127.0.0.1:9000/api/v1/'
+    VPNC_SERVICE_URL = 'http://127.0.0.1:9000/api/v1'
 
 
 class TestingConfig(Config):
