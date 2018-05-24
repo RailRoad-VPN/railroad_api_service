@@ -2,15 +2,14 @@ import json
 import sys
 from http import HTTPStatus
 
-from flask import make_response, Response, request
+from flask import Response
 
-from app import VPNServersMetaService
-from app.exception import RailRoadAPIError
+from app.service import VPNServersMetaService
 
 sys.path.insert(0, '../rest_api_library')
 from api import ResourceAPI
 from response import APIResponseStatus, APIResponse
-from utils import check_uuid, JSONDecimalEncoder
+from utils import make_api_response
 
 
 class VPNServersMetaAPI(ResourceAPI):
