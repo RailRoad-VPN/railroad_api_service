@@ -134,7 +134,8 @@ class VPNServersAPI(ResourceAPI):
                 servers_repr_list.append(server_repr)
 
             response_data = APIResponse(status=api_response.status, code=api_response.code, data=servers_repr_list,
-                                        headers=api_response.headers)
+                                        headers=api_response.headers, limit=self.pagination.limit,
+                                        offset=self.pagination.offset)
             resp = make_api_response(json.dumps(response_data.serialize()), HTTPStatus.OK)
             return resp
 
