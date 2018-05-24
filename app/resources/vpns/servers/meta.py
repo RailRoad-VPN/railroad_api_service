@@ -15,7 +15,7 @@ from utils import make_api_response
 class VPNServersMetaAPI(ResourceAPI):
     __version__ = 1
 
-    __api_url__ = 'vpn/servers/meta'
+    __api_url__ = 'vpns/servers/meta'
 
     _config = None
 

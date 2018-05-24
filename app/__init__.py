@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 
 # Load the default configuration
-app.config.from_object('config.DevelopmentConfig')
+app.config.from_object('config.TestingConfig')
 
 # USER API
 user_service = UserService(api_url=app.config['AUTH_SERVICE_URL'],

@@ -26,7 +26,7 @@ class VPNServersRepr(Enum):
 class VPNServersAPI(ResourceAPI):
     __version__ = 1
 
-    __api_url__ = 'vpn/servers'
+    __api_url__ = 'vpns/servers'
 
     _vpn_service = None
     _config = None
