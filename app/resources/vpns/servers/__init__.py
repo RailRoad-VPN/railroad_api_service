@@ -61,7 +61,6 @@ class VPNServersAPI(ResourceAPI):
                                         limit=self.pagination.limit, offset=self.pagination.offset)
             resp = make_api_response(json.dumps(response_data.serialize()), HTTPStatus.OK)
             return resp
-
         elif suuid is not None:
             # specific server by uuid
             is_valid = check_uuid(suuid=suuid)
@@ -81,8 +80,7 @@ class VPNServersAPI(ResourceAPI):
                 resp = make_api_response(json.dumps(response_data.serialize()), e.http_code)
                 return resp
 
-            response_data = APIResponse(status=APIResponseStatus.success.value, code=HTTPStatus.OK, data=server,
-                                        limit=self.pagination.limit, offset=self.pagination.offset)
+            response_data = APIResponse(status=APIResponseStatus.success.value, code=HTTPStatus.OK, data=server)
             resp = make_api_response(json.dumps(response_data.serialize()), HTTPStatus.OK)
             return resp
         else:
