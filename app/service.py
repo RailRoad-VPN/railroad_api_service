@@ -227,34 +227,17 @@ class VPNService(object):
         return self._get_vpn_server(server=server)
 
     def _get_vpn_server(self, server: dict):
-        geo_position_id = server['geo_position_id']
-        server.pop("geo_position_id", None)
+        geo_position_id = server.pop("geo_position_id")
+        server.pop("created_date", None)
 
         api_response = self.geoposition_service.get_geopos_by_id(sid=geo_position_id)
         if api_response.status == APIResponseStatus.failed.value:
             return server
 
         geopos = api_response.data
-        city_id = geopos['city_id']
-        country_code = geopos['country_code']
-        state_code = geopos['state_code']
+        geopos.pop("id", None)
+        geopos.pop("created_date", None)
 
-        server['geo'] = {}
-
-        if city_id is not None:
-            api_response = self.geocity_service.get_geocity_by_id(sid=city_id)
-            city = api_response.data
-            city.pop("id", None)
-            city.pop("created_date", None)
-            server['geo']['city_name'] = city['name']
-
-        server['geo']['country_code'] = country_code
-
-        if state_code is not None:
-            api_response = self.geostate_service.get_geostate_by_code(code=state_code)
-            state = api_response.data
-            state.pop("id", None)
-            state.pop("created_date", None)
-            server['geo']['state'] = state
+        server['geo'] = geopos
 
         return server
