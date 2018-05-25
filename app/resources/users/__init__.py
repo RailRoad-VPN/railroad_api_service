@@ -35,8 +35,7 @@ class UserAPI(ResourceAPI):
         try:
             api_response = self._user_service.get_user(email=user_email)
         except APIException as e:
-            response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code, error=e.message,
-                                        error_code=e.code)
+            response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code, errors=e.errors)
             resp = make_api_response(json.dumps(response_data.serialize()), e.http_code)
             return resp
 
@@ -52,8 +51,7 @@ class UserAPI(ResourceAPI):
         try:
             api_response = self._user_service.create_user(user_json=request_json)
         except APIException as e:
-            response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code, error=e.message,
-                                        error_code=e.code)
+            response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code, errors=e.errors)
             resp = make_api_response(json.dumps(response_data.serialize()), e.http_code)
             return resp
 
@@ -83,8 +81,7 @@ class UserAPI(ResourceAPI):
         try:
             api_response = self._user_service.get_user(suuid=uuid)
         except APIException as e:
-            response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code, error=e.message,
-                                        error_code=e.code)
+            response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code, errors=e.errors)
             resp = make_api_response(json.dumps(response_data.serialize()), e.http_code)
             return resp
 
@@ -100,8 +97,7 @@ class UserAPI(ResourceAPI):
         try:
             api_response = self._user_service.update_user(user_json=request_json)
         except APIException as e:
-            response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code,
-                                        error=e.message, error_code=e.code)
+            response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code, errors=e.errors)
             resp = make_api_response(json.dumps(response_data.serialize()), e.http_code)
             return resp
 
@@ -146,8 +142,7 @@ class UserAPI(ResourceAPI):
         try:
             api_response = self._user_service.get_user(suuid=suuid, email=email)
         except APIException as e:
-            response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code, error=e.message,
-                                        error_code=e.code)
+            response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code, errors=e.errors)
             resp = make_api_response(json.dumps(response_data.serialize()), e.http_code)
             return resp
 

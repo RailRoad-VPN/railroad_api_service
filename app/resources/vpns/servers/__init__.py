@@ -29,7 +29,38 @@ class VPNServersAPI(ResourceAPI):
         super().__init__()
 
     def post(self) -> Response:
-        resp = make_api_response('', HTTPStatus.METHOD_NOT_ALLOWED)
+        request_json = request.json
+
+        if request_json is None:
+            error = RailRoadAPIError.REQUEST_NO_JSON.phrase
+            error_code = RailRoadAPIError.REQUEST_NO_JSON
+            developer_message = RailRoadAPIError.REQUEST_NO_JSON.description
+            http_code = HTTPStatus.BAD_REQUEST
+            response_data = APIResponse(status=APIResponseStatus.failed.value, code=http_code, error=error,
+                                        developer_message=developer_message, error_code=error_code)
+            return make_api_response(json.dumps(response_data.serialize()), http_code)
+
+        vpnserver_suuid = request_json.get('uuid', None)
+
+        is_valid_vpnserver = check_uuid(vpnserver_suuid)
+        if not is_valid_vpnserver:
+            error = RailRoadAPIError.VPNSERVER_IDENTIFIER_ERROR.phrase
+            error_code = RailRoadAPIError.VPNSERVER_IDENTIFIER_ERROR
+            developer_message = RailRoadAPIError.VPNSERVER_IDENTIFIER_ERROR.description
+            http_code = HTTPStatus.BAD_REQUEST
+            response_data = APIResponse(status=APIResponseStatus.failed.value, code=http_code, error=error,
+                                        developer_message=developer_message, error_code=error_code)
+            resp = make_api_response(json.dumps(response_data.serialize()), http_code)
+            return resp
+
+        try:
+            self._vpn_service.create_vpn_server(vpnserver=request_json)
+        except APIException as e:
+            response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code, errors=e.errors)
+            resp = make_api_response(json.dumps(response_data.serialize()), e.http_code)
+            return resp
+
+        resp = make_api_response('', HTTPStatus.NO_CONTENT)
         return resp
 
     def put(self, suuid: str) -> Response:
@@ -71,8 +102,7 @@ class VPNServersAPI(ResourceAPI):
         try:
             self._vpn_service.update_vpn_server(vpnserver=request_json)
         except APIException as e:
-            response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code,
-                                        error=e.message, error_code=e.code)
+            response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code, errors=e.errors)
             resp = make_api_response(json.dumps(response_data.serialize()), e.http_code)
             return resp
 
@@ -86,8 +116,7 @@ class VPNServersAPI(ResourceAPI):
             try:
                 server_list = self._vpn_service.get_vpn_server_list(pagination=self.pagination)
             except APIException as e:
-                response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code,
-                                            error=e.message, error_code=e.code)
+                response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code, errors=e.errors)
                 resp = make_api_response(json.dumps(response_data.serialize()), e.http_code)
                 return resp
 
@@ -109,8 +138,7 @@ class VPNServersAPI(ResourceAPI):
             try:
                 server = self._vpn_service.get_vpn_server(suuid=suuid)
             except APIException as e:
-                response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code,
-                                            error=e.message, error_code=e.code)
+                response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code, errors=e.errors)
                 resp = make_api_response(json.dumps(response_data.serialize()), e.http_code)
                 return resp
 

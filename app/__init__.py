@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 
 # Load the default configuration
-app.config.from_object('config.TestingConfig')
+app.config.from_object('config.DevelopmentConfig')
 
 # SERVICES
 vpnserver_service = VPNServersService(api_url=app.config['VPNC_SERVICE_URL'],

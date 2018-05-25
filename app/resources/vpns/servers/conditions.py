@@ -45,8 +45,7 @@ class VPNServerConditionsAPI(ResourceAPI):
             try:
                 server_list = self._vpn_service.get_vpn_server_condition_list(pagination=self.pagination)
             except APIException as e:
-                response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code,
-                                            error=e.message, error_code=e.code)
+                response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code, errors=e.errors)
                 resp = make_api_response(json.dumps(response_data.serialize()), e.http_code)
                 return resp
 
@@ -68,8 +67,7 @@ class VPNServerConditionsAPI(ResourceAPI):
             try:
                 server = self._vpn_service.get_vpn_server_condition(suuid=suuid)
             except APIException as e:
-                response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code,
-                                            error=e.message, error_code=e.code)
+                response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code, errors=e.errors)
                 resp = make_api_response(json.dumps(response_data.serialize()), e.http_code)
                 return resp
 

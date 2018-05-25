@@ -59,6 +59,10 @@ class VPNServersService(RESTService):
         api_response = self._put(url=url, data=vpnserver)
         return api_response
 
+    def create_vpnserver(self, vpnserver: dict):
+        api_response = self._post(data=vpnserver)
+        return api_response
+
 
 class VPNServersMetaService(RESTService):
     __version__ = 1
@@ -209,17 +213,20 @@ class VPNService(object):
         self.geocountry_service = geocountry_service
         self.geostate_service = geostate_service
 
-    def update_vpn_server(self, vpnserver):
+    def create_vpn_server(self, vpnserver: dict):
+        api_response = self.vpnserver_service.create_vpnserver(vpnserver=vpnserver)
+        if api_response.status == APIResponseStatus.failed.value:
+            raise APIException(http_code=api_response.code, errors=api_response.errors)
+
+    def update_vpn_server(self, vpnserver: dict):
         api_response = self.vpnserver_service.update_vpnserver(vpnserver=vpnserver)
         if api_response.status == APIResponseStatus.failed.value:
-            raise APIException(http_code=api_response.code, code=RailRoadAPIError.UNKNOWN_ERROR_CODE.value,
-                               message=RailRoadAPIError.UNKNOWN_ERROR_CODE.phrase)
+            raise APIException(http_code=api_response.code, errors=api_response.errors)
 
-    def get_vpn_server_list(self, pagination):
+    def get_vpn_server_list(self, pagination: ResourcePagination):
         api_response = self.vpnserver_service.get_vpnservers(pagination=pagination)
         if api_response.status == APIResponseStatus.failed.value:
-            raise APIException(http_code=api_response.code, code=RailRoadAPIError.UNKNOWN_ERROR_CODE.value,
-                               message=RailRoadAPIError.UNKNOWN_ERROR_CODE.phrase)
+            raise APIException(http_code=api_response.code, errors=api_response.errors)
         servers_list = []
         for server in api_response.data:
             server_repr = self._get_vpn_server(server=server)
@@ -227,11 +234,10 @@ class VPNService(object):
 
         return servers_list
 
-    def get_vpn_server_condition_list(self, pagination):
+    def get_vpn_server_condition_list(self, pagination: ResourcePagination):
         api_response = self.vpnserver_service.get_vpnservers(pagination=pagination)
         if api_response.status == APIResponseStatus.failed.value:
-            raise APIException(http_code=api_response.code, code=RailRoadAPIError.UNKNOWN_ERROR_CODE.value,
-                               message=RailRoadAPIError.UNKNOWN_ERROR_CODE.phrase)
+            raise APIException(http_code=api_response.code, errors=api_response.errors)
         servers_list = []
         for server in api_response.data:
             server = self._get_vpn_server_condition(server=server)
@@ -242,8 +248,7 @@ class VPNService(object):
     def get_vpn_server_condition(self, suuid: str):
         api_response = self.vpnserver_service.get_vpnserver_by_uuid(suuid=suuid)
         if api_response.status == APIResponseStatus.failed.value:
-            raise APIException(http_code=api_response.code, code=RailRoadAPIError.UNKNOWN_ERROR_CODE.value,
-                               message=RailRoadAPIError.UNKNOWN_ERROR_CODE.phrase)
+            raise APIException(http_code=api_response.code, errors=api_response.errors)
 
         server = api_response.data
 
@@ -257,8 +262,7 @@ class VPNService(object):
     def get_vpn_server(self, suuid: str):
         api_response = self.vpnserver_service.get_vpnserver_by_uuid(suuid=suuid)
         if api_response.status == APIResponseStatus.failed.value:
-            raise APIException(http_code=api_response.code, code=RailRoadAPIError.UNKNOWN_ERROR_CODE.value,
-                               message=RailRoadAPIError.UNKNOWN_ERROR_CODE.phrase)
+            raise APIException(http_code=api_response.code, errors=api_response.errors)
 
         server = api_response.data
 
