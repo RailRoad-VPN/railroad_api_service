@@ -1,12 +1,10 @@
 import json
 import sys
 
-from enum import Enum
 from http import HTTPStatus
 
 from flask import Response, request
 
-from app import *
 from app.exception import RailRoadAPIError
 
 from app.service import VPNService
@@ -16,11 +14,6 @@ from rest import APIException
 from api import ResourceAPI
 from response import APIResponseStatus, APIResponse
 from utils import check_uuid, make_api_response
-
-
-class VPNServerConditionsRepr(Enum):
-    list = 'list'
-    map = 'map'
 
 
 class VPNServerConditionsAPI(ResourceAPI):
