@@ -227,59 +227,34 @@ class VPNService(object):
         return self._get_vpn_server(server=server)
 
     def _get_vpn_server(self, server: dict):
-        uuid = server['uuid']
-        version = server['version']
-        state_version = server['state_version']
-        bandwidth = server['bandwidth']
-        load = server['load']
-
-        vpntype_id = server['type_id']
-        vpnstatus_id = server['status_id']
         geo_position_id = server['geo_position_id']
-
-        server_repr = {
-            'uuid': uuid,
-            'version': version,
-            'state_version': state_version,
-            'load': load,
-            'bandwidth': bandwidth,
-            'geo': {
-                'id': geo_position_id,
-            }
-        }
-
-        api_response = self.vpntype_service.get_vpntype_by_id(sid=vpntype_id)
-        if api_response.status == APIResponseStatus.success.value:
-            vpntype = api_response.data
-            server_repr['type'] = vpntype,
-
-        api_response = self.vpnserverstatus_service.get_vpnserverstatuse_by_id(sid=vpnstatus_id)
-        if api_response.status == APIResponseStatus.success.value:
-            vpnstatus = api_response.data
-            server_repr['status'] = vpnstatus,
+        server.pop("geo_position_id", None)
 
         api_response = self.geoposition_service.get_geopos_by_id(sid=geo_position_id)
         if api_response.status == APIResponseStatus.failed.value:
-            return server_repr
+            return server
 
         geopos = api_response.data
         city_id = geopos['city_id']
         country_code = geopos['country_code']
         state_code = geopos['state_code']
 
+        server['geo'] = {}
+
         if city_id is not None:
             api_response = self.geocity_service.get_geocity_by_id(sid=city_id)
             city = api_response.data
-            server_repr['geo']['city'] = city
+            city.pop("id", None)
+            city.pop("created_date", None)
+            server['geo']['city_name'] = city['name']
 
-        if country_code is not None:
-            api_response = self.geocountry_service.get_geocountry_by_code(code=country_code)
-            country = api_response.data
-            server_repr['geo']['country'] = country
+        server['geo']['country_code'] = country_code
 
         if state_code is not None:
             api_response = self.geostate_service.get_geostate_by_code(code=state_code)
             state = api_response.data
-            server_repr['geo']['state'] = state
+            state.pop("id", None)
+            state.pop("created_date", None)
+            server['geo']['state'] = state
 
-        return server_repr
+        return server
