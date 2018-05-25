@@ -241,7 +241,6 @@ class VPNService(object):
     def _get_vpn_server_condition(self, server: dict):
         server.pop("geo_position_id", None)
         server.pop("type_id", None)
-        server.pop("created_date", None)
         return server
 
     def get_vpn_server(self, suuid: str):
@@ -256,7 +255,6 @@ class VPNService(object):
 
     def _get_vpn_server(self, server: dict):
         geo_position_id = server.pop("geo_position_id")
-        server.pop("created_date", None)
 
         api_response = self.geoposition_service.get_geopos_by_id(sid=geo_position_id)
         if api_response.status == APIResponseStatus.failed.value:
@@ -264,7 +262,6 @@ class VPNService(object):
 
         geopos = api_response.data
         geopos.pop("id", None)
-        geopos.pop("created_date", None)
 
         server['geo'] = geopos
 
