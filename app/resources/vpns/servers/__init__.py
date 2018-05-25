@@ -32,8 +32,51 @@ class VPNServersAPI(ResourceAPI):
         resp = make_api_response('', HTTPStatus.METHOD_NOT_ALLOWED)
         return resp
 
-    def put(self) -> Response:
-        resp = make_api_response('', HTTPStatus.METHOD_NOT_ALLOWED)
+    def put(self, suuid: str) -> Response:
+        request_json = request.json
+
+        if request_json is None:
+            error = RailRoadAPIError.REQUEST_NO_JSON.phrase
+            error_code = RailRoadAPIError.REQUEST_NO_JSON
+            developer_message = RailRoadAPIError.REQUEST_NO_JSON.description
+            http_code = HTTPStatus.BAD_REQUEST
+            response_data = APIResponse(status=APIResponseStatus.failed.value, code=http_code, error=error,
+                                        developer_message=developer_message, error_code=error_code)
+            return make_api_response(json.dumps(response_data.serialize()), http_code)
+
+        vpnserver_suuid = request_json.get('uuid', None)
+
+        is_valid_suuid = check_uuid(suuid)
+        is_valid_vpnserver_suuid = check_uuid(vpnserver_suuid)
+        if not is_valid_suuid or not is_valid_vpnserver_suuid:
+            error = RailRoadAPIError.VPNSERVER_IDENTIFIER_ERROR.phrase
+            error_code = RailRoadAPIError.VPNSERVER_IDENTIFIER_ERROR
+            developer_message = RailRoadAPIError.VPNSERVER_IDENTIFIER_ERROR.description
+            http_code = HTTPStatus.BAD_REQUEST
+            response_data = APIResponse(status=APIResponseStatus.failed.value, code=http_code, error=error,
+                                        developer_message=developer_message, error_code=error_code)
+            resp = make_api_response(json.dumps(response_data.serialize()), http_code)
+            return resp
+
+        if suuid != vpnserver_suuid:
+            error = RailRoadAPIError.VPNSERVER_IDENTIFIER_ERROR.phrase
+            error_code = RailRoadAPIError.VPNSERVER_IDENTIFIER_ERROR
+            developer_message = RailRoadAPIError.VPNSERVER_IDENTIFIER_ERROR.description
+            http_code = HTTPStatus.BAD_REQUEST
+            response_data = APIResponse(status=APIResponseStatus.failed.value, code=http_code, error=error,
+                                        developer_message=developer_message, error_code=error_code)
+            resp = make_api_response(json.dumps(response_data.serialize()), http_code)
+            return resp
+
+        try:
+            self._vpn_service.update_vpn_server(vpnserver=request_json)
+        except APIException as e:
+            response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code,
+                                        error=e.message, error_code=e.code)
+            resp = make_api_response(json.dumps(response_data.serialize()), e.http_code)
+            return resp
+
+        resp = make_api_response('', HTTPStatus.NO_CONTENT)
         return resp
 
     def get(self, suuid: str = None) -> Response:

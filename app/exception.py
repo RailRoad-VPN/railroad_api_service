@@ -19,3 +19,7 @@ class RailRoadAPIError(IntEnum):
     USER_NOT_EXIST = (4, 'USER_NOT_EXIST phrase', 'USER_NOT_EXIST description')
 
     BAD_SERVER_IDENTITY = (5, 'BAD_SERVER_IDENTITY phrase', 'BAD_SERVER_IDENTITY description')
+
+    REQUEST_NO_JSON = (6, 'REQUEST_NO_JSON phrase', 'REQUEST_NO_JSON description')
+
+    VPNSERVER_IDENTIFIER_ERROR = (7, 'VPNSERVER_IDENTIFIER_ERROR phrase', 'VPNSERVER_IDENTIFIER_ERROR description')

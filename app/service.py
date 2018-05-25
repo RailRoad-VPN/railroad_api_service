@@ -54,6 +54,11 @@ class VPNServersService(RESTService):
         api_response = self._get(url=url)
         return api_response
 
+    def update_vpnserver(self, vpnserver: dict):
+        url = '%s/%s' % (self._url, vpnserver['uuid'])
+        api_response = self._put(url=url, data=vpnserver)
+        return api_response
+
 
 class VPNServersMetaService(RESTService):
     __version__ = 1
@@ -203,6 +208,12 @@ class VPNService(object):
         self.geocity_service = geocity_service
         self.geocountry_service = geocountry_service
         self.geostate_service = geostate_service
+
+    def update_vpn_server(self, vpnserver):
+        api_response = self.vpnserver_service.update_vpnserver(vpnserver=vpnserver)
+        if api_response.status == APIResponseStatus.failed.value:
+            raise APIException(http_code=api_response.code, code=RailRoadAPIError.UNKNOWN_ERROR_CODE.value,
+                               message=RailRoadAPIError.UNKNOWN_ERROR_CODE.phrase)
 
     def get_vpn_server_list(self, pagination):
         api_response = self.vpnserver_service.get_vpnservers(pagination=pagination)
