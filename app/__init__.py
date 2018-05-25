@@ -6,15 +6,15 @@ from flask import Flask
 from app.resources.users import UserAPI
 from app.resources.vpns.servers import VPNServersAPI
 from app.resources.vpns.servers.meta import VPNServersMetaAPI
+from app.resources.vpns.servers.conditions import VPNServerConditionsAPI
 from app.service import *
-from vpns.servers.conditions import VPNServerConditionsAPI
 
 logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 
 # Load the default configuration
-app.config.from_object('config.TestingConfig')
+app.config.from_object('config.DevelopmentConfig')
 
 # SERVICES
 vpnserver_service = VPNServersService(api_url=app.config['VPNC_SERVICE_URL'],
