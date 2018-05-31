@@ -7,6 +7,7 @@ from app.resources.users import UserAPI
 from app.resources.vpns.servers import VPNServersAPI
 from app.resources.vpns.servers.conditions import VPNServerConditionsAPI
 from app.resources.vpns.servers.meta import VPNServersMetaAPI
+from app.resources.vpns.servers.configurations import VPNServersConfigurationsAPI
 from app.service import *
 
 logging.basicConfig(level=logging.DEBUG)
@@ -14,7 +15,7 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 
 # Load the default configuration
-app.config.from_object('config.TestingConfig')
+app.config.from_object('config.DevelopmentConfig')
 
 # SERVICES
 vpnserver_service = VPNServersService(api_url=app.config['VPNC_SERVICE_URL'],
@@ -27,8 +28,7 @@ vpntype_service = VPNTypeService(api_url=app.config['VPNC_SERVICE_URL'],
                                  resource_name=app.config['VPNC_SERVICE_VPNTYPE_RESOURCE_NAME'])
 
 vpnserverconfiguration_service = VPNServerConfigurationService(api_url=app.config['VPNC_SERVICE_URL'],
-                                                               resource_name=app.config[
-                                                                   'VPNC_SERVICE_VPNSERVERCONFIGURATION_RESOURCE_NAME'])
+                                                               resource_name=app.config['VPNC_SERVICE_VPNSERVERCONFIGURATION_RESOURCE_NAME'])
 vpnserverstatus_service = VPNServerStatusService(api_url=app.config['VPNC_SERVICE_URL'],
                                                  resource_name=app.config['VPNC_SERVICE_VPNSERVERSTATUS_RESOURCE_NAME'])
 
@@ -83,7 +83,11 @@ app.add_url_rule('%s/%s/type/<int:type_id>' % (app.config['API_BASE_URI'], VPNSe
                  view_func=vpnc_api_view_func, methods=['GET'])
 app.add_url_rule('%s/%s/<string:suuid>' % (app.config['API_BASE_URI'], VPNServersAPI.__api_url__),
                  view_func=vpnc_api_view_func, methods=['GET', 'PUT'])
-app.add_url_rule('%s/%s/<string:suuid>/configuration' % (app.config['API_BASE_URI'], VPNServersAPI.__api_url__),
-                 view_func=vpnc_api_view_func, methods=['GET'])
+
+
+vpnserversconfigurations_api_view_func = VPNServersConfigurationsAPI.as_view('vpnserversconfigurations_api',
+                                                                             vpnserverconfiguration_service, app.config)
+app.add_url_rule('%s/%s' % (app.config['API_BASE_URI'], VPNServersConfigurationsAPI.__api_url__),
+                 view_func=vpnserversconfigurations_api_view_func, methods=['GET'])
 
 pprint(app.url_map._rules_by_endpoint)

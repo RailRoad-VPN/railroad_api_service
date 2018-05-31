@@ -307,8 +307,13 @@ class VPNService(object):
 
         return self._get_vpn_server(server=server)
 
-    def get_vpn_server_configuration(self, suuid: str):
-        api_response = self.vpnserverconfiguration_service.get_vpnserverconfig(suuid=suuid)
+    def get_vpn_server_configuration(self, server_uuid: str, user_uuid: str = None):
+        api_response = self.vpnserverconfiguration_service.get_vpnserverconfig(server_uuid=server_uuid,
+                                                                               user_uuid=user_uuid)
+        if api_response.status == APIResponseStatus.failed.value:
+            raise APIException(http_code=api_response.code, errors=api_response.errors)
+
+        return api_response.data
 
     def _get_vpn_server(self, server: dict):
         geo_position_id = server.pop("geo_position_id")
