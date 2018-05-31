@@ -113,8 +113,9 @@ class VPNServerConfigurationService(RESTService):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def get_vpnserverconfig(self):
-        api_response = self._get()
+    def get_vpnserverconfig(self, server_uuid: str, user_uuid: str = None):
+        url = '%s/%s/configurations/user/%s' % (self._url, server_uuid, user_uuid)
+        api_response = self._get(url=url)
         return api_response
 
     def get_vpnserverconfig_by_uuid(self, suuid):
@@ -305,6 +306,9 @@ class VPNService(object):
         server = api_response.data
 
         return self._get_vpn_server(server=server)
+
+    def get_vpn_server_configuration(self, suuid: str):
+        api_response = self.vpnserverconfiguration_service.get_vpnserverconfig(suuid=suuid)
 
     def _get_vpn_server(self, server: dict):
         geo_position_id = server.pop("geo_position_id")

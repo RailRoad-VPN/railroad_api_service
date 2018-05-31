@@ -5,8 +5,8 @@ from flask import Flask
 
 from app.resources.users import UserAPI
 from app.resources.vpns.servers import VPNServersAPI
-from app.resources.vpns.servers.meta import VPNServersMetaAPI
 from app.resources.vpns.servers.conditions import VPNServerConditionsAPI
+from app.resources.vpns.servers.meta import VPNServersMetaAPI
 from app.service import *
 
 logging.basicConfig(level=logging.DEBUG)
@@ -83,5 +83,7 @@ app.add_url_rule('%s/%s/type/<int:type_id>' % (app.config['API_BASE_URI'], VPNSe
                  view_func=vpnc_api_view_func, methods=['GET'])
 app.add_url_rule('%s/%s/<string:suuid>' % (app.config['API_BASE_URI'], VPNServersAPI.__api_url__),
                  view_func=vpnc_api_view_func, methods=['GET', 'PUT'])
+app.add_url_rule('%s/%s/<string:suuid>/configuration' % (app.config['API_BASE_URI'], VPNServersAPI.__api_url__),
+                 view_func=vpnc_api_view_func, methods=['GET'])
 
 pprint(app.url_map._rules_by_endpoint)

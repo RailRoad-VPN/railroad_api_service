@@ -125,7 +125,6 @@ class VPNServersAPI(ResourceAPI):
             resp = make_api_response(json.dumps(response_data.serialize()), HTTPStatus.OK)
             return resp
         elif suuid is not None:
-            # specific server by uuid
             is_valid = check_uuid(suuid=suuid)
             if not is_valid:
                 code = HTTPStatus.NOT_FOUND
@@ -135,16 +134,31 @@ class VPNServersAPI(ResourceAPI):
                 resp = make_api_response(json.dumps(response_data.serialize()), code)
                 return resp
 
+            is_conf = request.args.get('configuration', None)
+            if is_conf is not None:
+                # configuration of specific server
+                try:
+                    server_configuration = self._vpn_service.get_vpn_server_configuration(suuid=suuid)
+                    response_data = APIResponse(status=APIResponseStatus.success.value, code=HTTPStatus.OK,
+                                                data=server_configuration)
+                    resp = make_api_response(json.dumps(response_data.serialize()), HTTPStatus.OK)
+                    return resp
+                except APIException as e:
+                    response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code,
+                                                errors=e.errors)
+                    resp = make_api_response(json.dumps(response_data.serialize()), e.http_code)
+                    return resp
+
+            # specific server by uuid
             try:
                 server = self._vpn_service.get_vpn_server(suuid=suuid)
+                response_data = APIResponse(status=APIResponseStatus.success.value, code=HTTPStatus.OK, data=server)
+                resp = make_api_response(json.dumps(response_data.serialize()), HTTPStatus.OK)
+                return resp
             except APIException as e:
                 response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code, errors=e.errors)
                 resp = make_api_response(json.dumps(response_data.serialize()), e.http_code)
                 return resp
-
-            response_data = APIResponse(status=APIResponseStatus.success.value, code=HTTPStatus.OK, data=server)
-            resp = make_api_response(json.dumps(response_data.serialize()), HTTPStatus.OK)
-            return resp
         elif type_id is not None:
             # list of servers by specific type id
             try:
