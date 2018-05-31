@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 
 # Load the default configuration
-app.config.from_object('config.TestingConfig')
+app.config.from_object('config.DevelopmentConfig')
 
 # SERVICES
 vpnserver_service = VPNServersService(api_url=app.config['VPNC_SERVICE_URL'],
@@ -77,7 +77,9 @@ app.add_url_rule('%s/%s/<string:suuid>' % (app.config['API_BASE_URI'], VPNServer
 vpnc_api_view_func = VPNServersAPI.as_view('vpnc_api', vpn_service, app.config)
 app.add_url_rule('%s/%s' % (app.config['API_BASE_URI'], VPNServersAPI.__api_url__), view_func=vpnc_api_view_func,
                  methods=['GET'])
-app.add_url_rule('%s/%s/status/<string:status>' % (app.config['API_BASE_URI'], VPNServersAPI.__api_url__),
+app.add_url_rule('%s/%s/status/<int:status_id>' % (app.config['API_BASE_URI'], VPNServersAPI.__api_url__),
+                 view_func=vpnc_api_view_func, methods=['GET'])
+app.add_url_rule('%s/%s/type/<int:type_id>' % (app.config['API_BASE_URI'], VPNServersAPI.__api_url__),
                  view_func=vpnc_api_view_func, methods=['GET'])
 app.add_url_rule('%s/%s/<string:suuid>' % (app.config['API_BASE_URI'], VPNServersAPI.__api_url__),
                  view_func=vpnc_api_view_func, methods=['GET', 'PUT'])

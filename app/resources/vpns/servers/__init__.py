@@ -109,9 +109,9 @@ class VPNServersAPI(ResourceAPI):
         resp = make_api_response('', HTTPStatus.NO_CONTENT)
         return resp
 
-    def get(self, suuid: str = None) -> Response:
+    def get(self, suuid: str = None, type_id: int = None, status_id: int = None) -> Response:
         super(VPNServersAPI, self).get(req=request)
-        if suuid is None:
+        if suuid is None and type_id is None and status_id is None:
             # list of all servers
             try:
                 server_list = self._vpn_service.get_vpn_server_list(pagination=self.pagination)
@@ -143,6 +143,32 @@ class VPNServersAPI(ResourceAPI):
                 return resp
 
             response_data = APIResponse(status=APIResponseStatus.success.value, code=HTTPStatus.OK, data=server)
+            resp = make_api_response(json.dumps(response_data.serialize()), HTTPStatus.OK)
+            return resp
+        elif type_id is not None:
+            # list of servers by specific type id
+            try:
+                server_list = self._vpn_service.get_vpn_server_list_by_type(type_id=type_id, pagination=self.pagination)
+            except APIException as e:
+                response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code, errors=e.errors)
+                resp = make_api_response(json.dumps(response_data.serialize()), e.http_code)
+                return resp
+
+            response_data = APIResponse(status=APIResponseStatus.success.value, code=HTTPStatus.OK, data=server_list,
+                                        limit=self.pagination.limit, offset=self.pagination.offset)
+            resp = make_api_response(json.dumps(response_data.serialize()), HTTPStatus.OK)
+            return resp
+        elif status_id is not None:
+            # list of servers by specific status id
+            try:
+                server_list = self._vpn_service.get_vpn_server_list(pagination=self.pagination)
+            except APIException as e:
+                response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code, errors=e.errors)
+                resp = make_api_response(json.dumps(response_data.serialize()), e.http_code)
+                return resp
+
+            response_data = APIResponse(status=APIResponseStatus.success.value, code=HTTPStatus.OK, data=server_list,
+                                        limit=self.pagination.limit, offset=self.pagination.offset)
             resp = make_api_response(json.dumps(response_data.serialize()), HTTPStatus.OK)
             return resp
         else:
