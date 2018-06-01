@@ -4,7 +4,7 @@ from http import HTTPStatus
 
 from flask import Response
 
-from app.service import VPNServersMetaService
+from app.service import VPNServersMetaAPIService
 
 sys.path.insert(0, '../rest_api_library')
 from api import ResourceAPI
@@ -21,7 +21,7 @@ class VPNServersMetaAPI(ResourceAPI):
 
     vpnserversmeta_service = None
 
-    def __init__(self, vpnserversmeta_service: VPNServersMetaService, config: dict) -> None:
+    def __init__(self, vpnserversmeta_service: VPNServersMetaAPIService, config: dict) -> None:
         super().__init__()
         self.vpnserversmeta_service = vpnserversmeta_service
 

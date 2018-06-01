@@ -6,8 +6,8 @@ from flask import Flask
 from app.resources.users import UserAPI
 from app.resources.vpns.servers import VPNServersAPI
 from app.resources.vpns.servers.conditions import VPNServerConditionsAPI
-from app.resources.vpns.servers.meta import VPNServersMetaAPI
 from app.resources.vpns.servers.configurations import VPNServersConfigurationsAPI
+from app.resources.vpns.servers.meta import VPNServersMetaAPI
 from app.service import *
 
 logging.basicConfig(level=logging.DEBUG)
@@ -15,37 +15,38 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 
 # Load the default configuration
-app.config.from_object('config.TestingConfig')
+app.config.from_object('config.DevelopmentConfig')
 
 # SERVICES
-vpnserver_service = VPNServersService(api_url=app.config['VPNC_SERVICE_URL'],
-                                      resource_name=app.config['VPNC_SERVICE_VPNSERVER_RESOURCE_NAME'])
+vpnserver_service = VPNServersAPIService(api_url=app.config['VPNC_SERVICE_URL'],
+                                         resource_name=app.config['VPNC_SERVICE_VPNSERVER_RESOURCE_NAME'])
 
-vpnserversmeta_service = VPNServersMetaService(api_url=app.config['VPNC_SERVICE_URL'],
-                                               resource_name=app.config['VPNC_SERVICE_VPNSERVERSMETA_RESOURCE_NAME'])
+vpnserversmeta_service = VPNServersMetaAPIService(api_url=app.config['VPNC_SERVICE_URL'],
+                                                  resource_name=app.config['VPNC_SERVICE_VPNSERVERSMETA_RESOURCE_NAME'])
 
-vpntype_service = VPNTypeService(api_url=app.config['VPNC_SERVICE_URL'],
-                                 resource_name=app.config['VPNC_SERVICE_VPNTYPE_RESOURCE_NAME'])
+vpntype_service = VPNTypeAPIService(api_url=app.config['VPNC_SERVICE_URL'],
+                                    resource_name=app.config['VPNC_SERVICE_VPNTYPE_RESOURCE_NAME'])
 
-vpnserverconfiguration_service = VPNServerConfigurationService(api_url=app.config['VPNC_SERVICE_URL'],
-                                                               resource_name=app.config['VPNC_SERVICE_VPNSERVERCONFIGURATION_RESOURCE_NAME'])
-vpnserverstatus_service = VPNServerStatusService(api_url=app.config['VPNC_SERVICE_URL'],
-                                                 resource_name=app.config['VPNC_SERVICE_VPNSERVERSTATUS_RESOURCE_NAME'])
+vpnserverconfiguration_service = VPNServerConfigurationAPIService(api_url=app.config['VPNC_SERVICE_URL'],
+                                                                  resource_name=app.config[
+                                                                   'VPNC_SERVICE_VPNSERVERCONFIGURATION_RESOURCE_NAME'])
+vpnserverstatus_service = VPNServerStatusAPIService(api_url=app.config['VPNC_SERVICE_URL'],
+                                                    resource_name=app.config['VPNC_SERVICE_VPNSERVERSTATUS_RESOURCE_NAME'])
 
-geoposition_service = GeoPositionService(api_url=app.config['VPNC_SERVICE_URL'],
-                                         resource_name=app.config['VPNC_SERVICE_GEOPOSITION_RESOURCE_NAME'])
+geoposition_service = GeoPositionAPIService(api_url=app.config['VPNC_SERVICE_URL'],
+                                            resource_name=app.config['VPNC_SERVICE_GEOPOSITION_RESOURCE_NAME'])
 
-geocity_service = GeoCityService(api_url=app.config['VPNC_SERVICE_URL'],
-                                 resource_name=app.config['VPNC_SERVICE_GEOCITY_RESOURCE_NAME'])
+geocity_service = GeoCityAPIService(api_url=app.config['VPNC_SERVICE_URL'],
+                                    resource_name=app.config['VPNC_SERVICE_GEOCITY_RESOURCE_NAME'])
 
-geocountry_service = GeoCountryService(api_url=app.config['VPNC_SERVICE_URL'],
-                                       resource_name=app.config['VPNC_SERVICE_GEOCOUNTRY_RESOURCE_NAME'])
+geocountry_service = GeoCountryAPIService(api_url=app.config['VPNC_SERVICE_URL'],
+                                          resource_name=app.config['VPNC_SERVICE_GEOCOUNTRY_RESOURCE_NAME'])
 
-geostate_service = GeoStateService(api_url=app.config['VPNC_SERVICE_URL'],
-                                   resource_name=app.config['VPNC_SERVICE_GEOSTATE_RESOURCE_NAME'])
+geostate_service = GeoStateAPIService(api_url=app.config['VPNC_SERVICE_URL'],
+                                      resource_name=app.config['VPNC_SERVICE_GEOSTATE_RESOURCE_NAME'])
 
-user_service = UserService(api_url=app.config['AUTH_SERVICE_URL'],
-                           resource_name=app.config['AUTH_SERVICE_USERS_RESOURCE_NAME'])
+user_service = UserAPIService(api_url=app.config['AUTH_SERVICE_URL'],
+                              resource_name=app.config['AUTH_SERVICE_USERS_RESOURCE_NAME'])
 
 vpn_service = VPNService(vpnserver_service=vpnserver_service, vpntype_service=vpntype_service,
                          vpnserverconfiguration_service=vpnserverconfiguration_service,
@@ -84,7 +85,7 @@ app.add_url_rule('%s/%s/type/<int:type_id>' % (app.config['API_BASE_URI'], VPNSe
 app.add_url_rule('%s/%s/<string:suuid>' % (app.config['API_BASE_URI'], VPNServersAPI.__api_url__),
                  view_func=vpnc_api_view_func, methods=['GET', 'PUT'])
 
-
+# VPNC Configurations API
 vpnserversconfigurations_api_view_func = VPNServersConfigurationsAPI.as_view('vpnserversconfigurations_api',
                                                                              vpnserverconfiguration_service, app.config)
 app.add_url_rule('%s/%s' % (app.config['API_BASE_URI'], VPNServersConfigurationsAPI.__api_url__),

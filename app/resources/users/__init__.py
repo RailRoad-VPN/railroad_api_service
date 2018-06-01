@@ -5,7 +5,7 @@ from http import HTTPStatus
 from flask import request, Response
 
 from app.exception import RailRoadAPIError
-from app.service import UserService
+from app.service import UserAPIService
 
 sys.path.insert(0, '../rest_api_library')
 from utils import check_uuid, make_api_response
@@ -22,7 +22,7 @@ class UserAPI(ResourceAPI):
     _config = None
     _user_service = None
 
-    def __init__(self, user_service: UserService, config: dict) -> None:
+    def __init__(self, user_service: UserAPIService, config: dict) -> None:
         super().__init__()
         self._config = config
         self._user_service = user_service

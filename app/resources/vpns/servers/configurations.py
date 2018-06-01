@@ -4,7 +4,7 @@ from http import HTTPStatus
 
 from flask import Response
 
-from app.service import VPNServerConfigurationService
+from app.service import VPNServerConfigurationAPIService
 from rest import APIException
 
 sys.path.insert(0, '../rest_api_library')
@@ -22,7 +22,7 @@ class VPNServersConfigurationsAPI(ResourceAPI):
 
     vpnserversconfigurations_service = None
 
-    def __init__(self, vpnserversconfigurations_service: VPNServerConfigurationService, config: dict) -> None:
+    def __init__(self, vpnserversconfigurations_service: VPNServerConfigurationAPIService, config: dict) -> None:
         super().__init__()
         self.vpnserversconfigurations_service = vpnserversconfigurations_service
 

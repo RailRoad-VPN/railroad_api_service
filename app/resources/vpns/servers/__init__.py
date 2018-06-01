@@ -111,6 +111,19 @@ class VPNServersAPI(ResourceAPI):
 
     def get(self, suuid: str = None, type_id: int = None, status_id: int = None) -> Response:
         super(VPNServersAPI, self).get(req=request)
+
+        is_get_random = request.args.get('random', None)
+        if is_get_random is not None:
+            try:
+                server_uuid = self._vpn_service.get_random_vpn_server(type_id=type_id, status_id=status_id)
+                resp = make_api_response('', HTTPStatus.OK)
+                resp.headers['Location'] = '%s/%s/%s' % (self._config['API_BASE_URI'], self.__api_url__, server_uuid)
+                return resp
+            except APIException as e:
+                response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code, errors=e.errors)
+                resp = make_api_response(json.dumps(response_data.serialize()), e.http_code)
+                return resp
+
         if suuid is None and type_id is None and status_id is None:
             # list of all servers
             try:

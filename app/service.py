@@ -6,7 +6,7 @@ from response import APIResponse, APIResponseStatus
 from api import ResourcePagination
 
 
-class UserService(RESTService):
+class UserAPIService(RESTService):
     __version__ = 1
 
     def __init__(self, **kwargs):
@@ -33,14 +33,14 @@ class UserService(RESTService):
         return api_response
 
 
-class VPNServersService(RESTService):
+class VPNServersAPIService(RESTService):
     __version__ = 1
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def get_vpnservers(self, pagination: ResourcePagination):
-        if pagination.is_paginated:
+    def get_vpnservers(self, pagination: ResourcePagination = None):
+        if pagination is not None and pagination.is_paginated:
             url = self._build_url_pagination(limit=pagination.limit, offset=pagination.offset)
             api_response = self._get(url=url)
         else:
@@ -80,7 +80,7 @@ class VPNServersService(RESTService):
         return api_response
 
 
-class VPNServersMetaService(RESTService):
+class VPNServersMetaAPIService(RESTService):
     __version__ = 1
 
     def __init__(self, **kwargs):
@@ -91,7 +91,7 @@ class VPNServersMetaService(RESTService):
         return api_response
 
 
-class VPNTypeService(RESTService):
+class VPNTypeAPIService(RESTService):
     __version__ = 1
 
     def __init__(self, **kwargs):
@@ -107,7 +107,7 @@ class VPNTypeService(RESTService):
         return api_response
 
 
-class VPNServerConfigurationService(RESTService):
+class VPNServerConfigurationAPIService(RESTService):
     __version__ = 1
 
     def __init__(self, **kwargs):
@@ -124,7 +124,7 @@ class VPNServerConfigurationService(RESTService):
         return api_response
 
 
-class VPNServerStatusService(RESTService):
+class VPNServerStatusAPIService(RESTService):
     __version__ = 1
 
     def __init__(self, **kwargs):
@@ -140,7 +140,7 @@ class VPNServerStatusService(RESTService):
         return api_response
 
 
-class GeoPositionService(RESTService):
+class GeoPositionAPIService(RESTService):
     __version__ = 1
 
     def __init__(self, **kwargs):
@@ -156,7 +156,7 @@ class GeoPositionService(RESTService):
         return api_response
 
 
-class GeoCityService(RESTService):
+class GeoCityAPIService(RESTService):
     __version__ = 1
 
     def __init__(self, **kwargs):
@@ -172,7 +172,7 @@ class GeoCityService(RESTService):
         return api_response
 
 
-class GeoCountryService(RESTService):
+class GeoCountryAPIService(RESTService):
     __version__ = 1
 
     def __init__(self, **kwargs):
@@ -188,7 +188,7 @@ class GeoCountryService(RESTService):
         return api_response
 
 
-class GeoStateService(RESTService):
+class GeoStateAPIService(RESTService):
     __version__ = 1
 
     def __init__(self, **kwargs):
@@ -216,11 +216,11 @@ class VPNService(object):
     geocountry_service = None
     geostate_service = None
 
-    def __init__(self, vpnserver_service: VPNServersService, vpntype_service: VPNTypeService,
-                 vpnserverconfiguration_service: VPNServerConfigurationService,
-                 vpnserverstatus_service: VPNServerStatusService, geoposition_service: GeoPositionService,
-                 geocity_service: GeoCityService, geocountry_service: GeoCountryService,
-                 geostate_service: GeoStateService):
+    def __init__(self, vpnserver_service: VPNServersAPIService, vpntype_service: VPNTypeAPIService,
+                 vpnserverconfiguration_service: VPNServerConfigurationAPIService,
+                 vpnserverstatus_service: VPNServerStatusAPIService, geoposition_service: GeoPositionAPIService,
+                 geocity_service: GeoCityAPIService, geocountry_service: GeoCountryAPIService,
+                 geostate_service: GeoStateAPIService):
         self.vpnserver_service = vpnserver_service
         self.vpntype_service = vpntype_service
         self.vpnserverconfiguration_service = vpnserverconfiguration_service
@@ -240,7 +240,26 @@ class VPNService(object):
         if api_response.status == APIResponseStatus.failed.value:
             raise APIException(http_code=api_response.code, errors=api_response.errors)
 
-    def get_vpn_server_list(self, pagination: ResourcePagination):
+    def get_random_vpn_server(self, type_id: int = None, status_id: int = None):
+        # TODO some logic to get random VPN server
+
+        pagination = ResourcePagination(limit=1, offset=0)
+
+        if type_id is not None:
+            api_response = self.vpnserver_service.get_vpnservers_by_type(type_id=type_id, pagination=pagination)
+        elif status_id is not None:
+            api_response = self.vpnserver_service.get_vpnservers_by_status(status_id=status_id, pagination=pagination)
+        else:
+            api_response = self.vpnserver_service.get_vpnservers(pagination=pagination)
+
+        if api_response.status == APIResponseStatus.failed.value:
+            raise APIException(http_code=api_response.code, errors=api_response.errors)
+
+        server = api_response.data[0]
+
+        return server['uuid']
+
+    def get_vpn_server_list(self, pagination: ResourcePagination = None):
         api_response = self.vpnserver_service.get_vpnservers(pagination=pagination)
         if api_response.status == APIResponseStatus.failed.value:
             raise APIException(http_code=api_response.code, errors=api_response.errors)
