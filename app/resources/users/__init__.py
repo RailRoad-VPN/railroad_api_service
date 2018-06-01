@@ -1,6 +1,7 @@
 import json
 import sys
 from http import HTTPStatus
+from typing import List
 
 from flask import request, Response
 
@@ -11,16 +12,28 @@ sys.path.insert(0, '../rest_api_library')
 from utils import check_uuid, make_api_response
 from api import ResourceAPI
 from response import APIResponseStatus, APIResponse
-from rest import APIException
+from rest import APIException, APIResourceURL
 
 
 class UserAPI(ResourceAPI):
     __version__ = 1
 
+    __endpoint_name__ = 'UserAPI'
     __api_url__ = 'users'
 
     _config = None
     _user_service = None
+
+    @staticmethod
+    def get_api_urls(base_url: str) -> List[APIResourceURL]:
+        url = "%s/%s" % (base_url, UserAPI.__api_url__)
+        api_urls = [
+            APIResourceURL(base_url=url, resource_name='', methods=['GET', 'POST']),
+            APIResourceURL(base_url=url, resource_name='<string:suuid>', methods=['PUT']),
+            APIResourceURL(base_url=url, resource_name='uuid/<string:suuid>', methods=['GET']),
+            APIResourceURL(base_url=url, resource_name='email/<string:email>', methods=['GET']),
+        ]
+        return api_urls
 
     def __init__(self, user_service: UserAPIService, config: dict) -> None:
         super().__init__()

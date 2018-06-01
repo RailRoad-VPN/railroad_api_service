@@ -1,11 +1,12 @@
 import json
 import sys
 from http import HTTPStatus
+from typing import List
 
 from flask import Response
 
 from app.service import VPNServerConfigurationAPIService
-from rest import APIException
+from rest import APIException, APIResourceURL
 
 sys.path.insert(0, '../rest_api_library')
 from api import ResourceAPI
@@ -16,11 +17,20 @@ from utils import make_api_response
 class VPNServersConfigurationsAPI(ResourceAPI):
     __version__ = 1
 
+    __endpoint_name__ = 'VPNServersConfigurationsAPI'
     __api_url__ = 'vpns/servers/<string:server_suuid>/configurations/user/<string:user_suuid>'
 
     _config = None
 
     vpnserversconfigurations_service = None
+
+    @staticmethod
+    def get_api_urls(base_url: str) -> List[APIResourceURL]:
+        url = "%s/%s" % (base_url, VPNServersConfigurationsAPI.__api_url__)
+        api_urls = [
+            APIResourceURL(base_url=url, resource_name='', methods=['GET', 'POST']),
+        ]
+        return api_urls
 
     def __init__(self, vpnserversconfigurations_service: VPNServerConfigurationAPIService, config: dict) -> None:
         super().__init__()

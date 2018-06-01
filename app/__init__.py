@@ -10,6 +10,9 @@ from app.resources.vpns.servers.configurations import VPNServersConfigurationsAP
 from app.resources.vpns.servers.meta import VPNServersMetaAPI
 from app.service import *
 
+sys.path.insert(1, '../rest_api_library')
+from api import register_api
+
 logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
@@ -17,78 +20,53 @@ app = Flask(__name__)
 # Load the default configuration
 app.config.from_object('config.DevelopmentConfig')
 
+app_config = app.config
+api_base_uri = app_config['API_BASE_URI']
+
 # SERVICES
-vpnserver_service = VPNServersAPIService(api_url=app.config['VPNC_SERVICE_URL'],
-                                         resource_name=app.config['VPNC_SERVICE_VPNSERVER_RESOURCE_NAME'])
+vpnserver_service = VPNServersAPIService(api_url=app_config['VPNC_SERVICE_URL'],
+                                         resource_name=app_config['VPNC_SERVICE_VPNSERVER_RESOURCE_NAME'])
 
-vpnserversmeta_service = VPNServersMetaAPIService(api_url=app.config['VPNC_SERVICE_URL'],
-                                                  resource_name=app.config['VPNC_SERVICE_VPNSERVERSMETA_RESOURCE_NAME'])
+vpnserversmeta_service = VPNServersMetaAPIService(api_url=app_config['VPNC_SERVICE_URL'],
+                                                  resource_name=app_config['VPNC_SERVICE_VPNSERVERSMETA_RESOURCE_NAME'])
 
-vpntype_service = VPNTypeAPIService(api_url=app.config['VPNC_SERVICE_URL'],
-                                    resource_name=app.config['VPNC_SERVICE_VPNTYPE_RESOURCE_NAME'])
+vpntype_service = VPNTypeAPIService(api_url=app_config['VPNC_SERVICE_URL'],
+                                    resource_name=app_config['VPNC_SERVICE_VPNTYPE_RESOURCE_NAME'])
 
-vpnserverconfiguration_service = VPNServerConfigurationAPIService(api_url=app.config['VPNC_SERVICE_URL'],
-                                                                  resource_name=app.config[
-                                                                   'VPNC_SERVICE_VPNSERVERCONFIGURATION_RESOURCE_NAME'])
-vpnserverstatus_service = VPNServerStatusAPIService(api_url=app.config['VPNC_SERVICE_URL'],
-                                                    resource_name=app.config['VPNC_SERVICE_VPNSERVERSTATUS_RESOURCE_NAME'])
+vpnserverconfiguration_service = VPNServerConfigurationAPIService(api_url=app_config['VPNC_SERVICE_URL'],
+                                                                  resource_name=app_config[
+                                                                      'VPNC_SERVICE_VPNSERVERCONFIGURATION_RESOURCE_NAME'])
+vpnserverstatus_service = VPNServerStatusAPIService(api_url=app_config['VPNC_SERVICE_URL'],
+                                                    resource_name=app_config[
+                                                        'VPNC_SERVICE_VPNSERVERSTATUS_RESOURCE_NAME'])
 
-geoposition_service = GeoPositionAPIService(api_url=app.config['VPNC_SERVICE_URL'],
-                                            resource_name=app.config['VPNC_SERVICE_GEOPOSITION_RESOURCE_NAME'])
+geoposition_service = GeoPositionAPIService(api_url=app_config['VPNC_SERVICE_URL'],
+                                            resource_name=app_config['VPNC_SERVICE_GEOPOSITION_RESOURCE_NAME'])
 
-geocity_service = GeoCityAPIService(api_url=app.config['VPNC_SERVICE_URL'],
-                                    resource_name=app.config['VPNC_SERVICE_GEOCITY_RESOURCE_NAME'])
+geocity_service = GeoCityAPIService(api_url=app_config['VPNC_SERVICE_URL'],
+                                    resource_name=app_config['VPNC_SERVICE_GEOCITY_RESOURCE_NAME'])
 
-geocountry_service = GeoCountryAPIService(api_url=app.config['VPNC_SERVICE_URL'],
-                                          resource_name=app.config['VPNC_SERVICE_GEOCOUNTRY_RESOURCE_NAME'])
+geocountry_service = GeoCountryAPIService(api_url=app_config['VPNC_SERVICE_URL'],
+                                          resource_name=app_config['VPNC_SERVICE_GEOCOUNTRY_RESOURCE_NAME'])
 
-geostate_service = GeoStateAPIService(api_url=app.config['VPNC_SERVICE_URL'],
-                                      resource_name=app.config['VPNC_SERVICE_GEOSTATE_RESOURCE_NAME'])
+geostate_service = GeoStateAPIService(api_url=app_config['VPNC_SERVICE_URL'],
+                                      resource_name=app_config['VPNC_SERVICE_GEOSTATE_RESOURCE_NAME'])
 
-user_service = UserAPIService(api_url=app.config['AUTH_SERVICE_URL'],
-                              resource_name=app.config['AUTH_SERVICE_USERS_RESOURCE_NAME'])
+user_service = UserAPIService(api_url=app_config['AUTH_SERVICE_URL'],
+                              resource_name=app_config['AUTH_SERVICE_USERS_RESOURCE_NAME'])
 
 vpn_service = VPNService(vpnserver_service=vpnserver_service, vpntype_service=vpntype_service,
                          vpnserverconfiguration_service=vpnserverconfiguration_service,
                          vpnserverstatus_service=vpnserverstatus_service, geoposition_service=geoposition_service,
                          geocity_service=geocity_service, geocountry_service=geocountry_service,
                          geostate_service=geostate_service)
-# USER API
-user_api_view_func = UserAPI.as_view('user_api', user_service, app.config)
-app.add_url_rule('%s/%s' % (app.config['API_BASE_URI'], UserAPI.__api_url__), view_func=user_api_view_func,
-                 methods=['GET', 'POST', ])
-app.add_url_rule('%s/%s/uuid/<string:suuid>' % (app.config['API_BASE_URI'], UserAPI.__api_url__),
-                 view_func=user_api_view_func, methods=['GET'])
-app.add_url_rule('%s/%s/email/<string:email>' % (app.config['API_BASE_URI'], UserAPI.__api_url__),
-                 view_func=user_api_view_func, methods=['GET'])
 
-# VPNC META API
-vpnserversmeta_api_view_func = VPNServersMetaAPI.as_view('vpnserversmeta_api', vpnserversmeta_service, app.config)
-app.add_url_rule('%s/%s' % (app.config['API_BASE_URI'], VPNServersMetaAPI.__api_url__),
-                 view_func=vpnserversmeta_api_view_func, methods=['GET'])
+apis = [
+    {'cls': UserAPI, 'args': [user_service, app_config]},
+    {'cls': VPNServersMetaAPI, 'args': [vpnserversmeta_service, app_config]},
+    {'cls': VPNServerConditionsAPI, 'args': [vpn_service, app_config]},
+    {'cls': VPNServersAPI, 'args': [vpn_service, app_config]},
+    {'cls': VPNServersConfigurationsAPI, 'args': [vpnserverconfiguration_service, app_config]},
+]
 
-# VPNC CONDITIONS API
-vpnserverconditions_api_view_func = VPNServerConditionsAPI.as_view('vpnserverconditions_api', vpn_service, app.config)
-app.add_url_rule('%s/%s' % (app.config['API_BASE_URI'], VPNServerConditionsAPI.__api_url__),
-                 view_func=vpnserverconditions_api_view_func, methods=['GET'])
-app.add_url_rule('%s/%s/<string:suuid>' % (app.config['API_BASE_URI'], VPNServerConditionsAPI.__api_url__),
-                 view_func=vpnserverconditions_api_view_func, methods=['GET'])
-
-# VPNC API
-vpnc_api_view_func = VPNServersAPI.as_view('vpnc_api', vpn_service, app.config)
-app.add_url_rule('%s/%s' % (app.config['API_BASE_URI'], VPNServersAPI.__api_url__), view_func=vpnc_api_view_func,
-                 methods=['GET'])
-app.add_url_rule('%s/%s/status/<int:status_id>' % (app.config['API_BASE_URI'], VPNServersAPI.__api_url__),
-                 view_func=vpnc_api_view_func, methods=['GET'])
-app.add_url_rule('%s/%s/type/<int:type_id>' % (app.config['API_BASE_URI'], VPNServersAPI.__api_url__),
-                 view_func=vpnc_api_view_func, methods=['GET'])
-app.add_url_rule('%s/%s/<string:suuid>' % (app.config['API_BASE_URI'], VPNServersAPI.__api_url__),
-                 view_func=vpnc_api_view_func, methods=['GET', 'PUT'])
-
-# VPNC Configurations API
-vpnserversconfigurations_api_view_func = VPNServersConfigurationsAPI.as_view('vpnserversconfigurations_api',
-                                                                             vpnserverconfiguration_service, app.config)
-app.add_url_rule('%s/%s' % (app.config['API_BASE_URI'], VPNServersConfigurationsAPI.__api_url__),
-                 view_func=vpnserversconfigurations_api_view_func, methods=['GET'])
-
-pprint(app.url_map._rules_by_endpoint)
+register_api(app, api_base_uri, apis)
