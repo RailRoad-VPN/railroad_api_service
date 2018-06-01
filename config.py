@@ -24,11 +24,15 @@ class Config(object):
 
 
 class ProductionConfig(Config):
+    ENV = 'production'
+
     AUTH_SERVICE_URL = ''
     VNPC_SERVICE_URL = ''
 
 
 class DevelopmentConfig(Config):
+    ENV = 'development'
+
     DEBUG = True
 
     AUTH_SERVICE_URL = 'http://127.0.0.1:6000/api/v1'
@@ -36,6 +40,8 @@ class DevelopmentConfig(Config):
 
 
 class TestingConfig(Config):
+    ENV = 'testing'
+
     TESTING = True
     DEBUG = True
 

@@ -1,5 +1,5 @@
 import logging
-from pprint import pprint
+import os
 
 from flask import Flask
 
@@ -17,8 +17,9 @@ logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 
-# Load the default configuration
-app.config.from_object('config.DevelopmentConfig')
+# Load config based on env variable
+ENVIRONMENT_CONFIG = os.environ.get("ENVIRONMENT_CONFIG", default='DevelopmentConfig')
+app.config.from_object("%s.%s" % ('config', ENVIRONMENT_CONFIG))
 
 app_config = app.config
 api_base_uri = app_config['API_BASE_URI']
