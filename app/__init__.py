@@ -9,6 +9,7 @@ from app.resources.vpns.servers.conditions import VPNServerConditionsAPI
 from app.resources.vpns.servers.configurations import VPNServersConfigurationsAPI
 from app.resources.vpns.servers.meta import VPNServersMetaAPI
 from app.service import *
+from subscriptions import SubscriptionAPI
 
 sys.path.insert(1, '../rest_api_library')
 from api import register_api
@@ -59,6 +60,9 @@ geostate_service = GeoStateAPIService(api_url=app_config['VPNC_SERVICE_URL'],
 user_service = UserAPIService(api_url=app_config['AUTH_SERVICE_URL'],
                               resource_name=app_config['AUTH_SERVICE_USERS_RESOURCE_NAME'])
 
+subscription_service = SubscriptionAPIService(api_url=app_config['BILLING_SERVICE_URL'],
+                                              resource_name=app_config['BILLING_SERVICE_SUBSCRIPTIONS_RESOURCE_NAME'])
+
 vpn_service = VPNService(vpnserver_service=vpnserver_service, vpntype_service=vpntype_service,
                          vpnserverconfiguration_service=vpnserverconfiguration_service,
                          vpnserverstatus_service=vpnserverstatus_service, geoposition_service=geoposition_service,
@@ -67,6 +71,7 @@ vpn_service = VPNService(vpnserver_service=vpnserver_service, vpntype_service=vp
 
 apis = [
     {'cls': UserAPI, 'args': [user_service, app_config]},
+    {'cls': SubscriptionAPI, 'args': [subscription_service, app_config]},
     {'cls': VPNServersMetaAPI, 'args': [vpnserversmeta_service, app_config]},
     {'cls': VPNServerConditionsAPI, 'args': [vpn_service, app_config]},
     {'cls': VPNServersAPI, 'args': [vpn_service, app_config]},

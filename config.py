@@ -12,6 +12,8 @@ class Config(object):
 
     AUTH_SERVICE_USERS_RESOURCE_NAME = 'users'
 
+    BILLING_SERVICE_SUBSCRIPTIONS_RESOURCE_NAME = 'subscriptions'
+
     VPNC_SERVICE_VPNTYPE_RESOURCE_NAME = 'vpns/types'
     VPNC_SERVICE_VPNSERVER_RESOURCE_NAME = 'vpns/servers'
     VPNC_SERVICE_VPNSERVERSTATUS_RESOURCE_NAME = 'vpns/servers/statuses'
@@ -28,6 +30,7 @@ class ProductionConfig(Config):
 
     AUTH_SERVICE_URL = ''
     VNPC_SERVICE_URL = ''
+    BILLING_SERVICE_URL = ''
 
 
 class DevelopmentConfig(Config):
@@ -37,6 +40,7 @@ class DevelopmentConfig(Config):
 
     AUTH_SERVICE_URL = 'http://127.0.0.1:6000/api/v1'
     VPNC_SERVICE_URL = 'http://127.0.0.1:9000/api/v1'
+    BILLING_SERVICE_URL = 'http://127.0.0.1:7000/api/v1'
 
 
 class TestingConfig(Config):
@@ -47,3 +51,4 @@ class TestingConfig(Config):
 
     AUTH_SERVICE_URL = 'http://127.0.0.1:6000/api/v1'
     VPNC_SERVICE_URL = 'http://127.0.0.1:9000/api/v1'
+    BILLING_SERVICE_URL = 'http://127.0.0.1:8000/api/v1'

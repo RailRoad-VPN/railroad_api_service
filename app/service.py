@@ -6,6 +6,21 @@ from response import APIResponse, APIResponseStatus
 from api import ResourcePagination
 
 
+class SubscriptionAPIService(RESTService):
+    __version__ = 1
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def get_subscriptions(self, lang_code: str) -> APIResponse:
+        headers = {
+            'Accept-Language': lang_code
+        }
+        api_response = self._get(headers=headers)
+
+        return api_response
+
+
 class UserAPIService(RESTService):
     __version__ = 1
 
@@ -238,7 +253,7 @@ class VPNService(object):
     def update_vpn_server(self, vpnserver: dict):
         api_response = self.vpnserver_service.update_vpnserver(vpnserver=vpnserver)
         if api_response.status == APIResponseStatus.failed.value:
-            raise APIException(http_code=api_response.code, errors=api_response.errors)
+            raise APIException(http_code=api_response.code, errors=api_response.errors, data=api_response.data)
 
     def get_random_vpn_server(self, type_id: int = None, status_id: int = None):
         # TODO some logic to get random VPN server
@@ -294,6 +309,28 @@ class VPNService(object):
 
     def get_vpn_server_condition_list(self, pagination: ResourcePagination):
         api_response = self.vpnserver_service.get_vpnservers(pagination=pagination)
+        if api_response.status == APIResponseStatus.failed.value:
+            raise APIException(http_code=api_response.code, errors=api_response.errors)
+        servers_list = []
+        for server in api_response.data:
+            server = self._get_vpn_server_condition(server=server)
+            servers_list.append(server)
+
+        return servers_list
+
+    def get_vpn_server_condition_list_by_type(self, type_id: int, pagination: ResourcePagination):
+        api_response = self.vpnserver_service.get_vpnservers_by_type(type_id=type_id, pagination=pagination)
+        if api_response.status == APIResponseStatus.failed.value:
+            raise APIException(http_code=api_response.code, errors=api_response.errors)
+        servers_list = []
+        for server in api_response.data:
+            server = self._get_vpn_server_condition(server=server)
+            servers_list.append(server)
+
+        return servers_list
+
+    def get_vpn_server_condition_list_by_status(self, status_id: int, pagination: ResourcePagination):
+        api_response = self.vpnserver_service.get_vpnservers_by_status(status_id=status_id, pagination=pagination)
         if api_response.status == APIResponseStatus.failed.value:
             raise APIException(http_code=api_response.code, errors=api_response.errors)
         servers_list = []
