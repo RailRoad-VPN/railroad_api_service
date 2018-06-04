@@ -56,16 +56,16 @@ class SubscriptionAPI(ResourceAPI):
                                         developer_message=RailRoadAPIError.BAD_ACCEPT_LANGUAGE_HEADER.description,
                                         error_code=RailRoadAPIError.BAD_ACCEPT_LANGUAGE_HEADER.value)
 
-            return make_api_response(json.dumps(response_data.serialize()), HTTPStatus.BAD_REQUEST)
+            return make_api_response(response_data, HTTPStatus.BAD_REQUEST)
 
         try:
             api_response = self._subscription_service.get_subscriptions(lang_code=lang_code)
         except APIException as e:
             response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code, errors=e.errors)
-            resp = make_api_response(json.dumps(response_data.serialize()), e.http_code)
+            resp = make_api_response(response_data, e.http_code)
             return resp
 
         response_data = APIResponse(status=api_response.status, code=api_response.code, data=api_response.data,
                                     headers=api_response.headers)
-        resp = make_api_response(json.dumps(response_data.serialize()), HTTPStatus.OK)
+        resp = make_api_response(response_data, HTTPStatus.OK)
         return resp
