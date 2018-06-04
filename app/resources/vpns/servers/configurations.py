@@ -39,11 +39,11 @@ class VPNServersConfigurationsAPI(ResourceAPI):
         self._config = config
 
     def post(self) -> Response:
-        resp = make_api_response('', HTTPStatus.METHOD_NOT_ALLOWED)
+        resp = make_api_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
         return resp
 
     def put(self) -> Response:
-        resp = make_api_response('', HTTPStatus.METHOD_NOT_ALLOWED)
+        resp = make_api_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
         return resp
 
     def get(self, server_suuid: str, user_suuid: str) -> Response:
@@ -52,10 +52,10 @@ class VPNServersConfigurationsAPI(ResourceAPI):
                                                                                      user_uuid=user_suuid)
             response_data = APIResponse(status=APIResponseStatus.success.value, code=api_response.code,
                                         data=api_response.data, headers=api_response.headers)
-            resp = make_api_response(response_data, HTTPStatus.OK)
+            resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
             return resp
         except APIException as e:
             response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code,
                                         errors=e.errors)
-            resp = make_api_response(response_data, e.http_code)
+            resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp

@@ -42,11 +42,11 @@ class VPNServerConditionsAPI(ResourceAPI):
         super().__init__()
 
     def post(self) -> Response:
-        resp = make_api_response('', HTTPStatus.METHOD_NOT_ALLOWED)
+        resp = make_api_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
         return resp
 
     def put(self) -> Response:
-        resp = make_api_response('', HTTPStatus.METHOD_NOT_ALLOWED)
+        resp = make_api_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
         return resp
 
     def get(self, suuid: str = None, type_id: int = None, status_id: int = None) -> Response:
@@ -58,12 +58,12 @@ class VPNServerConditionsAPI(ResourceAPI):
                 server_list = self._vpn_service.get_vpn_server_condition_list(pagination=self.pagination)
             except APIException as e:
                 response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code, errors=e.errors)
-                resp = make_api_response(response_data, e.http_code)
+                resp = make_api_response(data=response_data, http_code=e.http_code)
                 return resp
 
             response_data = APIResponse(status=APIResponseStatus.success.value, code=HTTPStatus.OK, data=server_list,
                                         limit=self.pagination.limit, offset=self.pagination.offset)
-            resp = make_api_response(response_data, HTTPStatus.OK)
+            resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
             return resp
         elif suuid is not None:
             # specific server by uuid
@@ -73,18 +73,18 @@ class VPNServerConditionsAPI(ResourceAPI):
                 response_data = APIResponse(status=APIResponseStatus.failed.value, code=code,
                                             error=RailRoadAPIError.BAD_USER_IDENTITY.phrase,
                                             error_code=RailRoadAPIError.BAD_USER_IDENTITY)
-                resp = make_api_response(response_data, code)
+                resp = make_api_response(data=response_data, http_code=code)
                 return resp
 
             try:
                 server = self._vpn_service.get_vpn_server_condition(suuid=suuid)
             except APIException as e:
                 response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code, errors=e.errors)
-                resp = make_api_response(response_data, e.http_code)
+                resp = make_api_response(data=response_data, http_code=e.http_code)
                 return resp
 
             response_data = APIResponse(status=APIResponseStatus.success.value, code=HTTPStatus.OK, data=server)
-            resp = make_api_response(response_data, HTTPStatus.OK)
+            resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
             return resp
         elif type_id is not None:
             # list of all servers with specific type
@@ -93,12 +93,12 @@ class VPNServerConditionsAPI(ResourceAPI):
                                                                                       pagination=self.pagination)
             except APIException as e:
                 response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code, errors=e.errors)
-                resp = make_api_response(response_data, e.http_code)
+                resp = make_api_response(data=response_data, http_code=e.http_code)
                 return resp
 
             response_data = APIResponse(status=APIResponseStatus.success.value, code=HTTPStatus.OK, data=server_list,
                                         limit=self.pagination.limit, offset=self.pagination.offset)
-            resp = make_api_response(response_data, HTTPStatus.OK)
+            resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
             return resp
         elif status_id is not None:
             # list of all servers with specific status
@@ -107,13 +107,13 @@ class VPNServerConditionsAPI(ResourceAPI):
                                                                                         pagination=self.pagination)
             except APIException as e:
                 response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code, errors=e.errors)
-                resp = make_api_response(response_data, e.http_code)
+                resp = make_api_response(data=response_data, http_code=e.http_code)
                 return resp
 
             response_data = APIResponse(status=APIResponseStatus.success.value, code=HTTPStatus.OK, data=server_list,
                                         limit=self.pagination.limit, offset=self.pagination.offset)
-            resp = make_api_response(response_data, HTTPStatus.OK)
+            resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
             return resp
         else:
-            resp = make_api_response('', HTTPStatus.BAD_REQUEST)
+            resp = make_api_response(http_code=HTTPStatus.BAD_REQUEST)
             return resp

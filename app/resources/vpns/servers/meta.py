@@ -39,11 +39,11 @@ class VPNServersMetaAPI(ResourceAPI):
         self._config = config
 
     def post(self) -> Response:
-        resp = make_api_response('', HTTPStatus.METHOD_NOT_ALLOWED)
+        resp = make_api_response(data=HTTPStatus.METHOD_NOT_ALLOWED)
         return resp
 
     def put(self) -> Response:
-        resp = make_api_response('', HTTPStatus.METHOD_NOT_ALLOWED)
+        resp = make_api_response(data=HTTPStatus.METHOD_NOT_ALLOWED)
         return resp
 
     def get(self) -> Response:
@@ -51,5 +51,5 @@ class VPNServersMetaAPI(ResourceAPI):
 
         response_data = APIResponse(status=APIResponseStatus.success.value, code=api_response.code,
                                     data=api_response.data, headers=api_response.headers)
-        resp = make_api_response(response_data, HTTPStatus.OK)
+        resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
         return resp
