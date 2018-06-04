@@ -8,8 +8,8 @@ from app.resources.vpns.servers import VPNServersAPI
 from app.resources.vpns.servers.conditions import VPNServerConditionsAPI
 from app.resources.vpns.servers.configurations import VPNServersConfigurationsAPI
 from app.resources.vpns.servers.meta import VPNServersMetaAPI
+from app.resources.subscriptions import SubscriptionAPI
 from app.service import *
-from subscriptions import SubscriptionAPI
 
 sys.path.insert(1, '../rest_api_library')
 from api import register_api
