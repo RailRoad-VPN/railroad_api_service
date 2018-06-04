@@ -19,7 +19,10 @@ app = Flask(__name__)
 
 # Load config based on env variable
 ENVIRONMENT_CONFIG = os.environ.get("ENVIRONMENT_CONFIG", default='DevelopmentConfig')
-app.config.from_object("%s.%s" % ('config', ENVIRONMENT_CONFIG))
+logging.info("Got ENVIRONMENT_CONFIG variable: %s" % ENVIRONMENT_CONFIG)
+config_name = "%s.%s" % ('config', ENVIRONMENT_CONFIG)
+logging.info("Config name: %s" % config_name)
+app.config.from_object(config_name)
 
 app_config = app.config
 api_base_uri = app_config['API_BASE_URI']
