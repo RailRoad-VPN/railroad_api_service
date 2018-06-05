@@ -51,4 +51,4 @@ class TestingConfig(Config):
 
     AUTH_SERVICE_URL = 'http://127.0.0.1:6000/api/v1'
     VPNC_SERVICE_URL = 'http://127.0.0.1:9000/api/v1'
-    BILLING_SERVICE_URL = 'http://127.0.0.1:8000/api/v1'
+    BILLING_SERVICE_URL = 'http://127.0.0.1:7000/api/v1'
