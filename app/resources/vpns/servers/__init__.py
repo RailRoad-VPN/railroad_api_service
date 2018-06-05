@@ -62,6 +62,7 @@ class VPNServersAPI(ResourceAPI):
 
         response_data = APIResponse(status=api_response.status, code=api_response.code, headers=api_response.headers)
         resp = make_api_response(data=response_data, http_code=api_response.code)
+        # TODO return link to public API, no private API
         return resp
 
     def put(self, suuid: str) -> Response:

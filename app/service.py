@@ -32,15 +32,15 @@ class UserAPIService(RESTService):
         return api_response
 
     def update_user(self, user_json: dict):
-        url = '%suuid/%s' % (self._url, user_json['uuid'])
+        url = '%s/uuid/%s' % (self._url, user_json['uuid'])
         api_response = self._put(url=url, data=user_json, headers=self._headers)
         return api_response
 
     def get_user(self, suuid: str = None, email: str = None) -> APIResponse:
         if suuid:
-            url = '%suuid/%s' % (self._url, suuid)
+            url = '%s/uuid/%s' % (self._url, suuid)
         elif email:
-            url = '%semail/%s' % (self._url, email)
+            url = '%s/email/%s' % (self._url, email)
         else:
             raise KeyError
         api_response = self._get(url=url)
@@ -63,7 +63,7 @@ class VPNServersAPIService(RESTService):
         return api_response
 
     def get_vpnservers_by_type(self, type_id: int, pagination: ResourcePagination):
-        url = "%stype/%s" % (self._url, type_id)
+        url = "%s/type/%s" % (self._url, type_id)
 
         if pagination.is_paginated:
             url = self._build_url_pagination(limit=pagination.limit, offset=pagination.offset, url=url)
@@ -72,7 +72,7 @@ class VPNServersAPIService(RESTService):
         return api_response
 
     def get_vpnservers_by_status(self, status_id: int, pagination: ResourcePagination):
-        url = "%sstatus/%s" % (self._url, status_id)
+        url = "%s/status/%s" % (self._url, status_id)
 
         if pagination.is_paginated:
             url = self._build_url_pagination(limit=pagination.limit, offset=pagination.offset, url=url)
@@ -81,12 +81,12 @@ class VPNServersAPIService(RESTService):
         return api_response
 
     def get_vpnserver_by_uuid(self, suuid: str):
-        url = '%s%s' % (self._url, suuid)
+        url = '%s/%s' % (self._url, suuid)
         api_response = self._get(url=url)
         return api_response
 
     def update_vpnserver(self, vpnserver: dict):
-        url = '%s%s' % (self._url, vpnserver['uuid'])
+        url = '%s/%s' % (self._url, vpnserver['uuid'])
         api_response = self._put(url=url, data=vpnserver)
         return api_response
 
@@ -117,7 +117,7 @@ class VPNTypeAPIService(RESTService):
         return api_response
 
     def get_vpntype_by_id(self, sid):
-        url = '%s%s' % (self._url, sid)
+        url = '%s/%s' % (self._url, sid)
         api_response = self._get(url=url)
         return api_response
 
@@ -129,12 +129,12 @@ class VPNServerConfigurationAPIService(RESTService):
         super().__init__(**kwargs)
 
     def get_vpnserverconfig(self, server_uuid: str, user_uuid: str = None):
-        url = '%s%s/configurations/user/%s' % (self._url, server_uuid, user_uuid)
+        url = '%s/%s/configurations/user/%s' % (self._url, server_uuid, user_uuid)
         api_response = self._get(url=url)
         return api_response
 
     def get_vpnserverconfig_by_uuid(self, suuid):
-        url = '%s%s' % (self._url, suuid)
+        url = '%s/%s' % (self._url, suuid)
         api_response = self._get(url=url)
         return api_response
 
@@ -150,7 +150,7 @@ class VPNServerStatusAPIService(RESTService):
         return api_response
 
     def get_vpnserverstatuse_by_id(self, sid):
-        url = '%s%s' % (self._url, sid)
+        url = '%s/%s' % (self._url, sid)
         api_response = self._get(url=url)
         return api_response
 
@@ -166,7 +166,7 @@ class GeoPositionAPIService(RESTService):
         return api_response
 
     def get_geopos_by_id(self, sid):
-        url = '%s%s' % (self._url, sid)
+        url = '%s/%s' % (self._url, sid)
         api_response = self._get(url=url)
         return api_response
 
@@ -182,7 +182,7 @@ class GeoCityAPIService(RESTService):
         return api_response
 
     def get_geocity_by_id(self, sid):
-        url = '%s%s' % (self._url, sid)
+        url = '%s/%s' % (self._url, sid)
         api_response = self._get(url=url)
         return api_response
 
@@ -198,7 +198,7 @@ class GeoCountryAPIService(RESTService):
         return api_response
 
     def get_geocountry_by_code(self, code):
-        url = '%s%s' % (self._url, code)
+        url = '%s/%s' % (self._url, code)
         api_response = self._get(url=url)
         return api_response
 
@@ -214,7 +214,7 @@ class GeoStateAPIService(RESTService):
         return api_response
 
     def get_geostate_by_code(self, code):
-        url = '%s%s' % (self._url, code)
+        url = '%s/%s' % (self._url, code)
         api_response = self._get(url=url)
         return api_response
 
