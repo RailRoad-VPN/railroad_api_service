@@ -71,7 +71,7 @@ class VPNServerConditionsAPI(ResourceAPI):
             if not is_valid:
                 code = HTTPStatus.NOT_FOUND
                 response_data = APIResponse(status=APIResponseStatus.failed.value, code=code,
-                                            error=RailRoadAPIError.BAD_USER_IDENTITY.phrase,
+                                            error=RailRoadAPIError.BAD_USER_IDENTITY.message,
                                             error_code=RailRoadAPIError.BAD_USER_IDENTITY)
                 resp = make_api_response(data=response_data, http_code=code)
                 return resp

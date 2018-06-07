@@ -45,9 +45,9 @@ class VPNServersAPI(ResourceAPI):
         request_json = request.json
 
         if request_json is None:
-            error = RailRoadAPIError.REQUEST_NO_JSON.phrase
-            error_code = RailRoadAPIError.REQUEST_NO_JSON
-            developer_message = RailRoadAPIError.REQUEST_NO_JSON.description
+            error = RailRoadAPIError.REQUEST_NO_JSON.message
+            error_code = RailRoadAPIError.REQUEST_NO_JSON.code
+            developer_message = RailRoadAPIError.REQUEST_NO_JSON.developer_message
             http_code = HTTPStatus.BAD_REQUEST
             response_data = APIResponse(status=APIResponseStatus.failed.value, code=http_code, error=error,
                                         developer_message=developer_message, error_code=error_code)
@@ -69,32 +69,32 @@ class VPNServersAPI(ResourceAPI):
         request_json = request.json
 
         if request_json is None:
-            error = RailRoadAPIError.REQUEST_NO_JSON.phrase
-            error_code = RailRoadAPIError.REQUEST_NO_JSON
-            developer_message = RailRoadAPIError.REQUEST_NO_JSON.description
+            error = RailRoadAPIError.REQUEST_NO_JSON.message
+            error_code = RailRoadAPIError.REQUEST_NO_JSON.code
+            developer_message = RailRoadAPIError.REQUEST_NO_JSON.developer_message
             http_code = HTTPStatus.BAD_REQUEST
             response_data = APIResponse(status=APIResponseStatus.failed.value, code=http_code, error=error,
                                         developer_message=developer_message, error_code=error_code)
             return make_api_response(data=response_data, http_code=http_code)
 
-        vpnserver_suuid = request_json.get('uuid', None)
+        vpnserver_uuid = request_json.get('uuid', None)
 
         is_valid_suuid = check_uuid(suuid)
-        is_valid_vpnserver_suuid = check_uuid(vpnserver_suuid)
-        if not is_valid_suuid or not is_valid_vpnserver_suuid:
-            error = RailRoadAPIError.VPNSERVER_IDENTIFIER_ERROR.phrase
-            error_code = RailRoadAPIError.VPNSERVER_IDENTIFIER_ERROR
-            developer_message = RailRoadAPIError.VPNSERVER_IDENTIFIER_ERROR.description
+        is_valid_vpnserver_uuid = check_uuid(vpnserver_uuid)
+        if not is_valid_suuid or not is_valid_vpnserver_uuid:
+            error = RailRoadAPIError.VPNSERVER_IDENTIFIER_ERROR.message
+            error_code = RailRoadAPIError.VPNSERVER_IDENTIFIER_ERROR.code
+            developer_message = RailRoadAPIError.VPNSERVER_IDENTIFIER_ERROR.developer_message
             http_code = HTTPStatus.BAD_REQUEST
             response_data = APIResponse(status=APIResponseStatus.failed.value, code=http_code, error=error,
                                         developer_message=developer_message, error_code=error_code)
             resp = make_api_response(data=response_data, http_code=http_code)
             return resp
 
-        if suuid != vpnserver_suuid:
-            error = RailRoadAPIError.VPNSERVER_IDENTIFIER_ERROR.phrase
-            error_code = RailRoadAPIError.VPNSERVER_IDENTIFIER_ERROR
-            developer_message = RailRoadAPIError.VPNSERVER_IDENTIFIER_ERROR.description
+        if suuid != vpnserver_uuid:
+            error = RailRoadAPIError.VPNSERVER_IDENTIFIER_ERROR.message
+            error_code = RailRoadAPIError.VPNSERVER_IDENTIFIER_ERROR.code
+            developer_message = RailRoadAPIError.VPNSERVER_IDENTIFIER_ERROR.developer_message
             http_code = HTTPStatus.BAD_REQUEST
             response_data = APIResponse(status=APIResponseStatus.failed.value, code=http_code, error=error,
                                         developer_message=developer_message, error_code=error_code)
@@ -147,8 +147,8 @@ class VPNServersAPI(ResourceAPI):
             if not is_valid:
                 code = HTTPStatus.NOT_FOUND
                 response_data = APIResponse(status=APIResponseStatus.failed.value, code=code,
-                                            error=RailRoadAPIError.BAD_USER_IDENTITY.phrase,
-                                            error_code=RailRoadAPIError.BAD_USER_IDENTITY)
+                                            error=RailRoadAPIError.BAD_USER_IDENTITY.message,
+                                            error_code=RailRoadAPIError.BAD_USER_IDENTITY.code)
                 resp = make_api_response(data=response_data, http_code=code)
                 return resp
 

@@ -52,9 +52,9 @@ class SubscriptionAPI(ResourceAPI):
 
         if lang_code is None:
             response_data = APIResponse(status=APIResponseStatus.failed.value, code=HTTPStatus.BAD_REQUEST,
-                                        error=RailRoadAPIError.BAD_ACCEPT_LANGUAGE_HEADER.phrase,
+                                        error=RailRoadAPIError.BAD_ACCEPT_LANGUAGE_HEADER.message,
                                         developer_message=RailRoadAPIError.BAD_ACCEPT_LANGUAGE_HEADER.description,
-                                        error_code=RailRoadAPIError.BAD_ACCEPT_LANGUAGE_HEADER.value)
+                                        error_code=RailRoadAPIError.BAD_ACCEPT_LANGUAGE_HEADER.code)
 
             return make_api_response(data=response_data, http_code=HTTPStatus.BAD_REQUEST)
 

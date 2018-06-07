@@ -18,7 +18,7 @@ class VPNServersConfigurationsAPI(ResourceAPI):
     __version__ = 1
 
     __endpoint_name__ = 'VPNServersConfigurationsAPI'
-    __api_url__ = 'vpns/servers/<string:server_suuid>/configurations/user/<string:user_suuid>'
+    __api_url__ = 'vpns/servers/<string:server_uuid>/configurations/user/<string:user_uuid>'
 
     _config = None
 
@@ -46,10 +46,10 @@ class VPNServersConfigurationsAPI(ResourceAPI):
         resp = make_api_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
         return resp
 
-    def get(self, server_suuid: str, user_suuid: str) -> Response:
+    def get(self, server_uuid: str, user_uuid: str) -> Response:
         try:
-            api_response = self.vpnserversconfigurations_service.get_vpnserverconfig(server_uuid=server_suuid,
-                                                                                     user_uuid=user_suuid)
+            api_response = self.vpnserversconfigurations_service.get_vpnserverconfig(server_uuid=server_uuid,
+                                                                                     user_uuid=user_uuid)
             response_data = APIResponse(status=APIResponseStatus.success.value, code=api_response.code,
                                         data=api_response.data, headers=api_response.headers)
             resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)

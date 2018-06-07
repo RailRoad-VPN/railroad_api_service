@@ -6,6 +6,20 @@ from response import APIResponse, APIResponseStatus
 from api import ResourcePagination
 
 
+class UserSubscriptionAPIService(RESTService):
+    __version__ = 1
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def get_by_user_uuid(self, user_uuid: str = None) -> APIResponse:
+        url = '%s/%s' % (self._url, user_uuid)
+
+        api_response = self._get(url=url)
+
+        return api_response
+
+
 class SubscriptionAPIService(RESTService):
     __version__ = 1
 

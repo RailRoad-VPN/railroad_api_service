@@ -3,12 +3,13 @@ import os
 
 from flask import Flask
 
+from app.resources.subscriptions import SubscriptionAPI
 from app.resources.users import UserAPI
 from app.resources.vpns.servers import VPNServersAPI
 from app.resources.vpns.servers.conditions import VPNServerConditionsAPI
 from app.resources.vpns.servers.configurations import VPNServersConfigurationsAPI
 from app.resources.vpns.servers.meta import VPNServersMetaAPI
-from app.resources.subscriptions import SubscriptionAPI
+from app.resources.users.subscription import UserSubscriptionAPI
 from app.service import *
 
 sys.path.insert(1, '../rest_api_library')
@@ -60,6 +61,10 @@ geostate_service = GeoStateAPIService(api_url=app_config['VPNC_SERVICE_URL'],
 user_service = UserAPIService(api_url=app_config['AUTH_SERVICE_URL'],
                               resource_name=app_config['AUTH_SERVICE_USERS_RESOURCE_NAME'])
 
+user_subscription_service = UserSubscriptionAPIService(api_url=app_config['BILLING_SERVICE_URL'],
+                                                       resource_name=app_config[
+                                                           'BILLING_SERVICE_USER_SUBSCRIPTION_RESOURCE_NAME'])
+
 subscription_service = SubscriptionAPIService(api_url=app_config['BILLING_SERVICE_URL'],
                                               resource_name=app_config['BILLING_SERVICE_SUBSCRIPTIONS_RESOURCE_NAME'])
 
@@ -71,6 +76,7 @@ vpn_service = VPNService(vpnserver_service=vpnserver_service, vpntype_service=vp
 
 apis = [
     {'cls': UserAPI, 'args': [user_service, app_config]},
+    {'cls': UserSubscriptionAPI, 'args': [user_subscription_service, app_config]},
     {'cls': SubscriptionAPI, 'args': [subscription_service, app_config]},
     {'cls': VPNServersMetaAPI, 'args': [vpnserversmeta_service, app_config]},
     {'cls': VPNServerConditionsAPI, 'args': [vpn_service, app_config]},

@@ -1,4 +1,3 @@
-import json
 import sys
 from http import HTTPStatus
 from typing import List
@@ -28,7 +27,6 @@ class UserAPI(ResourceAPI):
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
         url = "%s/%s" % (base_url, UserAPI.__api_url__)
         api_urls = [
-            APIResourceURL(base_url=url, resource_name='', methods=['GET', 'POST']),
             APIResourceURL(base_url=url, resource_name='<string:suuid>', methods=['PUT']),
             APIResourceURL(base_url=url, resource_name='uuid/<string:suuid>', methods=['GET']),
             APIResourceURL(base_url=url, resource_name='email/<string:email>', methods=['GET']),
@@ -56,7 +54,7 @@ class UserAPI(ResourceAPI):
             # user exist
             code = HTTPStatus.BAD_REQUEST
             response_data = APIResponse(status=APIResponseStatus.failed.value, code=code, headers=api_response.headers,
-                                        error=RailRoadAPIError.USER_EMAIL_BUSY.phrase,
+                                        error=RailRoadAPIError.USER_EMAIL_BUSY.message,
                                         error_code=RailRoadAPIError.USER_EMAIL_BUSY)
             resp = make_api_response(data=response_data, http_code=code)
             return resp
@@ -83,7 +81,7 @@ class UserAPI(ResourceAPI):
         if not is_valid:
             code = HTTPStatus.NOT_FOUND
             response_data = APIResponse(status=APIResponseStatus.failed.value, code=code,
-                                        error=RailRoadAPIError.BAD_USER_IDENTITY.phrase,
+                                        error=RailRoadAPIError.BAD_USER_IDENTITY.message,
                                         error_code=RailRoadAPIError.BAD_USER_IDENTITY)
 
             resp = make_api_response(data=response_data, http_code=code)
@@ -102,7 +100,7 @@ class UserAPI(ResourceAPI):
             # user does not exist
             code = HTTPStatus.BAD_REQUEST
             response_data = APIResponse(status=APIResponseStatus.failed.value, code=code,
-                                        error=RailRoadAPIError.USER_NOT_EXIST.phrase,
+                                        error=RailRoadAPIError.USER_NOT_EXIST.message,
                                         error_code=RailRoadAPIError.USER_NOT_EXIST)
             resp = make_api_response(data=response_data, http_code=code)
             return resp
@@ -134,8 +132,8 @@ class UserAPI(ResourceAPI):
             if not is_valid:
                 code = HTTPStatus.NOT_FOUND
                 response_data = APIResponse(status=APIResponseStatus.failed.value, code=code,
-                                            error=RailRoadAPIError.BAD_USER_IDENTITY.phrase,
-                                            error_code=RailRoadAPIError.BAD_USER_IDENTITY)
+                                            error=RailRoadAPIError.BAD_USER_IDENTITY.message,
+                                            error_code=RailRoadAPIError.BAD_USER_IDENTITY.code)
 
                 resp = make_api_response(data=response_data, http_code=code)
                 return resp
@@ -144,8 +142,8 @@ class UserAPI(ResourceAPI):
             # find all users - no parameters set
             code = HTTPStatus.METHOD_NOT_ALLOWED
             response_data = APIResponse(status=APIResponseStatus.failed.value, code=code,
-                                        error=RailRoadAPIError.PRIVATE_METHOD.phrase,
-                                        error_code=RailRoadAPIError.PRIVATE_METHOD, limit=self.pagination.limit,
+                                        error=RailRoadAPIError.PRIVATE_METHOD.message,
+                                        error_code=RailRoadAPIError.PRIVATE_METHOD.code, limit=self.pagination.limit,
                                         offset=self.pagination.offset)
 
             resp = make_api_response(data=response_data, http_code=code)
@@ -160,7 +158,7 @@ class UserAPI(ResourceAPI):
             return resp
 
         if api_response.status == APIResponseStatus.failed.value:
-            response_data = APIResponse(status=api_response.status, code=HTTPStatus.BAD_REQUEST.phrase,
+            response_data = APIResponse(status=api_response.status, code=HTTPStatus.BAD_REQUEST,
                                         headers=api_response.headers, errors=api_response.errors)
             resp = make_api_response(data=response_data, http_code=HTTPStatus.BAD_REQUEST)
             return resp
