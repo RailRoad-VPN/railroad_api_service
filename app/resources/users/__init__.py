@@ -55,7 +55,7 @@ class UserAPI(ResourceAPI):
             code = HTTPStatus.BAD_REQUEST
             response_data = APIResponse(status=APIResponseStatus.failed.value, code=code, headers=api_response.headers,
                                         error=RailRoadAPIError.USER_EMAIL_BUSY.message,
-                                        error_code=RailRoadAPIError.USER_EMAIL_BUSY)
+                                        error_code=RailRoadAPIError.USER_EMAIL_BUSY.code)
             resp = make_api_response(data=response_data, http_code=code)
             return resp
 

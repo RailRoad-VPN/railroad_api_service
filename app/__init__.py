@@ -11,6 +11,7 @@ from app.resources.vpns.servers.configurations import VPNServersConfigurationsAP
 from app.resources.vpns.servers.meta import VPNServersMetaAPI
 from app.resources.users.subscription import UserSubscriptionAPI
 from app.service import *
+from subscriptions.payments import PaymentAPI
 
 sys.path.insert(1, '../rest_api_library')
 from api import register_api
@@ -77,6 +78,7 @@ vpn_service = VPNService(vpnserver_service=vpnserver_service, vpntype_service=vp
 apis = [
     {'cls': UserAPI, 'args': [user_service, app_config]},
     {'cls': UserSubscriptionAPI, 'args': [user_subscription_service, app_config]},
+    {'cls': PaymentAPI, 'args': [app_config]},
     {'cls': SubscriptionAPI, 'args': [subscription_service, app_config]},
     {'cls': VPNServersMetaAPI, 'args': [vpnserversmeta_service, app_config]},
     {'cls': VPNServerConditionsAPI, 'args': [vpn_service, app_config]},

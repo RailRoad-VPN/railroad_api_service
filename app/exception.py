@@ -38,6 +38,8 @@ class RailRoadAPIError(Enum):
 
     BAD_SERVER_IDENTITY = (name + str(count()), 'BAD_SERVER_IDENTITY phrase', 'BAD_SERVER_IDENTITY description')
 
+    PAYMENT_BAD_DATA_ERROR = (name + str(count()), 'PAYMENT_BAD_DATA_ERROR phrase', 'PAYMENT_BAD_DATA_ERROR description')
+
     REQUEST_NO_JSON = (name + str(count()), 'REQUEST_NO_JSON phrase', 'REQUEST_NO_JSON description')
 
     VPNSERVER_IDENTIFIER_ERROR = (name + str(count()), 'VPNSERVER_IDENTIFIER_ERROR phrase', 'VPNSERVER_IDENTIFIER_ERROR description')
