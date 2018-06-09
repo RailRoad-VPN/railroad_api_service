@@ -1,12 +1,11 @@
-import json
 import sys
 from http import HTTPStatus
 from typing import List
 
 from flask import request, Response
 
-from app.service import UserSubscriptionAPIService
 from app.exception import RailRoadAPIError
+from app.service import UserSubscriptionAPIService
 
 sys.path.insert(0, '../rest_api_library')
 from utils import check_uuid, make_api_response
@@ -81,5 +80,3 @@ class UserSubscriptionAPI(ResourceAPI):
                                         errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
-
-

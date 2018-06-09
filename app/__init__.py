@@ -4,14 +4,14 @@ import os
 from flask import Flask
 
 from app.resources.subscriptions import SubscriptionAPI
+from app.resources.subscriptions.payments import PaymentAPI
 from app.resources.users import UserAPI
+from app.resources.users.subscription import UserSubscriptionAPI
 from app.resources.vpns.servers import VPNServersAPI
 from app.resources.vpns.servers.conditions import VPNServerConditionsAPI
 from app.resources.vpns.servers.configurations import VPNServersConfigurationsAPI
 from app.resources.vpns.servers.meta import VPNServersMetaAPI
-from app.resources.users.subscription import UserSubscriptionAPI
 from app.service import *
-from subscriptions.payments import PaymentAPI
 
 sys.path.insert(1, '../rest_api_library')
 from api import register_api
