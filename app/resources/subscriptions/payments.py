@@ -8,7 +8,7 @@ from flask import request, Response
 from app.exception import RailRoadAPIError
 
 sys.path.insert(0, '../rest_api_library')
-from utils import make_api_response, make_request_no_json_api_response, make_error_request_response
+from utils import make_api_response, make_error_request_response
 from api import ResourceAPI
 from response import APIResponseStatus, APIResponse
 from rest import APIResourceURL
@@ -39,12 +39,12 @@ class PaymentAPI(ResourceAPI):
         request_json = request.json
 
         if request_json is None:
-            return make_error_request_response(HTTPStatus.BAD_REQUEST, error=RailRoadAPIError.REQUEST_NO_JSON)
+            return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.REQUEST_NO_JSON)
 
         apn = request_json.get('apn', None)
 
         if apn is None:
-            return make_error_request_response(HTTPStatus.BAD_REQUEST, error=RailRoadAPIError.PAYMENT_BAD_DATA_ERROR)
+            return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.PAYMENT_BAD_DATA_ERROR)
 
         t = '{0:%Y_%m_%d_%H%M%S}'.format(datetime.datetime.now())
 

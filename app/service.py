@@ -33,8 +33,13 @@ class OrderAPIService(RESTService):
         api_response = self._put(url=url, data=order_json, headers=self._headers)
         return api_response
 
-    def get_order(self, suuid: str) -> APIResponse:
-        url = '%s/%s' % (self._url, suuid)
+    def get_order(self, suuid: str = None, code: int = None) -> APIResponse:
+        if suuid:
+            url = '%s/uuid/%s' % (self._url, suuid)
+        elif code:
+            url = '%s/code/%s' % (self._url, code)
+        else:
+            raise KeyError
         api_response = self._get(url=url)
 
         return api_response

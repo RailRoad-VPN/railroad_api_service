@@ -51,14 +51,14 @@ class UserSubscriptionAPI(ResourceAPI):
 
         is_valid = check_uuid(suuid=suuid)
         if not is_valid:
-            return make_error_request_response(HTTPStatus.NOT_FOUND, error=RailRoadAPIError.BAD_IDENTITY_ERROR)
+            return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
         try:
             api_response = self._user_subscription_service.get_by_user_uuid(user_uuid=suuid)
 
             if api_response.status == APIResponseStatus.failed.status:
                 # user subscription does not exist
-                return make_error_request_response(HTTPStatus.NOT_FOUND, error=RailRoadAPIError.USER_SUBSCRIPTION_NOT_EXIST)
+                return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.USER_SUBSCRIPTION_NOT_EXIST)
 
             response_data = APIResponse(status=api_response.status, code=api_response.code,
                                         data=api_response.data, headers=api_response.headers)

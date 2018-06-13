@@ -29,7 +29,7 @@ class RailRoadAPIError(APIErrorEnum):
     UNKNOWN_ERROR_CODE = (name + str(count()), 'UNKNOWN_ERROR_CODE phrase', 'UNKNOWN_ERROR_CODE description')
     PRIVATE_METHOD = (name + str(count()), 'PRIVATE_METHOD phrase', 'PRIVATE_METHOD description')
     BAD_ACCEPT_LANGUAGE_HEADER = (name + str(count()), 'BAD_ACCEPT_LANGUAGE_HEADER phrase', 'BAD_ACCEPT_LANGUAGE_HEADER description')
-    BAD_IDENTITY_ERROR = (name + str(count()), 'BAD_IDENTITY_ERROR %s phrase', 'BAD_IDENTITY_ERROR description')
+    BAD_IDENTITY_ERROR = (name + str(count()), 'BAD_IDENTITY_ERROR phrase', 'BAD_IDENTITY_ERROR description')
 
     USER_EMAIL_BUSY = (name + str(count()), 'USER_EMAIL_BUSY phrase', 'USER_EMAIL_BUSY description')
     USER_NOT_EXIST = (name + str(count()), 'USER_NOT_EXIST phrase', 'USER_NOT_EXIST description')

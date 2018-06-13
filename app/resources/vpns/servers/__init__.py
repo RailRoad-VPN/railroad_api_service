@@ -11,7 +11,7 @@ sys.path.insert(0, '../rest_api_library')
 from rest import APIException, APIResourceURL
 from api import ResourceAPI
 from response import APIResponseStatus, APIResponse
-from utils import check_uuid, make_api_response, make_request_no_json_api_response, make_error_request_response
+from utils import check_uuid, make_api_response, make_error_request_response
 
 
 class VPNServersAPI(ResourceAPI):
@@ -70,10 +70,10 @@ class VPNServersAPI(ResourceAPI):
         is_valid_suuid = check_uuid(suuid)
         is_valid_vpnserver_uuid = check_uuid(vpnserver_uuid)
         if not is_valid_suuid or not is_valid_vpnserver_uuid:
-            return make_error_request_response(HTTPStatus.BAD_REQUEST, error=RailRoadAPIError.VPNSERVER_IDENTIFIER_ERROR)
+            return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.VPNSERVER_IDENTIFIER_ERROR)
 
         if suuid != vpnserver_uuid:
-            return make_error_request_response(HTTPStatus.BAD_REQUEST, error=RailRoadAPIError.VPNSERVER_IDENTIFIER_ERROR)
+            return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.VPNSERVER_IDENTIFIER_ERROR)
 
         try:
             api_response = self._vpn_service.update_vpn_server(vpnserver=request_json)
@@ -119,7 +119,7 @@ class VPNServersAPI(ResourceAPI):
         elif suuid is not None:
             is_valid = check_uuid(suuid=suuid)
             if not is_valid:
-                return make_error_request_response(HTTPStatus.NOT_FOUND, error=RailRoadAPIError.BAD_IDENTITY_ERROR)
+                return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
             # specific server by uuid
             try:

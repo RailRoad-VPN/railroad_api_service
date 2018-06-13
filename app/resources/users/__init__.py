@@ -52,7 +52,7 @@ class UserAPI(ResourceAPI):
 
         if api_response.code == HTTPStatus.OK:
             # user exist
-            return make_error_request_response(HTTPStatus.BAD_REQUEST, error=RailRoadAPIError.USER_EMAIL_BUSY)
+            return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.USER_EMAIL_BUSY)
 
         try:
             api_response = self._user_service.create_user(user_json=request_json)
@@ -74,7 +74,7 @@ class UserAPI(ResourceAPI):
     def put(self, uuid: str = None) -> Response:
         is_valid = check_uuid(suuid=uuid)
         if not is_valid:
-            return make_error_request_response(HTTPStatus.NOT_FOUND, error=RailRoadAPIError.BAD_IDENTITY_ERROR)
+            return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
         request_json = request.json
 
@@ -87,7 +87,7 @@ class UserAPI(ResourceAPI):
 
         if api_response.status == APIResponseStatus.failed.status:
             # user does not exist
-            return make_error_request_response(HTTPStatus.NOT_FOUND, error=RailRoadAPIError.USER_NOT_EXIST)
+            return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.USER_NOT_EXIST)
         try:
             api_response = self._user_service.update_user(user_json=request_json)
         except APIException as e:
@@ -113,11 +113,11 @@ class UserAPI(ResourceAPI):
         if suuid is not None:
             is_valid = check_uuid(suuid=suuid)
             if not is_valid:
-                return make_error_request_response(HTTPStatus.NOT_FOUND, error=RailRoadAPIError.BAD_IDENTITY_ERROR)
+                return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
         if suuid is None and email is None:
             # find all users - no parameters set
-            return make_error_request_response(HTTPStatus.METHOD_NOT_ALLOWED, error=RailRoadAPIError.PRIVATE_METHOD)
+            return make_error_request_response(HTTPStatus.METHOD_NOT_ALLOWED, err=RailRoadAPIError.PRIVATE_METHOD)
 
         # uuid or email is not None, let's get user
         try:

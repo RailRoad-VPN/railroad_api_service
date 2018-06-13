@@ -44,12 +44,11 @@ class OrderAPI(ResourceAPI):
         if request_json is None:
             return make_request_no_json_api_response()
 
-        suuid = request_json.get('uuid', None)
         code = request_json.get('code', None)
         status_id = request_json.get('status_id', None)
         payment_uuid = request_json.get('payment_uuid', None)
 
-        error_fields = check_required_api_fields(suuid, code, status_id, payment_uuid)
+        error_fields = check_required_api_fields(code, status_id)
         if len(error_fields) > 0:
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST,
                                         errors=error_fields)
@@ -57,7 +56,6 @@ class OrderAPI(ResourceAPI):
             return resp
 
         order_json = {
-            'uuid': suuid,
             'code': code,
             'status_id': status_id,
             'payment_uuid': payment_uuid,
@@ -83,12 +81,27 @@ class OrderAPI(ResourceAPI):
     def put(self, uuid: str = None) -> Response:
         is_valid = check_uuid(suuid=uuid)
         if not is_valid:
-            return make_error_request_response(HTTPStatus.BAD_REQUEST, error=RailRoadAPIError.BAD_ORDER_IDENTITY)
+            return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.BAD_ORDER_IDENTITY)
 
         request_json = request.json
 
         if request_json is None:
-            return make_error_request_response(HTTPStatus.BAD_REQUEST, error=RailRoadAPIError.REQUEST_NO_JSON)
+            return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.REQUEST_NO_JSON)
+
+        suuid = request_json.get('uuid', None)
+        code = request_json.get('code', None)
+        status_id = request_json.get('status_id', None)
+        payment_uuid = request_json.get('payment_uuid', None)
+
+        order_json = {
+            'uuid': suuid,
+            'code': code,
+            'status_id': status_id,
+            'payment_uuid': payment_uuid,
+        }
+
+        # clear None elements
+        order_json = {k: v for k, v in order_json.items() if v is not None}
 
         try:
             api_response = self._order_service.get_order(suuid=uuid)
@@ -99,10 +112,10 @@ class OrderAPI(ResourceAPI):
 
         if api_response.status == APIResponseStatus.failed.status:
             # order does not exist
-            return make_error_request_response(HTTPStatus.NOT_FOUND, error=RailRoadAPIError.ORDER_NOT_EXIST)
+            return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.ORDER_NOT_EXIST)
 
         try:
-            api_response = self._order_service.update_order(order_json=request_json)
+            api_response = self._order_service.update_order(order_json=order_json)
         except APIException as e:
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
@@ -122,20 +135,25 @@ class OrderAPI(ResourceAPI):
             resp = make_api_response(data=response_data, http_code=api_response.code)
             return resp
 
-    def get(self, suuid: str = None, email: str = None) -> Response:
+    def get(self, suuid: str = None, code: int = None) -> Response:
         super(OrderAPI, self).get(req=request)
         if suuid is not None:
             is_valid = check_uuid(suuid=suuid)
             if not is_valid:
-                return make_error_request_response(HTTPStatus.NOT_FOUND, error=RailRoadAPIError.BAD_IDENTITY_ERROR)
+                return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
-        if suuid is None and email is None:
+        if suuid is None and code is None:
             # find all orders - no parameters set
-            return make_error_request_response(HTTPStatus.METHOD_NOT_ALLOWED, error=RailRoadAPIError.METHOD_NOT_ALLOWED)
+            return make_error_request_response(HTTPStatus.METHOD_NOT_ALLOWED, err=RailRoadAPIError.METHOD_NOT_ALLOWED)
 
-        # uuid or email is not None, let's get order
         try:
-            api_response = self._order_service.get_order(suuid=suuid)
+            code = int(code)
+        except ValueError:
+            return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
+
+        # uuid or code is not None, let's get order
+        try:
+            api_response = self._order_service.get_order(suuid=suuid, code=code)
         except APIException as e:
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
