@@ -88,7 +88,7 @@ class PaymentAPI(ResourceAPI):
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
 
-        if api_response.status == APIResponseStatus.failed.status:
+        if not api_response.is_ok:
             # payment does not exist
             code = HTTPStatus.BAD_REQUEST
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=code,
@@ -149,7 +149,7 @@ class PaymentAPI(ResourceAPI):
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
 
-        if api_response.status == APIResponseStatus.failed.status:
+        if not api_response.is_ok:
             response_data = APIResponse(status=api_response.status, code=HTTPStatus.BAD_REQUEST,
                                         headers=api_response.headers, errors=api_response.errors)
             resp = make_api_response(data=response_data, http_code=HTTPStatus.BAD_REQUEST)

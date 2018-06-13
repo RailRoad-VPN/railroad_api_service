@@ -3,7 +3,7 @@ from typing import List
 
 sys.path.insert(0, '../rest_api_library')
 from rest import RESTService, APIException
-from response import APIResponse, APIResponseStatus
+from response import APIResponse
 from api import ResourcePagination
 
 
@@ -51,11 +51,22 @@ class UserSubscriptionAPIService(RESTService):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def get_by_user_uuid(self, user_uuid: str = None) -> APIResponse:
-        url = '%s/%s' % (self._url, user_uuid)
+    def create(self, us_json: dict) -> APIResponse:
+        api_response = self._post(data=us_json)
+        return api_response
 
+    def update(self, us_json: dict) -> APIResponse:
+        api_response = self._put(data=us_json)
+        return api_response
+
+    def get_user_subscription_by_uuid(self, suuid: str) -> APIResponse:
+        url = '%s/%s' % (self._url, suuid)
         api_response = self._get(url=url)
+        return api_response
 
+    def get_user_subscriptions_by_user_uuid(self, user_uuid: str = None) -> APIResponse:
+        url = '%s/users/%s' % (self._url, user_uuid)
+        api_response = self._get(url=url)
         return api_response
 
 
@@ -300,13 +311,13 @@ class VPNService(object):
 
     def create_vpn_server(self, vpnserver: dict) -> APIResponse:
         api_response = self.vpnserver_service.create_vpnserver(vpnserver=vpnserver)
-        if api_response.status == APIResponseStatus.failed.status:
+        if not api_response.is_ok:
             raise APIException(http_code=api_response.code, errors=api_response.errors)
         return api_response
 
     def update_vpn_server(self, vpnserver: dict) -> APIResponse:
         api_response = self.vpnserver_service.update_vpnserver(vpnserver=vpnserver)
-        if api_response.status == APIResponseStatus.failed.status:
+        if not api_response.is_ok:
             raise APIException(http_code=api_response.code, errors=api_response.errors, data=api_response.data)
         return api_response
 
@@ -322,7 +333,7 @@ class VPNService(object):
         else:
             api_response = self.vpnserver_service.get_vpnservers(pagination=pagination)
 
-        if api_response.status == APIResponseStatus.failed.status:
+        if not api_response.is_ok:
             raise APIException(http_code=api_response.code, errors=api_response.errors)
 
         server = api_response.data[0]
@@ -331,7 +342,7 @@ class VPNService(object):
 
     def get_vpn_server_list(self, pagination: ResourcePagination = None) -> List[dict]:
         api_response = self.vpnserver_service.get_vpnservers(pagination=pagination)
-        if api_response.status == APIResponseStatus.failed.status:
+        if not api_response.is_ok:
             raise APIException(http_code=api_response.code, errors=api_response.errors)
         servers_list = []
         for server in api_response.data:
@@ -342,7 +353,7 @@ class VPNService(object):
 
     def get_vpn_server_list_by_type(self, type_id: int, pagination: ResourcePagination) -> List[dict]:
         api_response = self.vpnserver_service.get_vpnservers_by_type(type_id=type_id, pagination=pagination)
-        if api_response.status == APIResponseStatus.failed.status:
+        if not api_response.is_ok:
             raise APIException(http_code=api_response.code, errors=api_response.errors)
         servers_list = []
         for server in api_response.data:
@@ -353,7 +364,7 @@ class VPNService(object):
 
     def get_vpn_server_list_by_status(self, status_id: int, pagination: ResourcePagination) -> List[dict]:
         api_response = self.vpnserver_service.get_vpnservers_by_status(status_id=status_id, pagination=pagination)
-        if api_response.status == APIResponseStatus.failed.status:
+        if not api_response.is_ok:
             raise APIException(http_code=api_response.code, errors=api_response.errors)
         servers_list = []
         for server in api_response.data:
@@ -364,7 +375,7 @@ class VPNService(object):
 
     def get_vpn_server_condition_list(self, pagination: ResourcePagination) -> List[dict]:
         api_response = self.vpnserver_service.get_vpnservers(pagination=pagination)
-        if api_response.status == APIResponseStatus.failed.status:
+        if not api_response.is_ok:
             raise APIException(http_code=api_response.code, errors=api_response.errors)
         servers_list = []
         for server in api_response.data:
@@ -375,7 +386,7 @@ class VPNService(object):
 
     def get_vpn_server_condition_list_by_type(self, type_id: int, pagination: ResourcePagination) -> List[dict]:
         api_response = self.vpnserver_service.get_vpnservers_by_type(type_id=type_id, pagination=pagination)
-        if api_response.status == APIResponseStatus.failed.status:
+        if not api_response.is_ok:
             raise APIException(http_code=api_response.code, errors=api_response.errors)
         servers_list = []
         for server in api_response.data:
@@ -386,7 +397,7 @@ class VPNService(object):
 
     def get_vpn_server_condition_list_by_status(self, status_id: int, pagination: ResourcePagination) -> List[dict]:
         api_response = self.vpnserver_service.get_vpnservers_by_status(status_id=status_id, pagination=pagination)
-        if api_response.status == APIResponseStatus.failed.status:
+        if not api_response.is_ok:
             raise APIException(http_code=api_response.code, errors=api_response.errors)
         servers_list = []
         for server in api_response.data:
@@ -397,7 +408,7 @@ class VPNService(object):
 
     def get_vpn_server_condition(self, suuid: str):
         api_response = self.vpnserver_service.get_vpnserver_by_uuid(suuid=suuid)
-        if api_response.status == APIResponseStatus.failed.status:
+        if not api_response.is_ok:
             raise APIException(http_code=api_response.code, errors=api_response.errors)
 
         server = api_response.data
@@ -411,7 +422,7 @@ class VPNService(object):
 
     def get_vpn_server(self, suuid: str) -> dict:
         api_response = self.vpnserver_service.get_vpnserver_by_uuid(suuid=suuid)
-        if api_response.status == APIResponseStatus.failed.status:
+        if not api_response.is_ok:
             raise APIException(http_code=api_response.code, errors=api_response.errors)
 
         server = api_response.data
@@ -421,7 +432,7 @@ class VPNService(object):
     def get_vpn_server_configuration(self, server_uuid: str, user_uuid: str = None) -> dict:
         api_response = self.vpnserverconfiguration_service.get_vpnserverconfig(server_uuid=server_uuid,
                                                                                user_uuid=user_uuid)
-        if api_response.status == APIResponseStatus.failed.status:
+        if not api_response.is_ok:
             raise APIException(http_code=api_response.code, errors=api_response.errors)
 
         return api_response.data
@@ -430,7 +441,7 @@ class VPNService(object):
         geo_position_id = server.pop("geo_position_id")
 
         api_response = self.geoposition_service.get_geopos_by_id(sid=geo_position_id)
-        if api_response.status == APIResponseStatus.failed.status:
+        if not api_response.is_ok:
             return server
 
         geopos = api_response.data

@@ -7,6 +7,7 @@ from flask import Flask, request
 from app.resources.subscriptions import SubscriptionAPI
 from app.resources.subscriptions.payments import PaymentAPI
 from app.resources.users import UserAPI
+from app.resources.users.orders import OrderAPI
 from app.resources.users.subscription import UserSubscriptionAPI
 from app.resources.vpns.servers import VPNServersAPI
 from app.resources.vpns.servers.conditions import VPNServerConditionsAPI
@@ -71,6 +72,9 @@ user_subscription_service = UserSubscriptionAPIService(api_url=app_config['BILLI
 subscription_service = SubscriptionAPIService(api_url=app_config['BILLING_SERVICE_URL'],
                                               resource_name=app_config['BILLING_SERVICE_SUBSCRIPTIONS_RESOURCE_NAME'])
 
+order_service = OrderAPIService(api_url=app_config['BILLING_SERVICE_URL'],
+                                resource_name=app_config['BILLING_SERVICE_ORDERS_RESOURCE_NAME'])
+
 vpn_service = VPNService(vpnserver_service=vpnserver_service, vpntype_service=vpntype_service,
                          vpnserverconfiguration_service=vpnserverconfiguration_service,
                          vpnserverstatus_service=vpnserverstatus_service, geoposition_service=geoposition_service,
@@ -79,6 +83,7 @@ vpn_service = VPNService(vpnserver_service=vpnserver_service, vpntype_service=vp
 
 apis = [
     {'cls': UserAPI, 'args': [user_service, app_config]},
+    {'cls': OrderAPI, 'args': [order_service, app_config]},
     {'cls': UserSubscriptionAPI, 'args': [user_subscription_service, app_config]},
     {'cls': PaymentAPI, 'args': [app_config]},
     {'cls': SubscriptionAPI, 'args': [subscription_service, app_config]},
@@ -99,6 +104,7 @@ def wants_json_response():
 @app.errorhandler(400)
 def not_found_error(error):
     return make_error_request_response(HTTPStatus.BAD_REQUEST)
+
 
 @app.errorhandler(404)
 def not_found_error(error):

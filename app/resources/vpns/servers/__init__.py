@@ -44,7 +44,7 @@ class VPNServersAPI(ResourceAPI):
         request_json = request.json
 
         if request_json is None:
-            return make_request_no_json_api_response(error=RailRoadAPIError.REQUEST_NO_JSON)
+            return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.REQUEST_NO_JSON)
 
         try:
             api_response = self._vpn_service.create_vpn_server(vpnserver=request_json)
@@ -63,7 +63,7 @@ class VPNServersAPI(ResourceAPI):
         request_json = request.json
 
         if request_json is None:
-            return make_request_no_json_api_response(error=RailRoadAPIError.REQUEST_NO_JSON)
+            return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.REQUEST_NO_JSON)
 
         vpnserver_uuid = request_json.get('uuid', None)
 

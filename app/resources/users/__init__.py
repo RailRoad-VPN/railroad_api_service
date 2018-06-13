@@ -8,7 +8,7 @@ from app.exception import RailRoadAPIError
 from app.service import UserAPIService
 
 sys.path.insert(0, '../rest_api_library')
-from utils import check_uuid, make_api_response, make_error_request_response
+from utils import check_uuid, make_api_response, make_error_request_response, check_required_api_fields
 from api import ResourceAPI
 from response import APIResponseStatus, APIResponse
 from rest import APIException, APIResourceURL
@@ -41,10 +41,34 @@ class UserAPI(ResourceAPI):
     def post(self) -> Response:
         request_json = request.json
 
-        user_email = request_json['email']
+        if request_json is None:
+            return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.REQUEST_NO_JSON)
+
+        email = request_json.get('email', None)
+        password = request_json.get('password', None)
+        is_expired = request_json.get('is_expired', None)
+        is_locked = request_json.get('is_locked', None)
+        is_password_expired = request_json.get('is_password_expired', None)
+        enabled = request_json.get('enabled', None)
+
+        user_json = {
+            'email': email,
+            'password': password,
+            'is_expired': is_expired,
+            'is_locked': is_locked,
+            'is_password_expired': is_password_expired,
+            'enabled': enabled,
+        }
+
+        error_fields = check_required_api_fields(suuid, email, password, is_expired, is_locked, is_password_expired, enabled)
+        if len(error_fields) > 0:
+            response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST,
+                                        errors=error_fields)
+            resp = make_api_response(data=response_data, http_code=response_data.code)
+            return resp
 
         try:
-            api_response = self._user_service.get_user(email=user_email)
+            api_response = self._user_service.get_user(email=email)
         except APIException as e:
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
@@ -55,7 +79,7 @@ class UserAPI(ResourceAPI):
             return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.USER_EMAIL_BUSY)
 
         try:
-            api_response = self._user_service.create_user(user_json=request_json)
+            api_response = self._user_service.create_user(user_json=user_json)
         except APIException as e:
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
@@ -71,12 +95,42 @@ class UserAPI(ResourceAPI):
             resp = make_api_response(data=response_data, http_code=api_response.code)
         return resp
 
-    def put(self, uuid: str = None) -> Response:
-        is_valid = check_uuid(suuid=uuid)
-        if not is_valid:
+    def put(self, suuid: str = None) -> Response:
+        request_json = request.json
+
+        if request_json is None:
+            return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.REQUEST_NO_JSON)
+
+        user_uuid = request_json.get('suuid', None)
+
+        is_valid_a = check_uuid(suuid=suuid)
+        is_valid_b = check_uuid(suuid=user_uuid)
+        if not is_valid_a or not is_valid_b or (user_uuid != suuid):
             return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
-        request_json = request.json
+        email = request_json.get('email', None)
+        password = request_json.get('password', None)
+        is_expired = request_json.get('is_expired', None)
+        is_locked = request_json.get('is_locked', None)
+        is_password_expired = request_json.get('is_password_expired', None)
+        enabled = request_json.get('enabled', None)
+
+        user_json = {
+            'uuid': suuid,
+            'email': email,
+            'password': password,
+            'is_expired': is_expired,
+            'is_locked': is_locked,
+            'is_password_expired': is_password_expired,
+            'enabled': enabled,
+        }
+
+        error_fields = check_required_api_fields(suuid, email, password, is_expired, is_locked, is_password_expired, enabled)
+        if len(error_fields) > 0:
+            response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST,
+                                        errors=error_fields)
+            resp = make_api_response(data=response_data, http_code=response_data.code)
+            return resp
 
         try:
             api_response = self._user_service.get_user(suuid=uuid)
@@ -85,11 +139,11 @@ class UserAPI(ResourceAPI):
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
 
-        if api_response.status == APIResponseStatus.failed.status:
+        if not api_response.is_ok:
             # user does not exist
             return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.USER_NOT_EXIST)
         try:
-            api_response = self._user_service.update_user(user_json=request_json)
+            api_response = self._user_service.update_user(user_json=user_json)
         except APIException as e:
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
@@ -127,7 +181,7 @@ class UserAPI(ResourceAPI):
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
 
-        if api_response.status == APIResponseStatus.failed.status:
+        if not api_response.is_ok:
             response_data = APIResponse(status=api_response.status, code=HTTPStatus.BAD_REQUEST,
                                         headers=api_response.headers, errors=api_response.errors)
             resp = make_api_response(data=response_data, http_code=HTTPStatus.BAD_REQUEST)
