@@ -8,7 +8,7 @@ from flask import request, Response
 from app.exception import RailRoadAPIError
 
 sys.path.insert(0, '../rest_api_library')
-from utils import make_api_response
+from utils import make_api_response, make_request_no_json_api_response, make_error_request_response
 from api import ResourceAPI
 from response import APIResponseStatus, APIResponse
 from rest import APIResourceURL
@@ -39,31 +39,19 @@ class PaymentAPI(ResourceAPI):
         request_json = request.json
 
         if request_json is None:
-            error = RailRoadAPIError.REQUEST_NO_JSON.message
-            error_code = RailRoadAPIError.REQUEST_NO_JSON.code
-            developer_message = RailRoadAPIError.REQUEST_NO_JSON.developer_message
-            http_code = HTTPStatus.BAD_REQUEST
-            response_data = APIResponse(status=APIResponseStatus.failed.value, code=http_code, error=error,
-                                        developer_message=developer_message, error_code=error_code)
-            return make_api_response(data=response_data, http_code=http_code)
+            return make_error_request_response(HTTPStatus.BAD_REQUEST, error=RailRoadAPIError.REQUEST_NO_JSON)
 
         apn = request_json.get('apn', None)
 
         if apn is None:
-            error = RailRoadAPIError.PAYMENT_BAD_DATA_ERROR.message
-            error_code = RailRoadAPIError.PAYMENT_BAD_DATA_ERROR.code
-            developer_message = RailRoadAPIError.PAYMENT_BAD_DATA_ERROR.developer_message
-            http_code = HTTPStatus.BAD_REQUEST
-            response_data = APIResponse(status=APIResponseStatus.failed.value, code=http_code, error=error,
-                                        developer_message=developer_message, error_code=error_code)
-            return make_api_response(data=response_data, http_code=http_code)
+            return make_error_request_response(HTTPStatus.BAD_REQUEST, error=RailRoadAPIError.PAYMENT_BAD_DATA_ERROR)
 
         t = '{0:%Y_%m_%d_%H%M%S}'.format(datetime.datetime.now())
 
         with open('/opt/apps/dfn/apn/%s.apn' % t, 'w') as file:
             file.write(apn)
 
-        response_data = APIResponse(status=APIResponseStatus.success.value, code=HTTPStatus.OK)
+        response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK)
         resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
         return resp
 

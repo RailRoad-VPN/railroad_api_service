@@ -48,7 +48,7 @@ class VPNServersMetaAPI(ResourceAPI):
     def get(self) -> Response:
         api_response = self.vpnserversmeta_service.get_meta()
 
-        response_data = APIResponse(status=APIResponseStatus.success.value, code=api_response.code,
+        response_data = APIResponse(status=APIResponseStatus.success.status, code=api_response.code,
                                     data=api_response.data, headers=api_response.headers)
         resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
         return resp

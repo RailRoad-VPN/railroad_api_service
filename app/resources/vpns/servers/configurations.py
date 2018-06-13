@@ -49,12 +49,12 @@ class VPNServersConfigurationsAPI(ResourceAPI):
         try:
             api_response = self.vpnserversconfigurations_service.get_vpnserverconfig(server_uuid=server_uuid,
                                                                                      user_uuid=user_uuid)
-            response_data = APIResponse(status=APIResponseStatus.success.value, code=api_response.code,
+            response_data = APIResponse(status=APIResponseStatus.success.status, code=api_response.code,
                                         data=api_response.data, headers=api_response.headers)
             resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
             return resp
         except APIException as e:
-            response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code,
+            response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code,
                                         errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp

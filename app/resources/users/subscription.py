@@ -8,7 +8,7 @@ from app.exception import RailRoadAPIError
 from app.service import UserSubscriptionAPIService
 
 sys.path.insert(0, '../rest_api_library')
-from utils import check_uuid, make_api_response
+from utils import check_uuid, make_api_response, make_error_request_response
 from api import ResourceAPI
 from response import APIResponseStatus, APIResponse
 from rest import APIException, APIResourceURL
@@ -51,32 +51,21 @@ class UserSubscriptionAPI(ResourceAPI):
 
         is_valid = check_uuid(suuid=suuid)
         if not is_valid:
-            code = HTTPStatus.NOT_FOUND
-            response_data = APIResponse(status=APIResponseStatus.failed.value, code=code,
-                                        error=RailRoadAPIError.BAD_USER_IDENTITY.message,
-                                        error_code=RailRoadAPIError.BAD_USER_IDENTITY.code)
-
-            resp = make_api_response(data=response_data, http_code=code)
-            return resp
+            return make_error_request_response(HTTPStatus.NOT_FOUND, error=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
         try:
             api_response = self._user_subscription_service.get_by_user_uuid(user_uuid=suuid)
 
-            if api_response.status == APIResponseStatus.failed.value:
+            if api_response.status == APIResponseStatus.failed.status:
                 # user subscription does not exist
-                code = HTTPStatus.BAD_REQUEST
-                response_data = APIResponse(status=APIResponseStatus.failed.value, code=code,
-                                            error=RailRoadAPIError.USER_SUBSCRIPTION_NOT_EXIST.message,
-                                            error_code=RailRoadAPIError.USER_SUBSCRIPTION_NOT_EXIST.code)
-                resp = make_api_response(data=response_data, http_code=code)
-                return resp
+                return make_error_request_response(HTTPStatus.NOT_FOUND, error=RailRoadAPIError.USER_SUBSCRIPTION_NOT_EXIST)
 
             response_data = APIResponse(status=api_response.status, code=api_response.code,
                                         data=api_response.data, headers=api_response.headers)
             resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
             return resp
         except APIException as e:
-            response_data = APIResponse(status=APIResponseStatus.failed.value, code=e.http_code,
+            response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code,
                                         errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
