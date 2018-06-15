@@ -47,7 +47,7 @@ class OrderAPI(ResourceAPI):
         status_id = request_json.get('status_id', None)
         payment_uuid = request_json.get('payment_uuid', None)
 
-        error_fields = check_required_api_fields(status_id)
+        error_fields = check_required_api_fields({'status_id': status_id})
         if len(error_fields) > 0:
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST,
                                         errors=error_fields)
@@ -103,7 +103,13 @@ class OrderAPI(ResourceAPI):
         status_id = request_json.get('status_id', None)
         payment_uuid = request_json.get('payment_uuid', None)
 
-        error_fields = check_required_api_fields(suuid, code, status_id)
+        req_fields = {
+            'code': code,
+            'status_id': status_id,
+            'payment_uuid': payment_uuid,
+        }
+
+        error_fields = check_required_api_fields(req_fields)
         if len(error_fields) > 0:
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST,
                                         errors=error_fields)

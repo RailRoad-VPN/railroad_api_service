@@ -54,19 +54,19 @@ class UserSubscriptionAPI(ResourceAPI):
         expire_date = request_json.get('expire_date', None)
         order_uuid = request_json.get('order_uuid', None)
 
-        error_fields = check_required_api_fields(user_uuid, subscription_id, expire_date, order_uuid)
-        if len(error_fields) > 0:
-            response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST,
-                                        errors=error_fields)
-            resp = make_api_response(data=response_data, http_code=response_data.code)
-            return resp
-
         us_json = {
             'user_uuid': user_uuid,
             'subscription_id': subscription_id,
             'expire_date': expire_date,
             'order_uuid': order_uuid,
         }
+
+        error_fields = check_required_api_fields(us_json)
+        if len(error_fields) > 0:
+            response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST,
+                                        errors=error_fields)
+            resp = make_api_response(data=response_data, http_code=response_data.code)
+            return resp
 
         try:
             api_response = self._user_subscription_service.create(us_json=us_json)
@@ -107,20 +107,21 @@ class UserSubscriptionAPI(ResourceAPI):
         modify_date = request_json.get('modify_date', None)
         modify_reason = request_json.get('modify_reason', None)
 
-        error_fields = check_required_api_fields(us_uuid, user_uuid, subscription_id, expire_date, order_uuid,
-                                                 modify_date, modify_reason)
-        if len(error_fields) > 0:
-            response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST,
-                                        errors=error_fields)
-            resp = make_api_response(data=response_data, http_code=response_data.code)
-            return resp
-
         us_json = {
             'user_uuid': user_uuid,
             'subscription_id': subscription_id,
             'expire_date': expire_date,
             'order_uuid': order_uuid,
+            'modify_date': modify_date,
+            'modify_reason': modify_reason,
         }
+
+        error_fields = check_required_api_fields(us_json)
+        if len(error_fields) > 0:
+            response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST,
+                                        errors=error_fields)
+            resp = make_api_response(data=response_data, http_code=response_data.code)
+            return resp
 
         try:
             api_response = self._user_subscription_service.get_user_subscription_by_uuid(suuid=user_subscription_uuid)

@@ -60,7 +60,7 @@ class UserAPI(ResourceAPI):
             'enabled': enabled,
         }
 
-        error_fields = check_required_api_fields(suuid, email, password, is_expired, is_locked, is_password_expired, enabled)
+        error_fields = check_required_api_fields(user_json)
         if len(error_fields) > 0:
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST,
                                         errors=error_fields)
@@ -125,7 +125,7 @@ class UserAPI(ResourceAPI):
             'enabled': enabled,
         }
 
-        error_fields = check_required_api_fields(suuid, email, password, is_expired, is_locked, is_password_expired, enabled)
+        error_fields = check_required_api_fields(user_json)
         if len(error_fields) > 0:
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST,
                                         errors=error_fields)
