@@ -2,13 +2,14 @@ import sys
 from http import HTTPStatus
 from typing import List
 
+import logging
 from flask import request, Response
 
 from app.exception import RailRoadAPIError
 from app.service import SubscriptionAPIService
 
 sys.path.insert(0, '../rest_api_library')
-from utils import make_api_response
+from utils import make_api_response, make_error_request_response
 from api import ResourceAPI
 from response import APIResponseStatus, APIResponse
 from rest import APIResourceURL, APIException
@@ -50,11 +51,12 @@ class SubscriptionAPI(ResourceAPI):
         lang_code = request.headers.get('Accept-Language', None)
 
         if lang_code is None:
-            return make_error_request_response(HTTPStatus.BAD_REQUEST, error=RailRoadAPIError.BAD_ACCEPT_LANGUAGE_HEADER)
+            return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.BAD_ACCEPT_LANGUAGE_HEADER)
 
         try:
             api_response = self._subscription_service.get_subscriptions(lang_code=lang_code)
         except APIException as e:
+            logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp

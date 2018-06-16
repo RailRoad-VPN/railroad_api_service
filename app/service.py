@@ -1,3 +1,4 @@
+import datetime
 import sys
 from typing import List
 
@@ -51,16 +52,32 @@ class UserSubscriptionAPIService(RESTService):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def create(self, us_json: dict) -> APIResponse:
-        api_response = self._post(data=us_json)
+    def create(self, user_uuid: str, subscription_id: str, order_uuid: str) -> APIResponse:
+        us_json = {
+            'user_uuid': user_uuid,
+            'subscription_id': subscription_id,
+            'order_uuid': order_uuid,
+        }
+        url = self._url.replace('<string:user_uuid>', user_uuid)
+        api_response = self._post(data=us_json, url=url)
         return api_response
 
-    def update(self, us_json: dict) -> APIResponse:
-        api_response = self._put(data=us_json)
+    def update(self, user_uuid: str, subscription_id: str, order_uuid: str, expire_date: datetime,
+               modify_date: datetime, modify_reason: str) -> APIResponse:
+        us_json = {
+            'user_uuid': user_uuid,
+            'subscription_id': subscription_id,
+            'expire_date': expire_date,
+            'order_uuid': order_uuid,
+            'modify_date': modify_date,
+            'modify_reason': modify_reason,
+        }
+        url = self._url.replace('<string:user_uuid>', user_uuid)
+        api_response = self._put(data=us_json, url=url)
         return api_response
 
-    def get_user_subscription_by_uuid(self, suuid: str) -> APIResponse:
-        url = '%s/%s' % (self._url, suuid)
+    def get_user_subscription_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
+        url = '%s/%s' % (self._url.replace('<string:user_uuid>', user_uuid), suuid)
         api_response = self._get(url=url)
         return api_response
 

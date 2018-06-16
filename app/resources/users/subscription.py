@@ -2,6 +2,7 @@ import sys
 from http import HTTPStatus
 from typing import List
 
+import logging
 from flask import request, Response
 
 from app.exception import RailRoadAPIError
@@ -51,17 +52,15 @@ class UserSubscriptionAPI(ResourceAPI):
 
         user_uuid = request_json.get('user_uuid', None)
         subscription_id = request_json.get('subscription_id', None)
-        expire_date = request_json.get('expire_date', None)
         order_uuid = request_json.get('order_uuid', None)
 
-        us_json = {
+        req_fields = {
             'user_uuid': user_uuid,
             'subscription_id': subscription_id,
-            'expire_date': expire_date,
             'order_uuid': order_uuid,
         }
 
-        error_fields = check_required_api_fields(us_json)
+        error_fields = check_required_api_fields(req_fields)
         if len(error_fields) > 0:
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST,
                                         errors=error_fields)
@@ -69,20 +68,22 @@ class UserSubscriptionAPI(ResourceAPI):
             return resp
 
         try:
-            api_response = self._user_subscription_service.create(us_json=us_json)
+            api_response = self._user_subscription_service.create(user_uuid=user_uuid, subscription_id=subscription_id,
+                                                                  order_uuid=order_uuid)
             if api_response.is_ok:
-                user_subscription_uuid = api_response.data['uuid']
-                resp = make_api_response(http_code=HTTPStatus.CREATED)
+                us_uuid = api_response.headers['Location'].split('/')[-1]
+                api_url = self.__api_url__.replace('<string:user_uuid>', user_uuid)
 
-                api_url = self.__api_url__ % user_uuid
-                resp.headers['Location'] = '%s/%s/uuid/%s' % (
-                    self._config['API_BASE_URI'], api_url, user_subscription_uuid)
+                response_data = APIResponse(status=APIResponseStatus.success.status, code=api_response.code)
+                resp = make_api_response(data=response_data, http_code=api_response.code)
+                resp.headers['Location'] = '%s/%s/%s' % (self._config['API_BASE_URI'], api_url, us_uuid)
                 return resp
             else:
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=api_response.code,
                                             errors=api_response.errors, headers=api_response.headers)
                 return make_api_response(data=response_data, http_code=api_response.code)
         except APIException as e:
+            logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
@@ -130,6 +131,7 @@ class UserSubscriptionAPI(ResourceAPI):
                 return make_error_request_response(HTTPStatus.NOT_FOUND,
                                                    err=RailRoadAPIError.USER_SUBSCRIPTION_NOT_EXIST)
         except APIException as e:
+            logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
@@ -145,6 +147,7 @@ class UserSubscriptionAPI(ResourceAPI):
             resp = make_api_response(data=response_data, http_code=api_response.code)
             return resp
         except APIException as e:
+            logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
@@ -161,11 +164,19 @@ class UserSubscriptionAPI(ResourceAPI):
             if not is_valid:
                 return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
             # get user subscription by subscription uuid
-            api_response = self._user_subscription_service.get_user_subscription_by_uuid(suuid=user_subscription_uuid)
+            api_response = self._user_subscription_service.get_user_subscription_by_uuid(user_uuid=user_uuid,
+                                                                                         suuid=user_subscription_uuid)
             if api_response.is_ok:
-                pass
+                response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK,
+                                            data=api_response.data)
+                resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
+                return resp
             else:
-                pass
+                response_data = APIResponse(status=api_response.status, code=api_response.code,
+                                            data=api_response.data, headers=api_response.headers,
+                                            errors=api_response.errors)
+                resp = make_api_response(data=response_data, http_code=api_response.code)
+                return resp
         else:
             # get all user subscriptions
             try:
@@ -181,6 +192,7 @@ class UserSubscriptionAPI(ResourceAPI):
                     resp = make_api_response(data=response_data, http_code=api_response.code)
                 return resp
             except APIException as e:
+                logging.debug(e.serialize())
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
                 resp = make_api_response(data=response_data, http_code=e.http_code)
                 return resp

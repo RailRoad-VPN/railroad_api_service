@@ -54,6 +54,7 @@ class VPNServersConfigurationsAPI(ResourceAPI):
             resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
             return resp
         except APIException as e:
+            logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code,
                                         errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)

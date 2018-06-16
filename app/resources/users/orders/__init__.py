@@ -1,3 +1,4 @@
+import logging
 import sys
 from http import HTTPStatus
 from typing import List
@@ -13,6 +14,8 @@ from api import ResourceAPI
 from response import APIResponseStatus, APIResponse
 from rest import APIException, APIResourceURL
 
+logger = logging.getLogger(__name__)
+
 
 class OrderAPI(ResourceAPI):
     __version__ = 1
@@ -27,7 +30,7 @@ class OrderAPI(ResourceAPI):
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
         url = "%s/%s" % (base_url, OrderAPI.__api_url__)
         api_urls = [
-            APIResourceURL(base_url=url, resource_name='', methods=['GET']),
+            APIResourceURL(base_url=url, resource_name='', methods=['GET', 'POST']),
             APIResourceURL(base_url=url, resource_name='uuid/<string:suuid>', methods=['GET', 'POST']),
             APIResourceURL(base_url=url, resource_name='code/<int:code>', methods=['GET', 'POST']),
         ]
@@ -62,13 +65,15 @@ class OrderAPI(ResourceAPI):
         try:
             api_response = self._order_service.create_order(order_json=order_json)
         except APIException as e:
+            logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
 
         if api_response.code == HTTPStatus.CREATED:
-            order_uuid = api_response.data['uuid']
-            resp = make_api_response(http_code=HTTPStatus.CREATED)
+            order_uuid = api_response.headers['Location'].split('/')[-1]
+            response_data = APIResponse(status=APIResponseStatus.success.status, code=api_response.code)
+            resp = make_api_response(data=response_data, http_code=api_response.code)
             resp.headers['Location'] = '%s/%s/uuid/%s' % (self._config['API_BASE_URI'], self.__api_url__, order_uuid)
         else:
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=api_response.code,
@@ -95,6 +100,7 @@ class OrderAPI(ResourceAPI):
                 # order does not exist
                 return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.ORDER_NOT_EXIST)
         except APIException as e:
+            logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
@@ -126,6 +132,7 @@ class OrderAPI(ResourceAPI):
         try:
             api_response = self._order_service.update_order(order_json=order_json)
         except APIException as e:
+            logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
@@ -133,8 +140,7 @@ class OrderAPI(ResourceAPI):
         if api_response.code in [HTTPStatus.OK, HTTPStatus.NO_CONTENT]:
             response_data = APIResponse(status=api_response.status, code=api_response.code,
                                         headers=api_response.headers)
-            # 200 OK - means some content in body
-            if api_response.code == HTTPStatus.OK:
+            if api_response.code == HTTPStatus.CREATED:
                 response_data.data = api_response.data
             resp = make_api_response(data=response_data, http_code=api_response.code)
             return resp
@@ -147,24 +153,26 @@ class OrderAPI(ResourceAPI):
     def get(self, suuid: str = None, code: int = None) -> Response:
         super(OrderAPI, self).get(req=request)
 
+        if (suuid is None and code is None) or (suuid is not None and code is not None):
+            # find all orders - no parameters set
+            return make_error_request_response(HTTPStatus.METHOD_NOT_ALLOWED, err=RailRoadAPIError.METHOD_NOT_ALLOWED)
+
         if suuid is not None:
             is_valid = check_uuid(suuid=suuid)
             if not is_valid:
                 return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
-        if suuid is None and code is None:
-            # find all orders - no parameters set
-            return make_error_request_response(HTTPStatus.METHOD_NOT_ALLOWED, err=RailRoadAPIError.METHOD_NOT_ALLOWED)
-
-        try:
-            code = int(code)
-        except ValueError:
-            return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
+        if code is not None:
+            try:
+                code = int(code)
+            except ValueError:
+                return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
         # uuid or code is not None, let's get order
         try:
             api_response = self._order_service.get_order(suuid=suuid, code=code)
         except APIException as e:
+            logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp

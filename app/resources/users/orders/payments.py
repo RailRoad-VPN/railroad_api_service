@@ -2,6 +2,7 @@ import sys
 from http import HTTPStatus
 from typing import List
 
+import logging
 from flask import request, Response
 
 from app.exception import RailRoadAPIError
@@ -54,6 +55,7 @@ class PaymentAPI(ResourceAPI):
         try:
             api_response = self._payment_service.create_payment(payment_json=request_json)
         except APIException as e:
+            logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
@@ -84,6 +86,7 @@ class PaymentAPI(ResourceAPI):
         try:
             api_response = self._payment_service.get_payment(suuid=uuid)
         except APIException as e:
+            logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
@@ -100,6 +103,7 @@ class PaymentAPI(ResourceAPI):
         try:
             api_response = self._payment_service.update_payment(payment_json=request_json)
         except APIException as e:
+            logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
@@ -145,6 +149,7 @@ class PaymentAPI(ResourceAPI):
         try:
             api_response = self._payment_service.get_payment(suuid=suuid, email=email)
         except APIException as e:
+            logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp

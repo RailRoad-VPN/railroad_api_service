@@ -2,6 +2,7 @@ import sys
 from http import HTTPStatus
 from typing import List
 
+import logging
 from flask import Response, request
 
 from app.exception import RailRoadAPIError
@@ -56,6 +57,7 @@ class VPNServerConditionsAPI(ResourceAPI):
             try:
                 server_list = self._vpn_service.get_vpn_server_condition_list(pagination=self.pagination)
             except APIException as e:
+                logging.debug(e.serialize())
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
                 resp = make_api_response(data=response_data, http_code=e.http_code)
                 return resp
@@ -78,6 +80,7 @@ class VPNServerConditionsAPI(ResourceAPI):
             try:
                 server = self._vpn_service.get_vpn_server_condition(suuid=suuid)
             except APIException as e:
+                logging.debug(e.serialize())
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
                 resp = make_api_response(data=response_data, http_code=e.http_code)
                 return resp
@@ -91,6 +94,7 @@ class VPNServerConditionsAPI(ResourceAPI):
                 server_list = self._vpn_service.get_vpn_server_condition_list_by_type(type_id=type_id,
                                                                                       pagination=self.pagination)
             except APIException as e:
+                logging.debug(e.serialize())
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
                 resp = make_api_response(data=response_data, http_code=e.http_code)
                 return resp
@@ -105,6 +109,7 @@ class VPNServerConditionsAPI(ResourceAPI):
                 server_list = self._vpn_service.get_vpn_server_condition_list_by_status(status_id=status_id,
                                                                                         pagination=self.pagination)
             except APIException as e:
+                logging.debug(e.serialize())
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
                 resp = make_api_response(data=response_data, http_code=e.http_code)
                 return resp

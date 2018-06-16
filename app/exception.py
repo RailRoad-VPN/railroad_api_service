@@ -27,6 +27,7 @@ class RailRoadAPIError(APIErrorEnum):
         return obj
 
     UNKNOWN_ERROR_CODE = (name + str(count()), 'UNKNOWN_ERROR_CODE phrase', 'UNKNOWN_ERROR_CODE description')
+    METHOD_NOT_ALLOWED = (name + str(count()), 'METHOD_NOT_ALLOWED phrase', 'METHOD_NOT_ALLOWED description')
     PRIVATE_METHOD = (name + str(count()), 'PRIVATE_METHOD phrase', 'PRIVATE_METHOD description')
     BAD_ACCEPT_LANGUAGE_HEADER = (name + str(count()), 'BAD_ACCEPT_LANGUAGE_HEADER phrase', 'BAD_ACCEPT_LANGUAGE_HEADER description')
     BAD_IDENTITY_ERROR = (name + str(count()), 'BAD_IDENTITY_ERROR phrase', 'BAD_IDENTITY_ERROR description')
