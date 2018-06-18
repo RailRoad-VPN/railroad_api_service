@@ -27,7 +27,7 @@ class PaymentAPI(ResourceAPI):
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
         url = "%s/%s" % (base_url, PaymentAPI.__api_url__)
         api_urls = [
-            APIResourceURL(base_url=url, resource_name='', methods=['GET']),
+            APIResourceURL(base_url=url, resource_name='', methods=['POST']),
         ]
         return api_urls
 
