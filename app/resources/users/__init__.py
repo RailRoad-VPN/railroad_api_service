@@ -31,7 +31,7 @@ class UserAPI(ResourceAPI):
         url = "%s/%s" % (base_url, UserAPI.__api_url__)
         api_urls = [
             APIResourceURL(base_url=url, resource_name='', methods=['POST']),
-            APIResourceURL(base_url=url, resource_name='<string:suuid>', methods=['PUT']),
+            APIResourceURL(base_url=url, resource_name='<string:suuid>', methods=['GET', 'PUT']),
             APIResourceURL(base_url=url, resource_name='uuid/<string:suuid>', methods=['GET']),
             APIResourceURL(base_url=url, resource_name='email/<string:email>', methods=['GET']),
         ]

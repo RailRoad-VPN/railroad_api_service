@@ -62,9 +62,10 @@ class UserSubscriptionAPIService(RESTService):
         api_response = self._post(data=us_json, url=url)
         return api_response
 
-    def update(self, user_uuid: str, subscription_id: str, order_uuid: str, expire_date: datetime,
+    def update(self, user_uuid: str, user_subscription_uuid: str, subscription_id: str, order_uuid: str, expire_date: datetime,
                modify_date: datetime, modify_reason: str) -> APIResponse:
         us_json = {
+            'uuid': user_subscription_uuid,
             'user_uuid': user_uuid,
             'subscription_id': subscription_id,
             'expire_date': expire_date,
@@ -73,6 +74,7 @@ class UserSubscriptionAPIService(RESTService):
             'modify_reason': modify_reason,
         }
         url = self._url.replace('<string:user_uuid>', user_uuid)
+        url = '%s/%s' % (url, user_subscription_uuid)
         api_response = self._put(data=us_json, url=url)
         return api_response
 
@@ -82,7 +84,7 @@ class UserSubscriptionAPIService(RESTService):
         return api_response
 
     def get_user_subscriptions_by_user_uuid(self, user_uuid: str = None) -> APIResponse:
-        url = '%s/users/%s' % (self._url, user_uuid)
+        url = self._url.replace('<string:user_uuid>', user_uuid)
         api_response = self._get(url=url)
         return api_response
 

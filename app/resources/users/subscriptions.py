@@ -1,8 +1,8 @@
+import logging
 import sys
 from http import HTTPStatus
 from typing import List
 
-import logging
 from flask import request, Response
 
 from app.exception import RailRoadAPIError
@@ -109,6 +109,7 @@ class UserSubscriptionAPI(ResourceAPI):
         modify_reason = request_json.get('modify_reason', None)
 
         us_json = {
+            'uuid': us_uuid,
             'user_uuid': user_uuid,
             'subscription_id': subscription_id,
             'expire_date': expire_date,
@@ -125,7 +126,8 @@ class UserSubscriptionAPI(ResourceAPI):
             return resp
 
         try:
-            api_response = self._user_subscription_service.get_user_subscription_by_uuid(suuid=user_subscription_uuid)
+            api_response = self._user_subscription_service.get_user_subscription_by_uuid(user_uuid=user_uuid,
+                                                                                         suuid=user_subscription_uuid)
             if not api_response.is_ok:
                 # user subscription does not exist
                 return make_error_request_response(HTTPStatus.NOT_FOUND,
@@ -137,7 +139,11 @@ class UserSubscriptionAPI(ResourceAPI):
             return resp
 
         try:
-            api_response = self._user_subscription_service.update(us_json=us_json)
+            api_response = self._user_subscription_service.update(user_uuid=user_uuid,
+                                                                  user_subscription_uuid=user_subscription_uuid,
+                                                                  subscription_id=subscription_id,
+                                                                  order_uuid=order_uuid, expire_date=expire_date,
+                                                                  modify_date=modify_date, modify_reason=modify_reason)
             if api_response.is_ok:
                 response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.NO_CONTENT,
                                             headers=api_response.headers)
