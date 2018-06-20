@@ -1,5 +1,6 @@
 import datetime
 import sys
+import uuid
 from http import HTTPStatus
 from typing import List
 
@@ -47,8 +48,9 @@ class PaymentAPI(ResourceAPI):
             return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.PAYMENT_BAD_DATA_ERROR)
 
         t = '{0:%Y_%m_%d_%H%M%S}'.format(datetime.datetime.now())
+        tt = "%s_%s" % (t, uuid.uuid4())
 
-        with open('/opt/apps/dfn/apn/%s.apn' % t, 'w') as file:
+        with open('/opt/apps/dfn/apn/%s.apn' % tt, 'w') as file:
             file.write(apn)
 
         response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK)
