@@ -93,7 +93,7 @@ class VPNServersAPI(ResourceAPI):
         response_data = APIResponse(status=api_response.status, code=api_response.code)
         logger.debug('response data: %s' % response_data.serialize())
         resp = make_api_response(data=response_data, http_code=api_response.code)
-        logger.debug('make api response: %s' % resp.json)
+        logger.debug('make api response: %s' % resp.__str__())
         return resp
 
     def get(self, suuid: str = None, type_id: int = None, status_id: int = None) -> Response:
