@@ -1,8 +1,8 @@
+import logging
 import sys
 from http import HTTPStatus
 from typing import List
 
-import logging
 from flask import Response, request
 
 from app.exception import RailRoadAPIError
@@ -13,6 +13,8 @@ from rest import APIException, APIResourceURL
 from api import ResourceAPI
 from response import APIResponseStatus, APIResponse
 from utils import check_uuid, make_api_response, make_error_request_response
+
+logger = logging.getLogger(__name__)
 
 
 class VPNServersAPI(ResourceAPI):
@@ -62,6 +64,7 @@ class VPNServersAPI(ResourceAPI):
         return resp
 
     def put(self, suuid: str) -> Response:
+        logger.debug('put method')
         request_json = request.json
 
         if request_json is None:
@@ -78,7 +81,9 @@ class VPNServersAPI(ResourceAPI):
             return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.VPNSERVER_IDENTIFIER_ERROR)
 
         try:
+            logger.debug('call vpn service')
             api_response = self._vpn_service.update_vpn_server(vpnserver=request_json)
+            logger.debug('response: %s' % api_response.serialize())
         except APIException as e:
             logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
@@ -86,7 +91,9 @@ class VPNServersAPI(ResourceAPI):
             return resp
 
         response_data = APIResponse(status=api_response.status, code=api_response.code)
+        logger.debug('response data: %s' % response_data.serialize())
         resp = make_api_response(data=response_data, http_code=api_response.code)
+        logger.debug('make api response: %s' % resp.json)
         return resp
 
     def get(self, suuid: str = None, type_id: int = None, status_id: int = None) -> Response:
