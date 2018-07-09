@@ -22,7 +22,7 @@ class SubscriptionAPI(ResourceAPI):
     __api_url__ = 'subscriptions'
 
     _config = None
-    _subscription_service = None
+    _subscription_api_service = None
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
@@ -35,7 +35,7 @@ class SubscriptionAPI(ResourceAPI):
     def __init__(self, subscription_service: SubscriptionAPIService, config: dict) -> None:
         super().__init__()
         self._config = config
-        self._subscription_service = subscription_service
+        self._subscription_api_service = subscription_service
 
     def post(self) -> Response:
         resp = make_api_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -54,7 +54,7 @@ class SubscriptionAPI(ResourceAPI):
             return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.BAD_ACCEPT_LANGUAGE_HEADER)
 
         try:
-            api_response = self._subscription_service.get_subscriptions(lang_code=lang_code)
+            api_response = self._subscription_api_service.get_subscriptions(lang_code=lang_code)
         except APIException as e:
             logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)

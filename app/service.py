@@ -1,9 +1,8 @@
 import datetime
 import sys
-from typing import List
 
 sys.path.insert(0, '../rest_api_library')
-from rest import RESTService, APIException
+from rest import RESTService
 from response import APIResponse
 from api import ResourcePagination
 
@@ -46,6 +45,54 @@ class OrderAPIService(RESTService):
         return api_response
 
 
+class UserDeviceAPIService(RESTService):
+    __version__ = 1
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def create(self, user_uuid: str, pin_code: str, device_token: str = None, device_name: str = None,
+               location: str = None, is_active: str = None) -> APIResponse:
+        us_json = {
+            'user_uuid': user_uuid,
+            'pin_code': pin_code,
+            'device_token': device_token,
+            'device_name': device_name,
+            'location': location,
+            'is_active': is_active,
+        }
+        url = self._url.replace('<string:user_uuid>', user_uuid)
+        api_response = self._post(data=us_json, url=url)
+        return api_response
+
+    def update(self, user_uuid: str, suuid: str, pin_code: str, device_token: str, device_name: str, location: str,
+               is_active: str, modify_reason: str) -> APIResponse:
+        ud_json = {
+            'uuid': suuid,
+            'user_uuid': user_uuid,
+            'pin_code': pin_code,
+            'device_token': device_token,
+            'device_name': device_name,
+            'location': location,
+            'is_active': is_active,
+            'modify_reason': modify_reason,
+        }
+        url = self._url.replace('<string:user_uuid>', user_uuid)
+        url = '%s/%s' % (url, suuid)
+        api_response = self._put(data=ud_json, url=url)
+        return api_response
+
+    def get_user_device_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
+        url = '%s/%s' % (self._url.replace('<string:user_uuid>', user_uuid), suuid)
+        api_response = self._get(url=url)
+        return api_response
+
+    def get_user_devices(self, user_uuid: str) -> APIResponse:
+        url = self._url.replace('<string:user_uuid>', user_uuid)
+        api_response = self._get(url=url)
+        return api_response
+
+
 class UserSubscriptionAPIService(RESTService):
     __version__ = 1
 
@@ -62,8 +109,8 @@ class UserSubscriptionAPIService(RESTService):
         api_response = self._post(data=us_json, url=url)
         return api_response
 
-    def update(self, user_uuid: str, user_subscription_uuid: str, subscription_id: str, order_uuid: str, expire_date: datetime,
-               modify_date: datetime, modify_reason: str) -> APIResponse:
+    def update(self, user_uuid: str, user_subscription_uuid: str, subscription_id: str, order_uuid: str,
+               expire_date: datetime, modify_date: datetime, modify_reason: str) -> APIResponse:
         us_json = {
             'uuid': user_subscription_uuid,
             'user_uuid': user_uuid,
@@ -78,12 +125,12 @@ class UserSubscriptionAPIService(RESTService):
         api_response = self._put(data=us_json, url=url)
         return api_response
 
-    def get_user_subscription_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
+    def get_user_subs_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
         url = '%s/%s' % (self._url.replace('<string:user_uuid>', user_uuid), suuid)
         api_response = self._get(url=url)
         return api_response
 
-    def get_user_subscriptions_by_user_uuid(self, user_uuid: str = None) -> APIResponse:
+    def get_user_subs_by_user_uuid(self, user_uuid: str) -> APIResponse:
         url = self._url.replace('<string:user_uuid>', user_uuid)
         api_response = self._get(url=url)
         return api_response
@@ -300,172 +347,3 @@ class GeoStateAPIService(RESTService):
         url = '%s/%s' % (self._url, code)
         api_response = self._get(url=url)
         return api_response
-
-
-class VPNService(object):
-    __version__ = 1
-
-    vpnserver_service = None
-    vpntype_service = None
-    vpnserverconfiguration_service = None
-    vpnserverstatus_service = None
-    geoposition_service = None
-    geocity_service = None
-    geocountry_service = None
-    geostate_service = None
-
-    def __init__(self, vpnserver_service: VPNServersAPIService, vpntype_service: VPNTypeAPIService,
-                 vpnserverconfiguration_service: VPNServerConfigurationAPIService,
-                 vpnserverstatus_service: VPNServerStatusAPIService, geoposition_service: GeoPositionAPIService,
-                 geocity_service: GeoCityAPIService, geocountry_service: GeoCountryAPIService,
-                 geostate_service: GeoStateAPIService):
-        self.vpnserver_service = vpnserver_service
-        self.vpntype_service = vpntype_service
-        self.vpnserverconfiguration_service = vpnserverconfiguration_service
-        self.vpnserverstatus_service = vpnserverstatus_service
-        self.geoposition_service = geoposition_service
-        self.geocity_service = geocity_service
-        self.geocountry_service = geocountry_service
-        self.geostate_service = geostate_service
-
-    def create_vpn_server(self, vpnserver: dict) -> APIResponse:
-        api_response = self.vpnserver_service.create_vpnserver(vpnserver=vpnserver)
-        if not api_response.is_ok:
-            raise APIException(http_code=api_response.code, errors=api_response.errors)
-        return api_response
-
-    def update_vpn_server(self, vpnserver: dict) -> APIResponse:
-        api_response = self.vpnserver_service.update_vpnserver(vpnserver=vpnserver)
-        if not api_response.is_ok:
-            raise APIException(http_code=api_response.code, errors=api_response.errors, data=api_response.data)
-        return api_response
-
-    def get_random_vpn_server(self, type_id: int = None, status_id: int = None) -> str:
-        # TODO some logic to get random VPN server
-
-        pagination = ResourcePagination(limit=1, offset=0)
-
-        if type_id is not None:
-            api_response = self.vpnserver_service.get_vpnservers_by_type(type_id=type_id, pagination=pagination)
-        elif status_id is not None:
-            api_response = self.vpnserver_service.get_vpnservers_by_status(status_id=status_id, pagination=pagination)
-        else:
-            api_response = self.vpnserver_service.get_vpnservers(pagination=pagination)
-
-        if not api_response.is_ok:
-            raise APIException(http_code=api_response.code, errors=api_response.errors)
-
-        server = api_response.data[0]
-
-        return server['uuid']
-
-    def get_vpn_server_list(self, pagination: ResourcePagination = None) -> List[dict]:
-        api_response = self.vpnserver_service.get_vpnservers(pagination=pagination)
-        if not api_response.is_ok:
-            raise APIException(http_code=api_response.code, errors=api_response.errors)
-        servers_list = []
-        for server in api_response.data:
-            server_repr = self._get_vpn_server(server=server)
-            servers_list.append(server_repr)
-
-        return servers_list
-
-    def get_vpn_server_list_by_type(self, type_id: int, pagination: ResourcePagination) -> List[dict]:
-        api_response = self.vpnserver_service.get_vpnservers_by_type(type_id=type_id, pagination=pagination)
-        if not api_response.is_ok:
-            raise APIException(http_code=api_response.code, errors=api_response.errors)
-        servers_list = []
-        for server in api_response.data:
-            server_repr = self._get_vpn_server(server=server)
-            servers_list.append(server_repr)
-
-        return servers_list
-
-    def get_vpn_server_list_by_status(self, status_id: int, pagination: ResourcePagination) -> List[dict]:
-        api_response = self.vpnserver_service.get_vpnservers_by_status(status_id=status_id, pagination=pagination)
-        if not api_response.is_ok:
-            raise APIException(http_code=api_response.code, errors=api_response.errors)
-        servers_list = []
-        for server in api_response.data:
-            server_repr = self._get_vpn_server(server=server)
-            servers_list.append(server_repr)
-
-        return servers_list
-
-    def get_vpn_server_condition_list(self, pagination: ResourcePagination) -> List[dict]:
-        api_response = self.vpnserver_service.get_vpnservers(pagination=pagination)
-        if not api_response.is_ok:
-            raise APIException(http_code=api_response.code, errors=api_response.errors)
-        servers_list = []
-        for server in api_response.data:
-            server = self._get_vpn_server_condition(server=server)
-            servers_list.append(server)
-
-        return servers_list
-
-    def get_vpn_server_condition_list_by_type(self, type_id: int, pagination: ResourcePagination) -> List[dict]:
-        api_response = self.vpnserver_service.get_vpnservers_by_type(type_id=type_id, pagination=pagination)
-        if not api_response.is_ok:
-            raise APIException(http_code=api_response.code, errors=api_response.errors)
-        servers_list = []
-        for server in api_response.data:
-            server = self._get_vpn_server_condition(server=server)
-            servers_list.append(server)
-
-        return servers_list
-
-    def get_vpn_server_condition_list_by_status(self, status_id: int, pagination: ResourcePagination) -> List[dict]:
-        api_response = self.vpnserver_service.get_vpnservers_by_status(status_id=status_id, pagination=pagination)
-        if not api_response.is_ok:
-            raise APIException(http_code=api_response.code, errors=api_response.errors)
-        servers_list = []
-        for server in api_response.data:
-            server = self._get_vpn_server_condition(server=server)
-            servers_list.append(server)
-
-        return servers_list
-
-    def get_vpn_server_condition(self, suuid: str):
-        api_response = self.vpnserver_service.get_vpnserver_by_uuid(suuid=suuid)
-        if not api_response.is_ok:
-            raise APIException(http_code=api_response.code, errors=api_response.errors)
-
-        server = api_response.data
-
-        return self._get_vpn_server_condition(server=server)
-
-    def _get_vpn_server_condition(self, server: dict) -> dict:
-        server.pop("geo_position_id", None)
-        server.pop("type_id", None)
-        return server
-
-    def get_vpn_server(self, suuid: str) -> dict:
-        api_response = self.vpnserver_service.get_vpnserver_by_uuid(suuid=suuid)
-        if not api_response.is_ok:
-            raise APIException(http_code=api_response.code, errors=api_response.errors)
-
-        server = api_response.data
-
-        return self._get_vpn_server(server=server)
-
-    def get_vpn_server_configuration(self, server_uuid: str, user_uuid: str = None) -> dict:
-        api_response = self.vpnserverconfiguration_service.get_vpnserverconfig(server_uuid=server_uuid,
-                                                                               user_uuid=user_uuid)
-        if not api_response.is_ok:
-            raise APIException(http_code=api_response.code, errors=api_response.errors)
-
-        return api_response.data
-
-    def _get_vpn_server(self, server: dict) -> dict:
-        geo_position_id = server.pop("geo_position_id")
-
-        api_response = self.geoposition_service.get_geopos_by_id(sid=geo_position_id)
-        if not api_response.is_ok:
-            return server
-
-        geopos = api_response.data
-        geopos.pop("id", None)
-
-        server['geo'] = geopos
-
-        return server

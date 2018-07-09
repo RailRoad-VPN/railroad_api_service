@@ -21,7 +21,7 @@ class VPNServersConfigurationsAPI(ResourceAPI):
 
     _config = None
 
-    vpnserversconfigurations_service = None
+    vpnserversconfs_api_service = None
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
@@ -33,7 +33,7 @@ class VPNServersConfigurationsAPI(ResourceAPI):
 
     def __init__(self, vpnserversconfigurations_service: VPNServerConfigurationAPIService, config: dict) -> None:
         super().__init__()
-        self.vpnserversconfigurations_service = vpnserversconfigurations_service
+        self.vpnserversconfs_api_service = vpnserversconfigurations_service
 
         self._config = config
 
@@ -47,8 +47,8 @@ class VPNServersConfigurationsAPI(ResourceAPI):
 
     def get(self, server_uuid: str, user_uuid: str) -> Response:
         try:
-            api_response = self.vpnserversconfigurations_service.get_vpnserverconfig(server_uuid=server_uuid,
-                                                                                     user_uuid=user_uuid)
+            api_response = self.vpnserversconfs_api_service.get_vpnserverconfig(server_uuid=server_uuid,
+                                                                                user_uuid=user_uuid)
             response_data = APIResponse(status=APIResponseStatus.success.status, code=api_response.code,
                                         data=api_response.data, headers=api_response.headers)
             resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)

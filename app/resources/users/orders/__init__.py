@@ -24,7 +24,7 @@ class OrderAPI(ResourceAPI):
     __api_url__ = 'orders'
 
     _config = None
-    _order_service = None
+    _order_api_service = None
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
@@ -39,7 +39,7 @@ class OrderAPI(ResourceAPI):
     def __init__(self, order_service: OrderAPIService, config: dict) -> None:
         super().__init__()
         self._config = config
-        self._order_service = order_service
+        self._order_api_service = order_service
 
     def post(self) -> Response:
         request_json = request.json
@@ -63,7 +63,7 @@ class OrderAPI(ResourceAPI):
         }
 
         try:
-            api_response = self._order_service.create_order(order_json=order_json)
+            api_response = self._order_api_service.create_order(order_json=order_json)
         except APIException as e:
             logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
@@ -95,7 +95,7 @@ class OrderAPI(ResourceAPI):
             return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.BAD_ORDER_IDENTITY)
 
         try:
-            api_response = self._order_service.get_order(suuid=suuid)
+            api_response = self._order_api_service.get_order(suuid=suuid)
             if not api_response.is_ok:
                 # order does not exist
                 return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.ORDER_NOT_EXIST)
@@ -130,7 +130,7 @@ class OrderAPI(ResourceAPI):
         }
 
         try:
-            api_response = self._order_service.update_order(order_json=order_json)
+            api_response = self._order_api_service.update_order(order_json=order_json)
         except APIException as e:
             logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
@@ -170,7 +170,7 @@ class OrderAPI(ResourceAPI):
 
         # uuid or code is not None, let's get order
         try:
-            api_response = self._order_service.get_order(suuid=suuid, code=code)
+            api_response = self._order_api_service.get_order(suuid=suuid, code=code)
         except APIException as e:
             logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)

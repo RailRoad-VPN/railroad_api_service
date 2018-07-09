@@ -6,7 +6,7 @@ from typing import List
 from flask import Response, request
 
 from app.exception import RailRoadAPIError
-from app.service import VPNService
+from app.policy import VPNServerPolicy
 
 sys.path.insert(0, '../rest_api_library')
 from rest import APIException, APIResourceURL
@@ -23,7 +23,7 @@ class VPNServersAPI(ResourceAPI):
     __endpoint_name__ = 'VPNServersAPI'
     __api_url__ = 'vpns/servers'
 
-    _vpn_service = None
+    _vpn_policy = None
     _config = None
 
     @staticmethod
@@ -37,8 +37,8 @@ class VPNServersAPI(ResourceAPI):
         ]
         return api_urls
 
-    def __init__(self, vpn_service: VPNService, config: dict) -> None:
-        self._vpn_service = vpn_service
+    def __init__(self, vpn_service: VPNServerPolicy, config: dict) -> None:
+        self._vpn_policy = vpn_service
         self._config = config
 
         super().__init__()
@@ -50,7 +50,7 @@ class VPNServersAPI(ResourceAPI):
             return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.REQUEST_NO_JSON)
 
         try:
-            api_response = self._vpn_service.create_vpn_server(vpnserver=request_json)
+            api_response = self._vpn_policy.create_vpn_server(vpnserver=request_json)
         except APIException as e:
             logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
@@ -82,7 +82,7 @@ class VPNServersAPI(ResourceAPI):
 
         try:
             logger.debug('call vpn service')
-            api_response = self._vpn_service.update_vpn_server(vpnserver=request_json)
+            api_response = self._vpn_policy.update_vpn_server(vpnserver=request_json)
             logger.debug('response: %s' % api_response.serialize())
         except APIException as e:
             logging.debug(e.serialize())
@@ -102,7 +102,7 @@ class VPNServersAPI(ResourceAPI):
         is_get_random = request.args.get('random', None)
         if is_get_random is not None:
             try:
-                server_uuid = self._vpn_service.get_random_vpn_server(type_id=type_id, status_id=status_id)
+                server_uuid = self._vpn_policy.get_random_vpn_server(type_id=type_id, status_id=status_id)
 
                 response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK)
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
@@ -117,7 +117,7 @@ class VPNServersAPI(ResourceAPI):
         if suuid is None and type_id is None and status_id is None:
             # list of all servers
             try:
-                server_list = self._vpn_service.get_vpn_server_list(pagination=self.pagination)
+                server_list = self._vpn_policy.get_vpn_server_list(pagination=self.pagination)
             except APIException as e:
                 logging.debug(e.serialize())
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
@@ -135,7 +135,7 @@ class VPNServersAPI(ResourceAPI):
 
             # specific server by uuid
             try:
-                server = self._vpn_service.get_vpn_server(suuid=suuid)
+                server = self._vpn_policy.get_vpn_server(suuid=suuid)
                 response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK, data=server)
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
                 return resp
@@ -147,7 +147,7 @@ class VPNServersAPI(ResourceAPI):
         elif type_id is not None:
             # list of servers by specific type id
             try:
-                server_list = self._vpn_service.get_vpn_server_list_by_type(type_id=type_id, pagination=self.pagination)
+                server_list = self._vpn_policy.get_vpn_server_list_by_type(type_id=type_id, pagination=self.pagination)
             except APIException as e:
                 logging.debug(e.serialize())
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
@@ -162,8 +162,8 @@ class VPNServersAPI(ResourceAPI):
             # list of servers by specific status id
             # TODO if list is empty throw 404 or not?
             try:
-                server_list = self._vpn_service.get_vpn_server_list_by_status(status_id=status_id,
-                                                                              pagination=self.pagination)
+                server_list = self._vpn_policy.get_vpn_server_list_by_status(status_id=status_id,
+                                                                             pagination=self.pagination)
             except APIException as e:
                 logging.debug(e.serialize())
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)

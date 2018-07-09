@@ -5,8 +5,8 @@ from typing import List
 import logging
 from flask import request, Response
 
+from app.policy import UserPolicy
 from app.exception import RailRoadAPIError
-from app.service import UserAPIService
 
 sys.path.insert(0, '../rest_api_library')
 from utils import check_uuid, make_api_response, make_error_request_response, check_required_api_fields
@@ -24,7 +24,7 @@ class UserAPI(ResourceAPI):
     __api_url__ = 'users'
 
     _config = None
-    _user_service = None
+    _user_policy = None
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
@@ -37,10 +37,10 @@ class UserAPI(ResourceAPI):
         ]
         return api_urls
 
-    def __init__(self, user_service: UserAPIService, config: dict) -> None:
+    def __init__(self, user_policy: UserPolicy, config: dict) -> None:
         super().__init__()
         self._config = config
-        self._user_service = user_service
+        self._user_policy = user_policy
 
     def post(self) -> Response:
         request_json = request.json
@@ -68,7 +68,7 @@ class UserAPI(ResourceAPI):
             return resp
 
         try:
-            api_response = self._user_service.get_user(email=email)
+            api_response = self._user_policy.get_user(email=email)
         except APIException as e:
             logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
@@ -86,7 +86,7 @@ class UserAPI(ResourceAPI):
         user_json['enabled'] = enabled
 
         try:
-            api_response = self._user_service.create_user(user_json=user_json)
+            api_response = self._user_policy.create_user(user_json=user_json)
         except APIException as e:
             logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
@@ -142,7 +142,7 @@ class UserAPI(ResourceAPI):
             return resp
 
         try:
-            api_response = self._user_service.get_user(suuid=suuid)
+            api_response = self._user_policy.get_user(suuid=suuid)
         except APIException as e:
             logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
@@ -153,7 +153,7 @@ class UserAPI(ResourceAPI):
             # user does not exist
             return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.USER_NOT_EXIST)
         try:
-            api_response = self._user_service.update_user(user_json=user_json)
+            api_response = self._user_policy.update_user(user_json=user_json)
         except APIException as e:
             logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
@@ -168,8 +168,7 @@ class UserAPI(ResourceAPI):
                 response_data.data = api_response.data
         else:
             response_data = APIResponse(status=api_response.status, code=api_response.code,
-                                        error=api_response.error, error_code=api_response.error_code,
-                                        headers=api_response.headers)
+                                        errors=api_response.errors, headers=api_response.headers)
         resp = make_api_response(data=response_data, http_code=api_response.code)
         return resp
 
@@ -186,7 +185,7 @@ class UserAPI(ResourceAPI):
 
         # uuid or email is not None, let's get user
         try:
-            api_response = self._user_service.get_user(suuid=suuid, email=email)
+            api_response = self._user_policy.get_user(suuid=suuid, email=email)
         except APIException as e:
             logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)

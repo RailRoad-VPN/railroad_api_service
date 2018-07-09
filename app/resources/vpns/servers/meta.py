@@ -21,7 +21,7 @@ class VPNServersMetaAPI(ResourceAPI):
 
     _config = None
 
-    vpnserversmeta_service = None
+    vpnserversmeta_api_service = None
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
@@ -33,7 +33,7 @@ class VPNServersMetaAPI(ResourceAPI):
 
     def __init__(self, vpnserversmeta_service: VPNServersMetaAPIService, config: dict) -> None:
         super().__init__()
-        self.vpnserversmeta_service = vpnserversmeta_service
+        self.vpnserversmeta_api_service = vpnserversmeta_service
 
         self._config = config
 
@@ -46,7 +46,7 @@ class VPNServersMetaAPI(ResourceAPI):
         return resp
 
     def get(self) -> Response:
-        api_response = self.vpnserversmeta_service.get_meta()
+        api_response = self.vpnserversmeta_api_service.get_meta()
 
         response_data = APIResponse(status=APIResponseStatus.success.status, code=api_response.code,
                                     data=api_response.data, headers=api_response.headers)

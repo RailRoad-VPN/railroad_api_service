@@ -11,6 +11,7 @@ class Config(object):
     API_BASE_URI = '/api/%s' % VERSION
 
     AUTH_SERVICE_USERS_RESOURCE_NAME = 'users'
+    AUTH_SERVICE_USER_DEVICES_RESOURCE_NAME = 'users/<string:user_uuid>/devices'
 
     BILLING_SERVICE_SUBSCRIPTIONS_RESOURCE_NAME = 'subscriptions'
     BILLING_SERVICE_USER_SUBSCRIPTION_RESOURCE_NAME = 'users/<string:user_uuid>/subscriptions'

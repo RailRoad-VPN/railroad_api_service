@@ -15,21 +15,21 @@ from response import APIResponseStatus, APIResponse
 from rest import APIException, APIResourceURL
 
 
-class UserSubscriptionAPI(ResourceAPI):
+class UserDeviceAPI(ResourceAPI):
     __version__ = 1
 
-    __endpoint_name__ = 'UserSubscriptionAPI'
-    __api_url__ = 'users/<string:user_uuid>/subscriptions'
+    __endpoint_name__ = 'UserDeviceAPI'
+    __api_url__ = 'users/<string:user_uuid>/devices'
 
     _config = None
     _user_policy = None
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
-        url = "%s/%s" % (base_url, UserSubscriptionAPI.__api_url__)
+        url = "%s/%s" % (base_url, UserDeviceAPI.__api_url__)
         api_urls = [
             APIResourceURL(base_url=url, resource_name='', methods=['GET', 'POST', ]),
-            APIResourceURL(base_url=url, resource_name='<string:user_subscription_uuid>', methods=['GET', 'PUT', ]),
+            APIResourceURL(base_url=url, resource_name='<string:user_device_uuid>', methods=['GET', 'PUT', ]),
         ]
         return api_urls
 
@@ -49,13 +49,15 @@ class UserSubscriptionAPI(ResourceAPI):
             return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
         user_uuid = request_json.get('user_uuid', None)
-        subscription_id = request_json.get('subscription_id', None)
-        order_uuid = request_json.get('order_uuid', None)
+        pin_code = request_json.get('pin_code', None)
+        device_token = request_json.get('device_token', None)
+        device_name = request_json.get('device_name', None)
+        location = request_json.get('location', None)
+        is_active = request_json.get('is_active', None)
 
         req_fields = {
             'user_uuid': user_uuid,
-            'subscription_id': subscription_id,
-            'order_uuid': order_uuid,
+            'pin_code': pin_code
         }
 
         error_fields = check_required_api_fields(req_fields)
@@ -66,9 +68,9 @@ class UserSubscriptionAPI(ResourceAPI):
             return resp
 
         try:
-            api_response = self._user_policy.create_user_sub(user_uuid=user_uuid,
-                                                             subscription_id=subscription_id,
-                                                             order_uuid=order_uuid)
+            api_response = self._user_policy.create_user_device(user_uuid=user_uuid, pin_code=pin_code,
+                                                                device_token=device_token, device_name=device_name,
+                                                                location=location, is_active=is_active)
             if api_response.is_ok:
                 us_uuid = api_response.headers['Location'].split('/')[-1]
                 api_url = self.__api_url__.replace('<string:user_uuid>', user_uuid)
@@ -87,7 +89,7 @@ class UserSubscriptionAPI(ResourceAPI):
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
 
-    def put(self, user_uuid: str, user_subscription_uuid: str) -> Response:
+    def put(self, user_uuid: str, user_device_uuid: str) -> Response:
         request_json = request.json
 
         if request_json is None:
@@ -95,29 +97,31 @@ class UserSubscriptionAPI(ResourceAPI):
 
         us_uuid = request_json.get('uuid', None)
 
-        is_valid_a = check_uuid(suuid=user_subscription_uuid)
+        is_valid_a = check_uuid(suuid=user_device_uuid)
         is_valid_b = check_uuid(suuid=us_uuid)
-        if not is_valid_a or not is_valid_b or (user_subscription_uuid != us_uuid):
+        if not is_valid_a or not is_valid_b or (user_device_uuid != us_uuid):
             return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
+        suuid = request_json.get('uuid', None)
         user_uuid = request_json.get('user_uuid', None)
-        subscription_id = request_json.get('subscription_id', None)
-        expire_date = request_json.get('expire_date', None)
-        order_uuid = request_json.get('order_uuid', None)
-        modify_date = request_json.get('modify_date', None)
+        pin_code = request_json.get('pin_code', None)
+        device_token = request_json.get('device_token', None)
+        device_name = request_json.get('device_name', None)
+        location = request_json.get('location', None)
+        is_active = request_json.get('is_active', None)
         modify_reason = request_json.get('modify_reason', None)
 
-        us_json = {
-            'uuid': us_uuid,
+        req_fields = {
+            'uuid': suuid,
             'user_uuid': user_uuid,
-            'subscription_id': subscription_id,
-            'expire_date': expire_date,
-            'order_uuid': order_uuid,
-            'modify_date': modify_date,
+            'device_token': device_token,
+            'device_name': device_name,
+            'location': location,
+            'is_active': is_active,
             'modify_reason': modify_reason,
         }
 
-        error_fields = check_required_api_fields(us_json)
+        error_fields = check_required_api_fields(req_fields)
         if len(error_fields) > 0:
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST,
                                         errors=error_fields)
@@ -125,9 +129,9 @@ class UserSubscriptionAPI(ResourceAPI):
             return resp
 
         try:
-            api_response = self._user_policy.get_user_sub_by_uuid(user_uuid=user_uuid, suuid=user_subscription_uuid)
+            api_response = self._user_policy.get_user_device_by_uuid(user_uuid=user_uuid, suuid=user_device_uuid)
             if not api_response.is_ok:
-                # user subscription does not exist
+                # user device does not exist
                 return make_error_request_response(HTTPStatus.NOT_FOUND,
                                                    err=RailRoadAPIError.USER_SUBSCRIPTION_NOT_EXIST)
         except APIException as e:
@@ -137,12 +141,10 @@ class UserSubscriptionAPI(ResourceAPI):
             return resp
 
         try:
-            api_response = self._user_policy.update_user_sub(user_uuid=user_uuid,
-                                                             user_subscription_uuid=user_subscription_uuid,
-                                                             subscription_id=subscription_id,
-                                                             order_uuid=order_uuid, expire_date=expire_date,
-                                                             modify_date=modify_date,
-                                                             modify_reason=modify_reason)
+            api_response = self._user_policy.update_user_device(user_uuid=user_uuid, suuid=suuid, pin_code=pin_code,
+                                                                device_token=device_token, device_name=device_name,
+                                                                location=location, is_active=is_active,
+                                                                modify_reason=modify_reason)
             if api_response.is_ok:
                 response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.NO_CONTENT,
                                             headers=api_response.headers)
@@ -157,20 +159,19 @@ class UserSubscriptionAPI(ResourceAPI):
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
 
-    def get(self, user_uuid: str, user_subscription_uuid: str = None) -> Response:
-        super(UserSubscriptionAPI, self).get(req=request)
+    def get(self, user_uuid: str, user_device_uuid: str = None) -> Response:
+        super(UserDeviceAPI, self).get(req=request)
 
         is_valid = check_uuid(suuid=user_uuid)
         if not is_valid:
             return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
-        if user_subscription_uuid is not None:
-            is_valid = check_uuid(suuid=user_subscription_uuid)
+        if user_device_uuid is not None:
+            is_valid = check_uuid(suuid=user_device_uuid)
             if not is_valid:
                 return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
-            # get user subscription by subscription uuid
-            api_response = self._user_policy.get_user_sub_by_uuid(user_uuid=user_uuid,
-                                                                  suuid=user_subscription_uuid)
+            # get all user device by uuid
+            api_response = self._user_policy.get_user_device_by_uuid(user_uuid=user_uuid, suuid=user_device_uuid)
             if api_response.is_ok:
                 response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK,
                                             data=api_response.data)
@@ -182,9 +183,9 @@ class UserSubscriptionAPI(ResourceAPI):
                 resp = make_api_response(data=response_data, http_code=api_response.code)
                 return resp
         else:
-            # get all user subscriptions
+            # get all user devices
             try:
-                api_response = self._user_policy.get_user_subs(user_uuid=user_uuid)
+                api_response = self._user_policy.get_user_devices(user_uuid=user_uuid)
                 if api_response.is_ok:
                     subs = api_response.data
                     response_data = APIResponse(status=api_response.status, code=api_response.code,

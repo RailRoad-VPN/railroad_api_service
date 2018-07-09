@@ -22,7 +22,7 @@ class PaymentAPI(ResourceAPI):
     __api_url__ = 'payments'
 
     _config = None
-    _subscription_service = None
+    _subscription_api_service = None
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
