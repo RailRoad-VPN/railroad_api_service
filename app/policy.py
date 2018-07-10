@@ -76,17 +76,14 @@ class UserPolicy(object):
         api_response = self._user_api_service.update_user(user_json=user_json)
         return api_response
 
-    def create_user_device(self, user_uuid: str, pin_code: str, device_token: str = None, device_name: str = None,
-                           location: str = None, is_active: str = None) -> APIResponse:
-        api_response = self._user_device_api_service.create(user_uuid=user_uuid, pin_code=pin_code,
-                                                            device_token=device_token, device_name=device_name,
-                                                            location=location, is_active=is_active)
+    def create_user_device(self, user_uuid: str, pin_code: int) -> APIResponse:
+        api_response = self._user_device_api_service.create(user_uuid=user_uuid, pin_code=pin_code)
         return api_response
 
-    def update_user_device(self, user_uuid: str, suuid: str, pin_code: str, device_token: str, device_name: str,
-                           location: str, is_active: str, modify_reason: str) -> APIResponse:
+    def update_user_device(self, user_uuid: str, pin_code: int, device_token: str, device_id: str,
+                           location: str, is_active: bool, modify_reason: str, suuid: str = None) -> APIResponse:
         api_response = self._user_device_api_service.update(suuid=suuid, user_uuid=user_uuid, pin_code=pin_code,
-                                                            device_token=device_token, device_name=device_name,
+                                                            device_token=device_token, device_id=device_id,
                                                             location=location, is_active=is_active,
                                                             modify_reason=modify_reason)
         return api_response
@@ -97,6 +94,10 @@ class UserPolicy(object):
 
     def get_user_devices(self, user_uuid: str) -> APIResponse:
         api_response = self._user_device_api_service.get_user_devices(user_uuid=user_uuid)
+        return api_response
+
+    def get_user_uuid_by_pincode(self, pin_code: int):
+        api_response = self._user_api_service.get_user(pin_code=pin_code)
         return api_response
 
 

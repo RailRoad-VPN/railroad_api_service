@@ -35,6 +35,8 @@ class RailRoadAPIError(APIErrorEnum):
     USER_EMAIL_BUSY = (name + str(count()), 'USER_EMAIL_BUSY phrase', 'USER_EMAIL_BUSY description')
     USER_NOT_EXIST = (name + str(count()), 'USER_NOT_EXIST phrase', 'USER_NOT_EXIST description')
 
+    PINCODE_NOT_EXIST = (name + str(count()), 'PINCODE_NOT_EXIST phrase', 'PINCODE_NOT_EXIST description')
+
     USER_SUBSCRIPTION_NOT_EXIST = (name + str(count()), 'USER_SUBSCRIPTION_NOT_EXIST phrase', 'USER_SUBSCRIPTION_NOT_EXIST description')
 
     PAYMENT_BAD_DATA_ERROR = (name + str(count()), 'PAYMENT_BAD_DATA_ERROR phrase', 'PAYMENT_BAD_DATA_ERROR description')

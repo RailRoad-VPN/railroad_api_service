@@ -51,34 +51,31 @@ class UserDeviceAPIService(RESTService):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def create(self, user_uuid: str, pin_code: str, device_token: str = None, device_name: str = None,
-               location: str = None, is_active: str = None) -> APIResponse:
+    def create(self, user_uuid: str, pin_code: int) -> APIResponse:
         us_json = {
             'user_uuid': user_uuid,
             'pin_code': pin_code,
-            'device_token': device_token,
-            'device_name': device_name,
-            'location': location,
-            'is_active': is_active,
         }
         url = self._url.replace('<string:user_uuid>', user_uuid)
         api_response = self._post(data=us_json, url=url)
         return api_response
 
-    def update(self, user_uuid: str, suuid: str, pin_code: str, device_token: str, device_name: str, location: str,
-               is_active: str, modify_reason: str) -> APIResponse:
+    def update(self, user_uuid: str, pin_code: int, device_token: str, device_id: str, location: str,
+               is_active: bool, modify_reason: str, suuid: str = None) -> APIResponse:
         ud_json = {
             'uuid': suuid,
             'user_uuid': user_uuid,
             'pin_code': pin_code,
             'device_token': device_token,
-            'device_name': device_name,
+            'device_id': device_id,
             'location': location,
             'is_active': is_active,
             'modify_reason': modify_reason,
         }
         url = self._url.replace('<string:user_uuid>', user_uuid)
-        url = '%s/%s' % (url, suuid)
+        if suuid is not None:
+            url = '%s/%s' % (url, suuid)
+
         api_response = self._put(data=ud_json, url=url)
         return api_response
 
@@ -166,11 +163,13 @@ class UserAPIService(RESTService):
         api_response = self._put(url=url, data=user_json, headers=self._headers)
         return api_response
 
-    def get_user(self, suuid: str = None, email: str = None) -> APIResponse:
+    def get_user(self, suuid: str = None, email: str = None, pin_code: int = None) -> APIResponse:
         if suuid:
             url = '%s/uuid/%s' % (self._url, suuid)
         elif email:
             url = '%s/email/%s' % (self._url, email)
+        elif pin_code:
+            url = '%s/device/pincode/%s' % (self._url, str(pin_code))
         else:
             raise KeyError
         api_response = self._get(url=url)

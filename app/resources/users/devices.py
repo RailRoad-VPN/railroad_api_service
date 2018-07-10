@@ -51,7 +51,7 @@ class UserDeviceAPI(ResourceAPI):
         user_uuid = request_json.get('user_uuid', None)
         pin_code = request_json.get('pin_code', None)
         device_token = request_json.get('device_token', None)
-        device_name = request_json.get('device_name', None)
+        device_id = request_json.get('device_id', None)
         location = request_json.get('location', None)
         is_active = request_json.get('is_active', None)
 
@@ -69,7 +69,7 @@ class UserDeviceAPI(ResourceAPI):
 
         try:
             api_response = self._user_policy.create_user_device(user_uuid=user_uuid, pin_code=pin_code,
-                                                                device_token=device_token, device_name=device_name,
+                                                                device_token=device_token, device_id=device_id,
                                                                 location=location, is_active=is_active)
             if api_response.is_ok:
                 us_uuid = api_response.headers['Location'].split('/')[-1]
@@ -106,7 +106,7 @@ class UserDeviceAPI(ResourceAPI):
         user_uuid = request_json.get('user_uuid', None)
         pin_code = request_json.get('pin_code', None)
         device_token = request_json.get('device_token', None)
-        device_name = request_json.get('device_name', None)
+        device_id = request_json.get('device_id', None)
         location = request_json.get('location', None)
         is_active = request_json.get('is_active', None)
         modify_reason = request_json.get('modify_reason', None)
@@ -115,7 +115,7 @@ class UserDeviceAPI(ResourceAPI):
             'uuid': suuid,
             'user_uuid': user_uuid,
             'device_token': device_token,
-            'device_name': device_name,
+            'device_id': device_id,
             'location': location,
             'is_active': is_active,
             'modify_reason': modify_reason,
@@ -142,7 +142,7 @@ class UserDeviceAPI(ResourceAPI):
 
         try:
             api_response = self._user_policy.update_user_device(user_uuid=user_uuid, suuid=suuid, pin_code=pin_code,
-                                                                device_token=device_token, device_name=device_name,
+                                                                device_token=device_token, device_id=device_id,
                                                                 location=location, is_active=is_active,
                                                                 modify_reason=modify_reason)
             if api_response.is_ok:
