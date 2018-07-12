@@ -9,7 +9,7 @@ from app.exception import RailRoadAPIError
 from app.service import SubscriptionAPIService
 
 sys.path.insert(0, '../rest_api_library')
-from utils import make_api_response, make_error_request_response
+from response import make_api_response, make_error_request_response
 from api import ResourceAPI
 from response import APIResponseStatus, APIResponse
 from rest import APIResourceURL, APIException

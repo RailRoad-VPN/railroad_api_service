@@ -9,7 +9,8 @@ from app.exception import RailRoadAPIError
 from app.service import OrderAPIService
 
 sys.path.insert(0, '../rest_api_library')
-from utils import check_uuid, make_api_response, check_required_api_fields, make_error_request_response
+from utils import check_uuid
+from response import make_api_response, make_error_request_response, check_required_api_fields
 from api import ResourceAPI
 from response import APIResponseStatus, APIResponse
 from rest import APIException, APIResourceURL

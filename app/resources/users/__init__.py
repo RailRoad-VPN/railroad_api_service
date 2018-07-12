@@ -1,15 +1,17 @@
+import datetime
+import logging
 import sys
 from http import HTTPStatus
 from typing import List
 
-import logging
 from flask import request, Response
 
-from app.policy import UserPolicy
 from app.exception import RailRoadAPIError
+from app.policy import UserPolicy
 
 sys.path.insert(0, '../rest_api_library')
-from utils import check_uuid, make_api_response, make_error_request_response, check_required_api_fields
+from utils import check_uuid
+from response import make_api_response, make_error_request_response, check_required_api_fields
 from api import ResourceAPI
 from response import APIResponseStatus, APIResponse
 from rest import APIException, APIResourceURL
@@ -34,6 +36,7 @@ class UserAPI(ResourceAPI):
             APIResourceURL(base_url=url, resource_name='<string:suuid>', methods=['GET', 'PUT']),
             APIResourceURL(base_url=url, resource_name='uuid/<string:suuid>', methods=['GET']),
             APIResourceURL(base_url=url, resource_name='email/<string:email>', methods=['GET']),
+            APIResourceURL(base_url=url, resource_name='pincode/<string:pin_code>', methods=['GET']),
         ]
         return api_urls
 
@@ -110,7 +113,7 @@ class UserAPI(ResourceAPI):
         if request_json is None:
             return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.REQUEST_NO_JSON)
 
-        user_uuid = request_json.get('suuid', None)
+        user_uuid = request_json.get('uuid', None)
 
         is_valid_a = check_uuid(suuid=suuid)
         is_valid_b = check_uuid(suuid=user_uuid)
@@ -123,6 +126,12 @@ class UserAPI(ResourceAPI):
         is_locked = request_json.get('is_locked', None)
         is_password_expired = request_json.get('is_password_expired', None)
         enabled = request_json.get('enabled', None)
+        pin_code = request_json.get('pin_code', None)
+        pin_code_expire_date = request_json.get('pin_code_expire_date', None)
+
+        if pin_code is not None and pin_code_expire_date is None:
+            now = datetime.datetime.now()
+            pin_code_expire_date = now + datetime.timedelta(minutes=30)
 
         user_json = {
             'uuid': suuid,
@@ -153,7 +162,10 @@ class UserAPI(ResourceAPI):
             # user does not exist
             return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.USER_NOT_EXIST)
         try:
-            api_response = self._user_policy.update_user(user_json=user_json)
+            api_response = self._user_policy.update_user(suuid=suuid, email=email, password=password,
+                                                         is_expired=is_expired, is_locked=is_locked,
+                                                         is_password_expired=is_password_expired, enabled=enabled,
+                                                         pin_code=pin_code, pin_code_expire_date=pin_code_expire_date)
         except APIException as e:
             logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
@@ -172,20 +184,20 @@ class UserAPI(ResourceAPI):
         resp = make_api_response(data=response_data, http_code=api_response.code)
         return resp
 
-    def get(self, suuid: str = None, email: str = None) -> Response:
+    def get(self, suuid: str = None, email: str = None, pin_code: str = None) -> Response:
         super(UserAPI, self).get(req=request)
         if suuid is not None:
             is_valid = check_uuid(suuid=suuid)
             if not is_valid:
                 return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
-        if suuid is None and email is None:
+        if suuid is None and email is None and pin_code is None:
             # find all users - no parameters set
             return make_error_request_response(HTTPStatus.METHOD_NOT_ALLOWED, err=RailRoadAPIError.PRIVATE_METHOD)
 
-        # uuid or email is not None, let's get user
+        # uuid or email or pin_code is not None, let's get user
         try:
-            api_response = self._user_policy.get_user(suuid=suuid, email=email)
+            api_response = self._user_policy.get_user(suuid=suuid, email=email, pin_code=pin_code)
         except APIException as e:
             logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)

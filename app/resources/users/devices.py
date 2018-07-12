@@ -9,7 +9,8 @@ from app.exception import RailRoadAPIError
 from app.policy import UserPolicy
 
 sys.path.insert(0, '../rest_api_library')
-from utils import check_uuid, make_api_response, make_error_request_response, check_required_api_fields
+from utils import check_uuid
+from response import make_api_response, make_error_request_response, check_required_api_fields
 from api import ResourceAPI
 from response import APIResponseStatus, APIResponse
 from rest import APIException, APIResourceURL
@@ -49,15 +50,15 @@ class UserDeviceAPI(ResourceAPI):
             return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
         user_uuid = request_json.get('user_uuid', None)
-        pin_code = request_json.get('pin_code', None)
         device_token = request_json.get('device_token', None)
         device_id = request_json.get('device_id', None)
         location = request_json.get('location', None)
-        is_active = request_json.get('is_active', None)
+        is_active = request_json.get('is_active', False)
 
         req_fields = {
             'user_uuid': user_uuid,
-            'pin_code': pin_code
+            'device_id': device_id,
+            'is_active': is_active,
         }
 
         error_fields = check_required_api_fields(req_fields)
@@ -68,9 +69,9 @@ class UserDeviceAPI(ResourceAPI):
             return resp
 
         try:
-            api_response = self._user_policy.create_user_device(user_uuid=user_uuid, pin_code=pin_code,
-                                                                device_token=device_token, device_id=device_id,
-                                                                location=location, is_active=is_active)
+            api_response = self._user_policy.create_user_device(user_uuid=user_uuid, device_id=device_id,
+                                                                device_token=device_token, location=location,
+                                                                is_active=is_active)
             if api_response.is_ok:
                 us_uuid = api_response.headers['Location'].split('/')[-1]
                 api_url = self.__api_url__.replace('<string:user_uuid>', user_uuid)
@@ -78,6 +79,7 @@ class UserDeviceAPI(ResourceAPI):
                 response_data = APIResponse(status=APIResponseStatus.success.status, code=api_response.code)
                 resp = make_api_response(data=response_data, http_code=api_response.code)
                 resp.headers['Location'] = '%s/%s/%s' % (self._config['API_BASE_URI'], api_url, us_uuid)
+                resp.headers['X-Device-Token'] = api_response.headers['X-Device-Token']
                 return resp
             else:
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=api_response.code,
@@ -95,16 +97,15 @@ class UserDeviceAPI(ResourceAPI):
         if request_json is None:
             return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.REQUEST_NO_JSON)
 
-        us_uuid = request_json.get('uuid', None)
+        device_uuid = request_json.get('uuid', None)
 
         is_valid_a = check_uuid(suuid=user_device_uuid)
-        is_valid_b = check_uuid(suuid=us_uuid)
-        if not is_valid_a or not is_valid_b or (user_device_uuid != us_uuid):
+        is_valid_b = check_uuid(suuid=device_uuid)
+        if not is_valid_a or not is_valid_b or (user_device_uuid != device_uuid):
             return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
         suuid = request_json.get('uuid', None)
         user_uuid = request_json.get('user_uuid', None)
-        pin_code = request_json.get('pin_code', None)
         device_token = request_json.get('device_token', None)
         device_id = request_json.get('device_id', None)
         location = request_json.get('location', None)
@@ -116,7 +117,6 @@ class UserDeviceAPI(ResourceAPI):
             'user_uuid': user_uuid,
             'device_token': device_token,
             'device_id': device_id,
-            'location': location,
             'is_active': is_active,
             'modify_reason': modify_reason,
         }
@@ -141,18 +141,20 @@ class UserDeviceAPI(ResourceAPI):
             return resp
 
         try:
-            api_response = self._user_policy.update_user_device(user_uuid=user_uuid, suuid=suuid, pin_code=pin_code,
-                                                                device_token=device_token, device_id=device_id,
-                                                                location=location, is_active=is_active,
-                                                                modify_reason=modify_reason)
+            api_response = self._user_policy.update_user_device(suuid=suuid, user_uuid=user_uuid, device_id=device_id,
+                                                                device_token=device_token, location=location,
+                                                                is_active=is_active, modify_reason=modify_reason)
             if api_response.is_ok:
                 response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.NO_CONTENT,
                                             headers=api_response.headers)
+                resp = make_api_response(data=response_data, http_code=api_response.code)
+                resp.headers['X-Device-Token'] = api_response.headers['X-Device-Token']
+                return resp
             else:
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=api_response.code,
                                             headers=api_response.headers, errors=api_response.errors)
-            resp = make_api_response(data=response_data, http_code=api_response.code)
-            return resp
+                resp = make_api_response(data=response_data, http_code=api_response.code)
+                return resp
         except APIException as e:
             logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)

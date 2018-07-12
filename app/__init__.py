@@ -5,7 +5,7 @@ from http import HTTPStatus
 from flask import Flask, request
 
 from app.policy import *
-from app.resources.pincodes import PinCodeAPI
+from app.service import *
 from app.resources.subscriptions import SubscriptionAPI
 from app.resources.subscriptions.payments import PaymentAPI
 from app.resources.users import UserAPI
@@ -15,12 +15,11 @@ from app.resources.vpns.servers import VPNServersAPI
 from app.resources.vpns.servers.conditions import VPNServerConditionsAPI
 from app.resources.vpns.servers.configurations import VPNServersConfigurationsAPI
 from app.resources.vpns.servers.meta import VPNServersMetaAPI
-from app.service import *
 from app.resources.users.devices import UserDeviceAPI
 
 sys.path.insert(1, '../rest_api_library')
 from api import register_api
-from utils import make_error_request_response
+from response import make_error_request_response
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -93,7 +92,6 @@ vpn_policy = VPNServerPolicy(vpnserver_service=vpnserver_api_service, vpntype_se
                              geocountry_service=geocountry_api_service, geostate_service=geostate_api_service)
 
 apis = [
-    {'cls': PinCodeAPI, 'args': [user_policy, app_config]},
     {'cls': UserAPI, 'args': [user_policy, app_config]},
     {'cls': OrderAPI, 'args': [order_api_service, app_config]},
     {'cls': UserSubscriptionAPI, 'args': [user_policy, app_config]},

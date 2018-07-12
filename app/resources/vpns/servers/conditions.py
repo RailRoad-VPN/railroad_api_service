@@ -12,7 +12,8 @@ sys.path.insert(0, '../rest_api_library')
 from rest import APIException, APIResourceURL
 from api import ResourceAPI
 from response import APIResponseStatus, APIResponse
-from utils import check_uuid, make_api_response
+from utils import check_uuid
+from response import make_api_response
 
 
 class VPNServerConditionsAPI(ResourceAPI):

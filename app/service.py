@@ -51,21 +51,24 @@ class UserDeviceAPIService(RESTService):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def create(self, user_uuid: str, pin_code: int) -> APIResponse:
+    def create(self, user_uuid: str, device_id: str, device_token: str = None, location: str = None,
+               is_active: bool = False) -> APIResponse:
         us_json = {
             'user_uuid': user_uuid,
-            'pin_code': pin_code,
+            'device_id': device_id,
+            'device_token': device_token,
+            'location': location,
+            'is_active': is_active,
         }
         url = self._url.replace('<string:user_uuid>', user_uuid)
         api_response = self._post(data=us_json, url=url)
         return api_response
 
-    def update(self, user_uuid: str, pin_code: int, device_token: str, device_id: str, location: str,
-               is_active: bool, modify_reason: str, suuid: str = None) -> APIResponse:
+    def update(self, suuid: str, user_uuid: str, device_id: str, device_token: str, location: str,
+               is_active: bool, modify_reason: str) -> APIResponse:
         ud_json = {
             'uuid': suuid,
             'user_uuid': user_uuid,
-            'pin_code': pin_code,
             'device_token': device_token,
             'device_id': device_id,
             'location': location,
@@ -154,12 +157,39 @@ class UserAPIService(RESTService):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def create_user(self, user_json: dict) -> APIResponse:
+    def create_user(self, email: str, password: str, is_expired: bool = False, is_locked: bool = False,
+                    is_password_expired: bool = False, enabled: bool = False, pin_code: str = None,
+                    pin_code_expire_date: datetime = None) -> APIResponse:
+        user_json = {
+            'email': email,
+            'password': password,
+            'is_expired': is_expired,
+            'is_locked': is_locked,
+            'is_password_expired': is_password_expired,
+            'enabled': enabled,
+            'pin_code': pin_code,
+            'pin_code_expire_date': pin_code_expire_date,
+        }
+
         api_response = self._post(data=user_json, headers=self._headers)
         return api_response
 
-    def update_user(self, user_json: dict):
-        url = '%s/uuid/%s' % (self._url, user_json['uuid'])
+    def update_user(self, suuid: str, email: str, password: str, is_expired: bool, is_locked: bool,
+                    is_password_expired: bool, enabled: bool, pin_code: str = None,
+                    pin_code_expire_date: datetime = None):
+        user_json = {
+            'uuid': suuid,
+            'email': email,
+            'password': password,
+            'is_expired': is_expired,
+            'is_locked': is_locked,
+            'is_password_expired': is_password_expired,
+            'enabled': enabled,
+            'pin_code': pin_code,
+            'pin_code_expire_date': str(pin_code_expire_date),
+        }
+
+        url = '%s/%s' % (self._url, suuid)
         api_response = self._put(url=url, data=user_json, headers=self._headers)
         return api_response
 
@@ -169,7 +199,7 @@ class UserAPIService(RESTService):
         elif email:
             url = '%s/email/%s' % (self._url, email)
         elif pin_code:
-            url = '%s/device/pincode/%s' % (self._url, str(pin_code))
+            url = '%s/pincode/%s' % (self._url, str(pin_code))
         else:
             raise KeyError
         api_response = self._get(url=url)

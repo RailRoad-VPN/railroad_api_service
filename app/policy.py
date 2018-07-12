@@ -64,28 +64,40 @@ class UserPolicy(object):
         user_sub['is_expired'] = is_expired
         return user_sub
 
-    def get_user(self, suuid: str = None, email: str = None) -> APIResponse:
-        api_response = self._user_api_service.get_user(suuid=suuid, email=email)
+    def get_user(self, suuid: str = None, email: str = None, pin_code: str = None) -> APIResponse:
+        api_response = self._user_api_service.get_user(suuid=suuid, email=email, pin_code=pin_code)
         return api_response
 
-    def create_user(self, user_json) -> APIResponse:
-        api_response = self._user_api_service.create_user(user_json=user_json)
+    def create_user(self, email: str, password: str, is_expired: bool = False, is_locked: bool = False,
+                    is_password_expired: bool = False, enabled: bool = False, pin_code: str = None,
+                    pin_code_expire_date: datetime = None) -> APIResponse:
+        api_response = self._user_api_service.create_user(email=email, password=password, is_expired=is_expired,
+                                                          is_locked=is_locked, is_password_expired=is_password_expired,
+                                                          enabled=enabled, pin_code=pin_code,
+                                                          pin_code_expire_date=pin_code_expire_date)
         return api_response
 
-    def update_user(self, user_json) -> APIResponse:
-        api_response = self._user_api_service.update_user(user_json=user_json)
+    def update_user(self, suuid: str, email: str, password: str, is_expired: bool, is_locked: bool,
+                    is_password_expired: bool, enabled: bool, pin_code: str = None,
+                    pin_code_expire_date: datetime = None) -> APIResponse:
+        api_response = self._user_api_service.update_user(suuid=suuid, email=email, password=password,
+                                                          is_expired=is_expired, is_locked=is_locked,
+                                                          is_password_expired=is_password_expired, enabled=enabled,
+                                                          pin_code=pin_code, pin_code_expire_date=pin_code_expire_date)
         return api_response
 
-    def create_user_device(self, user_uuid: str, pin_code: int) -> APIResponse:
-        api_response = self._user_device_api_service.create(user_uuid=user_uuid, pin_code=pin_code)
+    def create_user_device(self, user_uuid: str, device_id: str, device_token: str = None, location: str = None,
+                           is_active: bool = False) -> APIResponse:
+        api_response = self._user_device_api_service.create(user_uuid=user_uuid, device_id=device_id,
+                                                            device_token=device_token, location=location,
+                                                            is_active=is_active)
         return api_response
 
-    def update_user_device(self, user_uuid: str, pin_code: int, device_token: str, device_id: str,
-                           location: str, is_active: bool, modify_reason: str, suuid: str = None) -> APIResponse:
-        api_response = self._user_device_api_service.update(suuid=suuid, user_uuid=user_uuid, pin_code=pin_code,
-                                                            device_token=device_token, device_id=device_id,
-                                                            location=location, is_active=is_active,
-                                                            modify_reason=modify_reason)
+    def update_user_device(self, suuid: str, user_uuid: str, device_id: str, modify_reason: str,
+                           device_token: str = None, location: str = None, is_active: bool = False) -> APIResponse:
+        api_response = self._user_device_api_service.update(suuid=suuid, user_uuid=user_uuid, device_id=device_id,
+                                                            device_token=device_token, location=location,
+                                                            is_active=is_active, modify_reason=modify_reason)
         return api_response
 
     def get_user_device_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
@@ -94,10 +106,6 @@ class UserPolicy(object):
 
     def get_user_devices(self, user_uuid: str) -> APIResponse:
         api_response = self._user_device_api_service.get_user_devices(user_uuid=user_uuid)
-        return api_response
-
-    def get_user_uuid_by_pincode(self, pin_code: int):
-        api_response = self._user_api_service.get_user(pin_code=pin_code)
         return api_response
 
 

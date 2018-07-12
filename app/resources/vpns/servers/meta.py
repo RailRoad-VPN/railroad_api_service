@@ -10,7 +10,7 @@ from rest import APIResourceURL
 sys.path.insert(0, '../rest_api_library')
 from api import ResourceAPI
 from response import APIResponseStatus, APIResponse
-from utils import make_api_response
+from response import make_api_response
 
 
 class VPNServersMetaAPI(ResourceAPI):
