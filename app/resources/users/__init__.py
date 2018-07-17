@@ -89,7 +89,9 @@ class UserAPI(ResourceAPI):
         user_json['enabled'] = enabled
 
         try:
-            api_response = self._user_policy.create_user(user_json=user_json)
+            api_response = self._user_policy.create_user(email=email, password=password, is_expired=is_expired,
+                                                         is_locked=is_locked, is_password_expired=is_password_expired,
+                                                         enabled=enabled)
         except APIException as e:
             logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
@@ -128,15 +130,13 @@ class UserAPI(ResourceAPI):
         enabled = request_json.get('enabled', None)
         pin_code = request_json.get('pin_code', None)
         pin_code_expire_date = request_json.get('pin_code_expire_date', None)
-
-        if pin_code is not None and pin_code_expire_date is None:
-            now = datetime.datetime.now()
-            pin_code_expire_date = now + datetime.timedelta(minutes=30)
+        modify_reason = request_json.get('modify_reason', None)
 
         user_json = {
             'uuid': suuid,
             'email': email,
             'password': password,
+            'modify_reason': modify_reason,
             'is_expired': is_expired,
             'is_locked': is_locked,
             'is_password_expired': is_password_expired,
@@ -149,6 +149,10 @@ class UserAPI(ResourceAPI):
                                         errors=error_fields)
             resp = make_api_response(data=response_data, http_code=response_data.code)
             return resp
+
+        if pin_code is not None and pin_code_expire_date is None:
+            now = datetime.datetime.now()
+            pin_code_expire_date = now + datetime.timedelta(minutes=30)
 
         try:
             api_response = self._user_policy.get_user(suuid=suuid)
@@ -165,7 +169,8 @@ class UserAPI(ResourceAPI):
             api_response = self._user_policy.update_user(suuid=suuid, email=email, password=password,
                                                          is_expired=is_expired, is_locked=is_locked,
                                                          is_password_expired=is_password_expired, enabled=enabled,
-                                                         pin_code=pin_code, pin_code_expire_date=pin_code_expire_date)
+                                                         modify_reason=modify_reason, pin_code=pin_code,
+                                                         pin_code_expire_date=pin_code_expire_date)
         except APIException as e:
             logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)

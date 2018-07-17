@@ -7,6 +7,8 @@ from rest import APIException
 from response import APIResponse
 from api import ResourcePagination
 
+logger = logging.getLogger(__name__)
+
 
 class UserPolicy(object):
     __version__ = 1
@@ -78,11 +80,12 @@ class UserPolicy(object):
         return api_response
 
     def update_user(self, suuid: str, email: str, password: str, is_expired: bool, is_locked: bool,
-                    is_password_expired: bool, enabled: bool, pin_code: str = None,
+                    is_password_expired: bool, enabled: bool, modify_reason: str, pin_code: str = None,
                     pin_code_expire_date: datetime = None) -> APIResponse:
         api_response = self._user_api_service.update_user(suuid=suuid, email=email, password=password,
                                                           is_expired=is_expired, is_locked=is_locked,
                                                           is_password_expired=is_password_expired, enabled=enabled,
+                                                          modify_reason=modify_reason,
                                                           pin_code=pin_code, pin_code_expire_date=pin_code_expire_date)
         return api_response
 
