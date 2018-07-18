@@ -53,7 +53,7 @@ class UserDeviceAPI(ResourceAPI):
         device_token = request_json.get('device_token', None)
         device_id = request_json.get('device_id', None)
         location = request_json.get('location', None)
-        is_active = request_json.get('is_active', False)
+        is_active = request_json.get('is_active', True)
 
         req_fields = {
             'user_uuid': user_uuid,
