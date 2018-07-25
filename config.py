@@ -16,6 +16,8 @@ class Config(object):
     BILLING_SERVICE_SUBSCRIPTIONS_RESOURCE_NAME = 'subscriptions'
     BILLING_SERVICE_USER_SUBSCRIPTION_RESOURCE_NAME = 'users/<string:user_uuid>/subscriptions'
     BILLING_SERVICE_ORDERS_RESOURCE_NAME = 'orders'
+    BILLING_SERVICE_PAYMENTS_RESOURCE_NAME = 'payments'
+
 
     VPNC_SERVICE_VPNTYPE_RESOURCE_NAME = 'vpns/types'
     VPNC_SERVICE_VPNSERVER_RESOURCE_NAME = 'vpns/servers'
@@ -45,6 +47,8 @@ class DevelopmentConfig(Config):
     VPNC_SERVICE_URL = 'http://127.0.0.1:9000/api/v1'
     BILLING_SERVICE_URL = 'http://127.0.0.1:7000/api/v1'
 
+    APN_PATH = '/Users/dikkini/Developing/workspaces/my/DFN/railroad_api_service/%s.apn'
+
 
 class TestingConfig(Config):
     ENV = 'testing'
@@ -55,3 +59,5 @@ class TestingConfig(Config):
     AUTH_SERVICE_URL = 'http://127.0.0.1:6000/api/v1'
     VPNC_SERVICE_URL = 'http://127.0.0.1:9000/api/v1'
     BILLING_SERVICE_URL = 'http://127.0.0.1:7000/api/v1'
+
+    APN_PATH = '/opt/apps/dfn/apn/%s.apn'

@@ -1,6 +1,9 @@
 import datetime
+import json
 import logging
 import sys
+
+from app.model.payment_type import PaymentType
 
 sys.path.insert(0, '../rest_api_library')
 from rest import RESTService
@@ -13,8 +16,15 @@ logger = logging.getLogger(__name__)
 class PaymentAPIService(RESTService):
     __version__ = 1
 
-    def create_payment(self, payment_json: dict) -> APIResponse:
-        api_response = self._post(data=payment_json, headers=self._headers)
+    def create_ppg_payment(self, order_id: int, apn_dict: dict) -> APIResponse:
+        data = {
+            'order_id': order_id,
+            'type_id': PaymentType.PPG.sid,
+            'json_data': json.dumps(apn_dict)
+        }
+
+        logger.debug(f"Create PayProGlobal payment: {data}")
+        api_response = self._post(data=data, headers=self._headers)
         return api_response
 
     def get_payment(self, suuid: str) -> APIResponse:
@@ -27,8 +37,12 @@ class PaymentAPIService(RESTService):
 class OrderAPIService(RESTService):
     __version__ = 1
 
-    def create_order(self, order_json: dict) -> APIResponse:
-        api_response = self._post(data=order_json, headers=self._headers)
+    def create_order(self, status_id: int, payment_uuid: str = None) -> APIResponse:
+        data = {
+            'status_id': status_id,
+            'payment_uuid': payment_uuid,
+        }
+        api_response = self._post(data=data, headers=self._headers)
         return api_response
 
     def update_order(self, order_json: dict) -> APIResponse:
@@ -233,7 +247,7 @@ class VPNServersAPIService(RESTService):
     def get_vpnservers_by_type(self, type_id: int, pagination: ResourcePagination) -> APIResponse:
         url = "%s/type/%s" % (self._url, type_id)
 
-        if pagination.is_paginated:
+        if pagination is not None and pagination.is_paginated:
             url = self._build_url_pagination(limit=pagination.limit, offset=pagination.offset, url=url)
 
         api_response = self._get(url=url)
@@ -242,7 +256,7 @@ class VPNServersAPIService(RESTService):
     def get_vpnservers_by_status(self, status_id: int, pagination: ResourcePagination) -> APIResponse:
         url = "%s/status/%s" % (self._url, status_id)
 
-        if pagination.is_paginated:
+        if pagination is not None and pagination.is_paginated:
             url = self._build_url_pagination(limit=pagination.limit, offset=pagination.offset, url=url)
 
         api_response = self._get(url=url)

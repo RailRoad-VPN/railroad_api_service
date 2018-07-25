@@ -58,13 +58,8 @@ class OrderAPI(ResourceAPI):
             resp = make_api_response(data=response_data, http_code=response_data.code)
             return resp
 
-        order_json = {
-            'status_id': status_id,
-            'payment_uuid': payment_uuid,
-        }
-
         try:
-            api_response = self._order_api_service.create_order(order_json=order_json)
+            api_response = self._order_api_service.create_order(status_id=status_id, payment_uuid=payment_uuid)
         except APIException as e:
             logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
@@ -109,11 +104,13 @@ class OrderAPI(ResourceAPI):
         code = request_json.get('code', None)
         status_id = request_json.get('status_id', None)
         payment_uuid = request_json.get('payment_uuid', None)
+        modify_reason = request_json.get('modify_reason', None)
 
         req_fields = {
             'code': code,
             'status_id': status_id,
             'payment_uuid': payment_uuid,
+            'modify_reason': modify_reason,
         }
 
         error_fields = check_required_api_fields(req_fields)
@@ -128,6 +125,7 @@ class OrderAPI(ResourceAPI):
             'code': code,
             'status_id': status_id,
             'payment_uuid': payment_uuid,
+            'modify_reason': modify_reason,
         }
 
         try:
