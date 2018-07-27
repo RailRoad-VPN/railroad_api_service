@@ -90,6 +90,7 @@ class UserDeviceAPI(ResourceAPI):
 
                 user_dict = api_response.data
                 logger.debug(f'Got user {user_dict}')
+
                 logger.debug('Add modify_reason')
                 user_dict['modify_reason'] = 'update pin code expire date'
 
