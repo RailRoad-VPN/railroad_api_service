@@ -118,8 +118,8 @@ class UserDeviceAPI(ResourceAPI):
                 logger.debug(f"Set Location Header: {location_header}")
                 resp.headers['Location'] = location_header
 
-                logger.debug(f"Set X-Device-Token: {x_device_token}")
-                resp.headers['X-Device-Token'] = x_device_token
+                # logger.debug(f"Set X-Device-Token: {x_device_token}")
+                # resp.headers['X-Device-Token'] = x_device_token
 
                 logger.debug("Return response")
                 return resp
