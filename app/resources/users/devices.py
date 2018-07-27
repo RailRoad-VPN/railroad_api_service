@@ -75,6 +75,10 @@ class UserDeviceAPI(ResourceAPI):
                                                                 device_token=device_token, location=location,
                                                                 is_active=is_active)
             if api_response.is_ok:
+                logger.debug("Get X-Device-Token from headers")
+                x_device_token = api_response.headers['X-Device-Token']
+                logger.debug(f"X-Device-Token: {x_device_token}")
+
                 # TODO think about addition log and process errors
                 logger.debug(f'Get user by uuid: {user_uuid}')
                 api_response = self._user_policy.get_user(suuid=user_uuid)
@@ -104,7 +108,8 @@ class UserDeviceAPI(ResourceAPI):
                 response_data = APIResponse(status=APIResponseStatus.success.status, code=api_response.code)
                 resp = make_api_response(data=response_data, http_code=api_response.code)
                 resp.headers['Location'] = '%s/%s/%s' % (self._config['API_BASE_URI'], api_url, us_uuid)
-                resp.headers['X-Device-Token'] = api_response.headers['X-Device-Token']
+
+                resp.headers['X-Device-Token'] = x_device_token
                 return resp
             else:
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=api_response.code,
