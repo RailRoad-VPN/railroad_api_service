@@ -77,7 +77,6 @@ class UserDeviceAPI(ResourceAPI):
             if api_response.is_ok:
                 logger.debug("Get X-Device-Token from headers")
                 x_device_token = api_response.headers['X-Device-Token']
-                logger.debug(f"X-Device-Token: {x_device_token}")
 
                 # TODO think about addition log and process errors
                 logger.debug(f'Get user by uuid: {user_uuid}')
@@ -99,18 +98,30 @@ class UserDeviceAPI(ResourceAPI):
 
                 api_response = self._user_policy.update_user(user_dict=user_dict)
                 if not api_response.is_ok:
+                    logger.debug("Failed to update user")
                     response_data = APIResponse(status=APIResponseStatus.failed.status, code=api_response.code,
                                                 errors=api_response.errors, headers=api_response.headers)
                     return make_api_response(data=response_data, http_code=api_response.code)
 
-                us_uuid = api_response.headers['Location'].split('/')[-1]
+                logger.debug("Get user device uuid from Location header")
+                ud_uuid = api_response.headers['Location'].split('/')[-1]
+                logger.debug(f"User Device uuid: {ud_uuid}")
+
+                logger.debug("Prepare API URL")
                 api_url = self.__api_url__.replace('<string:user_uuid>', user_uuid)
+                logger.debug(f"API URL: {api_url}")
 
                 response_data = APIResponse(status=APIResponseStatus.success.status, code=api_response.code)
                 resp = make_api_response(data=response_data, http_code=api_response.code)
-                resp.headers['Location'] = '%s/%s/%s' % (self._config['API_BASE_URI'], api_url, us_uuid)
+                location_header = f"{self._config['API_BASE_URI']}/{api_url}/{ud_uuid}"
 
+                logger.debug(f"Set Location Header: {location_header}")
+                resp.headers['Location'] = location_header
+
+                logger.debug(f"Set X-Device-Token: {x_device_token}")
                 resp.headers['X-Device-Token'] = x_device_token
+
+                logger.debug("Return response")
                 return resp
             else:
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=api_response.code,
