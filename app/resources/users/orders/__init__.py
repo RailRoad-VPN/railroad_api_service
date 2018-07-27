@@ -32,6 +32,7 @@ class OrderAPI(ResourceAPI):
         url = "%s/%s" % (base_url, OrderAPI.__api_url__)
         api_urls = [
             APIResourceURL(base_url=url, resource_name='', methods=['GET', 'POST']),
+            APIResourceURL(base_url=url, resource_name='<string:suuid>', methods=['PUT']),
             APIResourceURL(base_url=url, resource_name='uuid/<string:suuid>', methods=['GET', 'POST']),
             APIResourceURL(base_url=url, resource_name='code/<int:code>', methods=['GET', 'POST']),
         ]
@@ -109,7 +110,6 @@ class OrderAPI(ResourceAPI):
         req_fields = {
             'code': code,
             'status_id': status_id,
-            'payment_uuid': payment_uuid,
             'modify_reason': modify_reason,
         }
 
@@ -136,18 +136,13 @@ class OrderAPI(ResourceAPI):
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
 
-        if api_response.code in [HTTPStatus.OK, HTTPStatus.NO_CONTENT]:
-            response_data = APIResponse(status=api_response.status, code=api_response.code,
-                                        headers=api_response.headers)
-            if api_response.code == HTTPStatus.CREATED:
-                response_data.data = api_response.data
-            resp = make_api_response(data=response_data, http_code=api_response.code)
-            return resp
+        if api_response.is_ok:
+            response_data = APIResponse(status=APIResponseStatus.success.status, code=api_response.code)
         else:
-            response_data = APIResponse(status=api_response.status, code=api_response.code,
-                                        headers=api_response.headers)
-            resp = make_api_response(data=response_data, http_code=api_response.code)
-            return resp
+            response_data = APIResponse(status=api_response.status, code=api_response.code)
+
+        resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
+        return resp
 
     def get(self, suuid: str = None, code: int = None) -> Response:
         super(OrderAPI, self).get(req=request)

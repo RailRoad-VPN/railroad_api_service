@@ -178,7 +178,7 @@ class UserAPI(ResourceAPI):
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
 
-        if api_response.code in [HTTPStatus.OK, HTTPStatus.NO_CONTENT]:
+        if api_response.is_ok:
             response_data = APIResponse(status=api_response.status, code=api_response.code,
                                         headers=api_response.headers)
             # 200 OK - means some content in body

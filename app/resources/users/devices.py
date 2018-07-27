@@ -187,7 +187,7 @@ class UserDeviceAPI(ResourceAPI):
                                                                 device_token=device_token, location=location,
                                                                 is_active=is_active, modify_reason=modify_reason)
             if api_response.is_ok:
-                response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.NO_CONTENT,
+                response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK,
                                             headers=api_response.headers)
                 resp = make_api_response(data=response_data, http_code=api_response.code)
                 resp.headers['X-Device-Token'] = api_response.headers['X-Device-Token']

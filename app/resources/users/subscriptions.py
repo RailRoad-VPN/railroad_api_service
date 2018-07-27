@@ -145,11 +145,10 @@ class UserSubscriptionAPI(ResourceAPI):
                                                              modify_date=modify_date,
                                                              modify_reason=modify_reason)
             if api_response.is_ok:
-                response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.NO_CONTENT,
-                                            headers=api_response.headers)
+                response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK)
             else:
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=api_response.code,
-                                            headers=api_response.headers, errors=api_response.errors)
+                                            errors=api_response.errors)
             resp = make_api_response(data=response_data, http_code=api_response.code)
             return resp
         except APIException as e:
