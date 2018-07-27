@@ -111,15 +111,15 @@ class UserDeviceAPI(ResourceAPI):
                 api_url = self.__api_url__.replace('<string:user_uuid>', user_uuid)
                 logger.debug(f"API URL: {api_url}")
 
-                response_data = APIResponse(status=APIResponseStatus.success.status, code=api_response.code)
-                resp = make_api_response(data=response_data, http_code=api_response.code)
+                response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.CREATED)
+                resp = make_api_response(data=response_data, http_code=HTTPStatus.CREATED)
                 location_header = f"{self._config['API_BASE_URI']}/{api_url}/{ud_uuid}"
 
                 logger.debug(f"Set Location Header: {location_header}")
                 resp.headers['Location'] = location_header
 
-                # logger.debug(f"Set X-Device-Token: {x_device_token}")
-                # resp.headers['X-Device-Token'] = x_device_token
+                logger.debug(f"Set X-Device-Token: {x_device_token}")
+                resp.headers['X-Device-Token'] = x_device_token
 
                 logger.debug("Return response")
                 return resp
