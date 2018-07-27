@@ -191,29 +191,11 @@ class UserAPIService(RESTService):
         api_response = self._post(data=user_json, headers=self._headers)
         return api_response
 
-    def update_user(self, suuid: str, email: str, password: str, is_expired: bool, is_locked: bool,
-                    is_password_expired: bool, enabled: bool, modify_reason: str, pin_code: str = None,
-                    pin_code_expire_date: datetime = None):
-        logger.debug('update user with parameters suuid=%s, email=%s, password=%s, is_expired=%s, is_locked=%s, '
-                     'is_password_expired=%s, enabled=%s, modify_reason=%s,'
-                     'pin_code=%s, pin_code_expire_date=%s' % (
-                         suuid, email, password, is_expired, is_locked, is_password_expired, enabled, modify_reason,
-                         pin_code, pin_code_expire_date))
-        user_json = {
-            'uuid': suuid,
-            'email': email,
-            'password': password,
-            'modify_reason': modify_reason,
-            'is_expired': is_expired,
-            'is_locked': is_locked,
-            'is_password_expired': is_password_expired,
-            'enabled': enabled,
-            'pin_code': pin_code,
-            'pin_code_expire_date': str(pin_code_expire_date),
-        }
+    def update_user(self, user_dict: dict):
+        logger.debug(f"Updating user with dict: {user_dict}")
 
-        url = '%s/%s' % (self._url, suuid)
-        api_response = self._put(url=url, data=user_json, headers=self._headers)
+        url = '%s/%s' % (self._url, user_dict['uuid'])
+        api_response = self._put(url=url, data=user_dict, headers=self._headers)
         return api_response
 
     def get_user(self, suuid: str = None, email: str = None, pin_code: int = None) -> APIResponse:

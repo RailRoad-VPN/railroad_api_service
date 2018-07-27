@@ -79,14 +79,8 @@ class UserPolicy(object):
                                                           pin_code_expire_date=pin_code_expire_date)
         return api_response
 
-    def update_user(self, suuid: str, email: str, password: str, is_expired: bool, is_locked: bool,
-                    is_password_expired: bool, enabled: bool, modify_reason: str, pin_code: str = None,
-                    pin_code_expire_date: datetime = None) -> APIResponse:
-        api_response = self._user_api_service.update_user(suuid=suuid, email=email, password=password,
-                                                          is_expired=is_expired, is_locked=is_locked,
-                                                          is_password_expired=is_password_expired, enabled=enabled,
-                                                          modify_reason=modify_reason,
-                                                          pin_code=pin_code, pin_code_expire_date=pin_code_expire_date)
+    def update_user(self, user_dict: dict) -> APIResponse:
+        api_response = self._user_api_service.update_user(user_dict=user_dict)
         return api_response
 
     def create_user_device(self, user_uuid: str, device_id: str, device_token: str = None, location: str = None,

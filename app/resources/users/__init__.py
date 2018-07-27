@@ -132,7 +132,7 @@ class UserAPI(ResourceAPI):
         pin_code_expire_date = request_json.get('pin_code_expire_date', None)
         modify_reason = request_json.get('modify_reason', None)
 
-        user_json = {
+        user_dict = {
             'uuid': suuid,
             'email': email,
             'password': password,
@@ -143,7 +143,7 @@ class UserAPI(ResourceAPI):
             'enabled': enabled,
         }
 
-        error_fields = check_required_api_fields(user_json)
+        error_fields = check_required_api_fields(user_dict)
         if len(error_fields) > 0:
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST,
                                         errors=error_fields)
@@ -165,12 +165,13 @@ class UserAPI(ResourceAPI):
         if not api_response.is_ok:
             # user does not exist
             return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.USER_NOT_EXIST)
+
+        user_dict['pin_code'] = pin_code
+        user_dict['pin_code_expire_date'] = pin_code_expire_date
+
         try:
-            api_response = self._user_policy.update_user(suuid=suuid, email=email, password=password,
-                                                         is_expired=is_expired, is_locked=is_locked,
-                                                         is_password_expired=is_password_expired, enabled=enabled,
-                                                         modify_reason=modify_reason, pin_code=pin_code,
-                                                         pin_code_expire_date=pin_code_expire_date)
+
+            api_response = self._user_policy.update_user(user_dict=user_dict)
         except APIException as e:
             logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)

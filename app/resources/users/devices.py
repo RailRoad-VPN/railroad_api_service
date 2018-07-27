@@ -73,6 +73,21 @@ class UserDeviceAPI(ResourceAPI):
                                                                 device_token=device_token, location=location,
                                                                 is_active=is_active)
             if api_response.is_ok:
+                # TODO think about addition log and process errors
+                api_response = self._user_policy.get_user(suuid=user_uuid)
+                if not api_response.is_ok:
+                    response_data = APIResponse(status=APIResponseStatus.failed.status, code=api_response.code,
+                                                errors=api_response.errors, headers=api_response.headers)
+                    return make_api_response(data=response_data, http_code=api_response.code)
+
+                user_dict = api_response.data
+
+                api_response = self._user_policy.update_user(user_dict=user_dict)
+                if not api_response.is_ok:
+                    response_data = APIResponse(status=APIResponseStatus.failed.status, code=api_response.code,
+                                                errors=api_response.errors, headers=api_response.headers)
+                    return make_api_response(data=response_data, http_code=api_response.code)
+
                 us_uuid = api_response.headers['Location'].split('/')[-1]
                 api_url = self.__api_url__.replace('<string:user_uuid>', user_uuid)
 
