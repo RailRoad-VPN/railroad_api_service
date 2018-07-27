@@ -15,6 +15,8 @@ from api import ResourceAPI
 from response import APIResponseStatus, APIResponse
 from rest import APIException, APIResourceURL
 
+logger = logging.getLogger(__name__)
+
 
 class UserDeviceAPI(ResourceAPI):
     __version__ = 1
@@ -74,13 +76,21 @@ class UserDeviceAPI(ResourceAPI):
                                                                 is_active=is_active)
             if api_response.is_ok:
                 # TODO think about addition log and process errors
+                logger.debug(f'Get user by uuid: {user_uuid}')
                 api_response = self._user_policy.get_user(suuid=user_uuid)
                 if not api_response.is_ok:
+                    logger.debug(f'Failed to get user by uuid')
                     response_data = APIResponse(status=APIResponseStatus.failed.status, code=api_response.code,
                                                 errors=api_response.errors, headers=api_response.headers)
                     return make_api_response(data=response_data, http_code=api_response.code)
 
                 user_dict = api_response.data
+                logger.debug(f'Got user {user_dict}')
+                logger.debug('Add modify_reason')
+                user_dict['modify_reason'] = 'update pin code expire date'
+
+                logger.debug('Set pin code activate True')
+                user_dict['is_pin_code_activated'] = True
 
                 api_response = self._user_policy.update_user(user_dict=user_dict)
                 if not api_response.is_ok:
