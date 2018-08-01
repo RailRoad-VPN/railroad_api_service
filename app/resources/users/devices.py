@@ -29,7 +29,7 @@ class UserDeviceAPI(ResourceAPI):
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
-        url = "%s/%s" % (base_url, UserDeviceAPI.__api_url__)
+        url = f"{base_url}/{UserDeviceAPI.__api_url__}"
         api_urls = [
             APIResourceURL(base_url=url, resource_name='', methods=['GET', 'POST', ]),
             APIResourceURL(base_url=url, resource_name='<string:user_device_uuid>', methods=['GET', 'PUT', ]),
@@ -74,59 +74,51 @@ class UserDeviceAPI(ResourceAPI):
             api_response = self._user_policy.create_user_device(user_uuid=user_uuid, device_id=device_id,
                                                                 device_token=device_token, location=location,
                                                                 is_active=is_active)
-            if api_response.is_ok:
-                logger.debug("Get X-Device-Token from headers")
-                x_device_token = api_response.headers['X-Device-Token']
+            user_device = api_response.data
 
-                # TODO think about addition log and process errors
-                logger.debug(f'Get user by uuid: {user_uuid}')
+            logger.debug("Get X-Device-Token from headers")
+            x_device_token = api_response.headers['X-Device-Token']
+
+            logger.debug(f'Get user by uuid: {user_uuid}')
+            try:
                 api_response = self._user_policy.get_user(suuid=user_uuid)
-                if not api_response.is_ok:
-                    logger.debug(f'Failed to get user by uuid')
-                    response_data = APIResponse(status=APIResponseStatus.failed.status, code=api_response.code,
-                                                errors=api_response.errors, headers=api_response.headers)
-                    return make_api_response(data=response_data, http_code=api_response.code)
+            except APIException as e:
+                logger.debug(f"Failed to get user by uuid: {user_uuid}")
+                response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code,
+                                            errors=e.errors)
+                return make_api_response(data=response_data, http_code=e.http_code)
 
-                user_dict = api_response.data
-                logger.debug(f'Got user {user_dict}')
+            user_dict = api_response.data
+            logger.debug(f'Got user {user_dict}')
 
-                logger.debug('Add modify_reason')
-                user_dict['modify_reason'] = 'update pin code expire date'
+            logger.debug('Add modify_reason')
+            user_dict['modify_reason'] = 'update pin code expire date'
 
-                logger.debug('Set pin code activate True')
-                user_dict['is_pin_code_activated'] = True
+            logger.debug('Set pin code activate True')
+            user_dict['is_pin_code_activated'] = True
 
-                api_response = self._user_policy.update_user(user_dict=user_dict)
-                if not api_response.is_ok:
-                    logger.debug("Failed to update user")
-                    response_data = APIResponse(status=APIResponseStatus.failed.status, code=api_response.code,
-                                                errors=api_response.errors, headers=api_response.headers)
-                    return make_api_response(data=response_data, http_code=api_response.code)
+            self._user_policy.update_user(user_dict=user_dict)
 
-                logger.debug("Get user device uuid from Location header")
-                ud_uuid = api_response.headers['Location'].split('/')[-1]
-                logger.debug(f"User Device uuid: {ud_uuid}")
+            logger.debug("Get user device uuid from response of creating user device")
+            ud_uuid = user_device['uuid']
+            logger.debug(f"User Device uuid: {ud_uuid}")
 
-                logger.debug("Prepare API URL")
-                api_url = self.__api_url__.replace('<string:user_uuid>', user_uuid)
-                logger.debug(f"API URL: {api_url}")
+            logger.debug("Prepare API URL")
+            api_url = self.__api_url__.replace('<string:user_uuid>', user_uuid)
+            logger.debug(f"API URL: {api_url}")
 
-                response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.CREATED)
-                resp = make_api_response(data=response_data, http_code=HTTPStatus.CREATED)
-                location_header = f"{self._config['API_BASE_URI']}/{api_url}/{ud_uuid}"
+            response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.CREATED)
+            resp = make_api_response(data=response_data, http_code=HTTPStatus.CREATED)
+            location_header = f"{self._config['API_BASE_URI']}/{api_url}/{ud_uuid}"
 
-                logger.debug(f"Set Location Header: {location_header}")
-                resp.headers['Location'] = location_header
+            logger.debug(f"Set Location Header: {location_header}")
+            resp.headers['Location'] = location_header
 
-                logger.debug(f"Set X-Device-Token: {x_device_token}")
-                resp.headers['X-Device-Token'] = x_device_token
+            logger.debug(f"Set X-Device-Token: {x_device_token}")
+            resp.headers['X-Device-Token'] = x_device_token
 
-                logger.debug("Return response")
-                return resp
-            else:
-                response_data = APIResponse(status=APIResponseStatus.failed.status, code=api_response.code,
-                                            errors=api_response.errors, headers=api_response.headers)
-                return make_api_response(data=response_data, http_code=api_response.code)
+            logger.debug("Return response")
+            return resp
         except APIException as e:
             logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
@@ -171,32 +163,14 @@ class UserDeviceAPI(ResourceAPI):
             return resp
 
         try:
-            api_response = self._user_policy.get_user_device_by_uuid(user_uuid=user_uuid, suuid=user_device_uuid)
-            if not api_response.is_ok:
-                # user device does not exist
-                return make_error_request_response(HTTPStatus.NOT_FOUND,
-                                                   err=RailRoadAPIError.USER_SUBSCRIPTION_NOT_EXIST)
-        except APIException as e:
-            logging.debug(e.serialize())
-            response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
-            resp = make_api_response(data=response_data, http_code=e.http_code)
+            # check does user device exists
+            self._user_policy.get_user_device_by_uuid(user_uuid=user_uuid, suuid=user_device_uuid)
+            # reuse variable
+            req_fields['location'] = location
+            self._user_policy.update_user_device(req_fields)
+            response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK)
+            resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
             return resp
-
-        try:
-            api_response = self._user_policy.update_user_device(suuid=suuid, user_uuid=user_uuid, device_id=device_id,
-                                                                device_token=device_token, location=location,
-                                                                is_active=is_active, modify_reason=modify_reason)
-            if api_response.is_ok:
-                response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK,
-                                            headers=api_response.headers)
-                resp = make_api_response(data=response_data, http_code=api_response.code)
-                resp.headers['X-Device-Token'] = api_response.headers['X-Device-Token']
-                return resp
-            else:
-                response_data = APIResponse(status=APIResponseStatus.failed.status, code=api_response.code,
-                                            headers=api_response.headers, errors=api_response.errors)
-                resp = make_api_response(data=response_data, http_code=api_response.code)
-                return resp
         except APIException as e:
             logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)

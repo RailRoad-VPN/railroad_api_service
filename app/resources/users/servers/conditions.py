@@ -20,19 +20,17 @@ class VPNServerConditionsAPI(ResourceAPI):
     __version__ = 1
 
     __endpoint_name__ = 'VPNServerConditionsAPI'
-    __api_url__ = 'vpns/servers/conditions'
+    __api_url__ = 'users/<string:user_uuid>/servers/conditions'
 
     _vpn_policy = None
     _config = None
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
-        url = "%s/%s" % (base_url, VPNServerConditionsAPI.__api_url__)
+        url = f"{base_url}/{VPNServerConditionsAPI.__api_url__}"
         api_urls = [
             APIResourceURL(base_url=url, resource_name='', methods=['GET']),
             APIResourceURL(base_url=url, resource_name='<string:suuid>', methods=['GET']),
-            APIResourceURL(base_url=url, resource_name='status/<int:status_id>', methods=['GET']),
-            APIResourceURL(base_url=url, resource_name='type/<int:type_id>', methods=['GET']),
         ]
         return api_urls
 
@@ -50,9 +48,13 @@ class VPNServerConditionsAPI(ResourceAPI):
         resp = make_api_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
         return resp
 
-    def get(self, suuid: str = None, type_id: int = None, status_id: int = None) -> Response:
+    def get(self, user_uuid: str, suuid: str = None) -> Response:
         super(VPNServerConditionsAPI, self).get(req=request)
 
+        type_id = request.args.get('type', None)
+        status_id = request.args.get('status', None)
+
+        # TODO make business logic to retrieve only servers for user
         if suuid is None and type_id is None and status_id is None:
             # list of all servers
             try:
@@ -77,7 +79,6 @@ class VPNServerConditionsAPI(ResourceAPI):
                                             error_code=RailRoadAPIError.BAD_USER_IDENTITY)
                 resp = make_api_response(data=response_data, http_code=code)
                 return resp
-
             try:
                 server = self._vpn_policy.get_vpn_server_condition(suuid=suuid)
             except APIException as e:

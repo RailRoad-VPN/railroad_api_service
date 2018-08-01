@@ -42,3 +42,5 @@ class RailRoadAPIError(APIErrorEnum):
     PAYMENT_BAD_DATA_ERROR = (name + str(count()), 'PAYMENT_BAD_DATA_ERROR phrase', 'PAYMENT_BAD_DATA_ERROR description')
 
     REQUEST_NO_JSON = (name + str(count()), 'REQUEST_NO_JSON phrase', 'REQUEST_NO_JSON description')
+
+    PAYMENT_DOES_NOT_UPDATE_ORDER = (name + str(count()), 'Order does not update for payment', 'We create payment, but did not link this payment with order')

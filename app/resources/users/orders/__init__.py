@@ -67,15 +67,10 @@ class OrderAPI(ResourceAPI):
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
 
-        if api_response.code == HTTPStatus.CREATED:
-            order_uuid = api_response.headers['Location'].split('/')[-1]
-            response_data = APIResponse(status=APIResponseStatus.success.status, code=api_response.code)
-            resp = make_api_response(data=response_data, http_code=api_response.code)
-            resp.headers['Location'] = '%s/%s/uuid/%s' % (self._config['API_BASE_URI'], self.__api_url__, order_uuid)
-        else:
-            response_data = APIResponse(status=APIResponseStatus.failed.status, code=api_response.code,
-                                        errors=api_response.errors, headers=api_response.headers)
-            resp = make_api_response(data=response_data, http_code=api_response.code)
+        order_uuid = api_response.data['uuid']
+        response_data = APIResponse(status=APIResponseStatus.success.status, code=api_response.code)
+        resp = make_api_response(data=response_data, http_code=api_response.code)
+        resp.headers['Location'] = f"{self._config['API_BASE_URI']}/{self.__api_url__}/{order_uuid}"
         return resp
 
     def put(self, suuid: str) -> Response:
@@ -92,15 +87,10 @@ class OrderAPI(ResourceAPI):
             return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.BAD_ORDER_IDENTITY)
 
         try:
-            api_response = self._order_api_service.get_order(suuid=suuid)
-            if not api_response.is_ok:
-                # order does not exist
-                return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.ORDER_NOT_EXIST)
+            self._order_api_service.get_order(suuid=suuid)
         except APIException as e:
-            logging.debug(e.serialize())
-            response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
-            resp = make_api_response(data=response_data, http_code=e.http_code)
-            return resp
+            # order does not exist
+            return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.ORDER_NOT_EXIST)
 
         code = request_json.get('code', None)
         status_id = request_json.get('status_id', None)
@@ -120,27 +110,18 @@ class OrderAPI(ResourceAPI):
             resp = make_api_response(data=response_data, http_code=response_data.code)
             return resp
 
-        order_json = {
-            'uuid': suuid,
-            'code': code,
-            'status_id': status_id,
-            'payment_uuid': payment_uuid,
-            'modify_reason': modify_reason,
-        }
+        req_fields['uuid'] = suuid,
+        req_fields['payment_uuid'] = payment_uuid,
 
         try:
-            api_response = self._order_api_service.update_order(order_json=order_json)
+            api_response = self._order_api_service.update_order(order_json=req_fields)
         except APIException as e:
             logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
 
-        if api_response.is_ok:
-            response_data = APIResponse(status=APIResponseStatus.success.status, code=api_response.code)
-        else:
-            response_data = APIResponse(status=api_response.status, code=api_response.code)
-
+        response_data = APIResponse(status=APIResponseStatus.success.status, code=api_response.code)
         resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
         return resp
 
@@ -170,13 +151,6 @@ class OrderAPI(ResourceAPI):
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
-
-        if not api_response.is_ok:
-            response_data = APIResponse(status=api_response.status, code=HTTPStatus.BAD_REQUEST,
-                                        headers=api_response.headers, errors=api_response.errors)
-            resp = make_api_response(data=response_data, http_code=HTTPStatus.BAD_REQUEST)
-            return resp
-
         response_data = APIResponse(status=api_response.status, code=api_response.code, data=api_response.data,
                                     headers=api_response.headers)
         resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)

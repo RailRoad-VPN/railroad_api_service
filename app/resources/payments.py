@@ -15,7 +15,7 @@ sys.path.insert(0, '../rest_api_library')
 from response import make_api_response, make_error_request_response
 from api import ResourceAPI
 from response import APIResponseStatus, APIResponse
-from rest import APIResourceURL
+from rest import APIResourceURL, APIException
 
 
 class PaymentAPI(ResourceAPI):
@@ -30,13 +30,13 @@ class PaymentAPI(ResourceAPI):
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
-        url = "%s/%s" % (base_url, PaymentAPI.__api_url__)
+        url = f"{base_url}/{PaymentAPI.__api_url__}"
         api_urls = [
             APIResourceURL(base_url=url, resource_name='', methods=['POST']),
         ]
         return api_urls
 
-    def __init__(self, payment_api_service: PaymentAPIService, order_api_service: OrderAPIService, config: dict) -> None:
+    def __init__(self, payment_api_service: PaymentAPIService, order_api_service: OrderAPIService, config: dict):
         super().__init__()
         self._config = config
         self._payment_api_service = payment_api_service
@@ -54,7 +54,7 @@ class PaymentAPI(ResourceAPI):
             return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.PAYMENT_BAD_DATA_ERROR)
 
         t = '{0:%Y_%m_%d_%H%M%S}'.format(datetime.datetime.now())
-        tt = "%s_%s" % (t, uuid.uuid4())
+        tt = f"{t}_{uuid.uuid4()}"
 
         with open(self._config['APN_PATH'] % tt, 'w') as file:
             file.write(apn)
@@ -84,34 +84,23 @@ class PaymentAPI(ResourceAPI):
         order_code = splitted[-1]
 
         api_response = self._payment_api_service.create_ppg_payment(apn_dict=apn_dict, order_id=order_code)
+        ppg_payment = api_response.data
+        payment_uuid = ppg_payment['uuid']
 
-        if not api_response.is_ok:
-            response_data = APIResponse(status=APIResponseStatus.failed.status, code=api_response.code,
-                                        errors=api_response.errors, headers=api_response.headers)
-            resp = make_api_response(data=response_data, http_code=api_response.code)
-            return resp
-        elif api_response.code == HTTPStatus.CREATED:
-            payment_uuid = api_response.headers['Location'].split('/')[-1]
-
+        try:
             api_response = self._order_api_service.get_order(code=order_code)
-            if api_response.is_ok:
-                order = api_response.data
-            else:
-                response_data = APIResponse(status=APIResponseStatus.failed.status, code=api_response.code,
-                                            errors=api_response.errors, headers=api_response.headers)
-                resp = make_api_response(data=response_data, http_code=api_response.code)
-                return resp
-            order['payment_uuid'] = payment_uuid
-            order['modify_reason'] = 'add payment uuid'
-            self._order_api_service.update_order(order_json=order)
+            order = api_response.data
+        except APIException:
+            return make_error_request_response(HTTPStatus.BAD_REQUEST,
+                                               err=RailRoadAPIError.PAYMENT_DOES_NOT_UPDATE_ORDER)
 
-            response_data = APIResponse(status=APIResponseStatus.success.status, code=api_response.code)
-            resp = make_api_response(data=response_data, http_code=api_response.code)
-            resp.headers['Location'] = '%s/%s/%s' % (self._config['API_BASE_URI'], self.__api_url__, payment_uuid)
-            return resp
+        order['payment_uuid'] = payment_uuid
+        order['modify_reason'] = 'add payment uuid'
+        self._order_api_service.update_order(order_json=order)
 
         response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK)
         resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
+        resp.headers['Location'] = f"{self._config['API_BASE_URI']}/{self.__api_url__}/{payment_uuid}"
         return resp
 
     def put(self, uuid: str = None) -> Response:

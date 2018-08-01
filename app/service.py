@@ -6,7 +6,7 @@ import sys
 from app.model.payment_type import PaymentType
 
 sys.path.insert(0, '../rest_api_library')
-from rest import RESTService
+from rest import RESTService, APIException
 from response import APIResponse
 from api import ResourcePagination
 
@@ -25,12 +25,17 @@ class PaymentAPIService(RESTService):
 
         logger.debug(f"Create PayProGlobal payment: {data}")
         api_response = self._post(data=data, headers=self._headers)
-        return api_response
+
+        if 'Location' in api_response.headers:
+            api_response = self._get(url=api_response.headers.get('Location'))
+            return api_response
+        else:
+            logging.debug(api_response.serialize())
+            raise APIException(http_code=api_response.code, errors=api_response.errors)
 
     def get_payment(self, suuid: str) -> APIResponse:
-        url = '%s/%s' % (self._url, suuid)
+        url = f"{self._url}/{suuid}"
         api_response = self._get(url=url)
-
         return api_response
 
 
@@ -43,18 +48,22 @@ class OrderAPIService(RESTService):
             'payment_uuid': payment_uuid,
         }
         api_response = self._post(data=data, headers=self._headers)
-        return api_response
+        if 'Location' in api_response.headers:
+            api_response = self._get(url=api_response.headers.get('Location'))
+            return api_response
+        else:
+            logging.debug(api_response.serialize())
+            raise APIException(http_code=api_response.code, errors=api_response.errors)
 
-    def update_order(self, order_json: dict) -> APIResponse:
-        url = '%s/%s' % (self._url, order_json['uuid'])
-        api_response = self._put(url=url, data=order_json, headers=self._headers)
-        return api_response
+    def update_order(self, order_json: dict):
+        url = f"{self._url}/{order_json['uuid']}"
+        self._put(url=url, data=order_json, headers=self._headers)
 
     def get_order(self, suuid: str = None, code: int = None) -> APIResponse:
         if suuid:
-            url = '%s/uuid/%s' % (self._url, suuid)
+            url = f"{self._url}/uuid/{suuid}"
         elif code:
-            url = '%s/code/%s' % (self._url, code)
+            url = f"{self._url}/code/{code}"
         else:
             raise KeyError
         api_response = self._get(url=url)
@@ -81,26 +90,15 @@ class UserDeviceAPIService(RESTService):
         api_response = self._post(data=us_json, url=url)
         return api_response
 
-    def update(self, suuid: str, user_uuid: str, device_id: str, device_token: str, location: str,
-               is_active: bool, modify_reason: str) -> APIResponse:
-        ud_json = {
-            'uuid': suuid,
-            'user_uuid': user_uuid,
-            'device_token': device_token,
-            'device_id': device_id,
-            'location': location,
-            'is_active': is_active,
-            'modify_reason': modify_reason,
-        }
-        url = self._url.replace('<string:user_uuid>', user_uuid)
-        if suuid is not None:
-            url = '%s/%s' % (url, suuid)
+    def update(self, user_device: dict):
+        url = self._url.replace('<string:user_uuid>', user_device['user_uuid'])
+        url = f"{url}/{user_device['uuid']}"
 
-        api_response = self._put(data=ud_json, url=url)
-        return api_response
+        self._put(data=user_device, url=url)
 
     def get_user_device_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
-        url = '%s/%s' % (self._url.replace('<string:user_uuid>', user_uuid), suuid)
+        url = self._url.replace('<string:user_uuid>', user_uuid)
+        url = f"{url}/{suuid}"
         api_response = self._get(url=url)
         return api_response
 
@@ -126,24 +124,14 @@ class UserSubscriptionAPIService(RESTService):
         api_response = self._post(data=us_json, url=url)
         return api_response
 
-    def update(self, user_uuid: str, user_subscription_uuid: str, subscription_id: str, order_uuid: str,
-               expire_date: datetime, modify_date: datetime, modify_reason: str) -> APIResponse:
-        us_json = {
-            'uuid': user_subscription_uuid,
-            'user_uuid': user_uuid,
-            'subscription_id': subscription_id,
-            'expire_date': expire_date,
-            'order_uuid': order_uuid,
-            'modify_date': modify_date,
-            'modify_reason': modify_reason,
-        }
-        url = self._url.replace('<string:user_uuid>', user_uuid)
-        url = '%s/%s' % (url, user_subscription_uuid)
-        api_response = self._put(data=us_json, url=url)
-        return api_response
+    def update(self, user_subscription: dict):
+        url = self._url.replace('<string:user_uuid>', user_subscription['user_uuid'])
+        url = f"{url}/{user_subscription['uuid']}"
+        self._put(data=user_subscription, url=url)
 
-    def get_user_subs_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
-        url = '%s/%s' % (self._url.replace('<string:user_uuid>', user_uuid), suuid)
+    def get_user_sub_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
+        url = self._url.replace('<string:user_uuid>', user_uuid)
+        url = f"{url}/{suuid}"
         api_response = self._get(url=url)
         return api_response
 
@@ -194,21 +182,19 @@ class UserAPIService(RESTService):
     def update_user(self, user_dict: dict):
         logger.debug(f"Updating user with dict: {user_dict}")
 
-        url = '%s/%s' % (self._url, user_dict['uuid'])
-        api_response = self._put(url=url, data=user_dict, headers=self._headers)
-        return api_response
+        url = f"{self._url}/{user_dict['uuid']}"
+        self._put(url=url, data=user_dict, headers=self._headers)
 
     def get_user(self, suuid: str = None, email: str = None, pin_code: int = None) -> APIResponse:
         if suuid:
-            url = '%s/uuid/%s' % (self._url, suuid)
+            url = f"{self._url}/uuid/{suuid}"
         elif email:
-            url = '%s/email/%s' % (self._url, email)
+            url = f"{self._url}/email/{email}"
         elif pin_code:
-            url = '%s/pincode/%s' % (self._url, str(pin_code))
+            url = f"{self._url}/pincode/{pin_code}"
         else:
             raise KeyError
         api_response = self._get(url=url)
-
         return api_response
 
 
@@ -227,7 +213,7 @@ class VPNServersAPIService(RESTService):
         return api_response
 
     def get_vpnservers_by_type(self, type_id: int, pagination: ResourcePagination) -> APIResponse:
-        url = "%s/type/%s" % (self._url, type_id)
+        url = f"{self._url}/type/{type_id}"
 
         if pagination is not None and pagination.is_paginated:
             url = self._build_url_pagination(limit=pagination.limit, offset=pagination.offset, url=url)
@@ -236,8 +222,7 @@ class VPNServersAPIService(RESTService):
         return api_response
 
     def get_vpnservers_by_status(self, status_id: int, pagination: ResourcePagination) -> APIResponse:
-        url = "%s/status/%s" % (self._url, status_id)
-
+        url = f"{self._url}/status/{status_id}"
         if pagination is not None and pagination.is_paginated:
             url = self._build_url_pagination(limit=pagination.limit, offset=pagination.offset, url=url)
 
@@ -245,14 +230,13 @@ class VPNServersAPIService(RESTService):
         return api_response
 
     def get_vpnserver_by_uuid(self, suuid: str) -> APIResponse:
-        url = '%s/%s' % (self._url, suuid)
+        url = f"{self._url}/{suuid}"
         api_response = self._get(url=url)
         return api_response
 
-    def update_vpnserver(self, vpnserver: dict) -> APIResponse:
-        url = '%s/%s' % (self._url, vpnserver['uuid'])
-        api_response = self._put(url=url, data=vpnserver)
-        return api_response
+    def update_vpnserver(self, vpnserver: dict):
+        url = f"{self._url}/{vpnserver['uuid']}"
+        self._put(url=url, data=vpnserver)
 
     def create_vpnserver(self, vpnserver: dict) -> APIResponse:
         api_response = self._post(data=vpnserver)
@@ -281,7 +265,7 @@ class VPNTypeAPIService(RESTService):
         return api_response
 
     def get_vpntype_by_id(self, sid) -> APIResponse:
-        url = '%s/%s' % (self._url, sid)
+        url = f"{self._url}/{sid}"
         api_response = self._get(url=url)
         return api_response
 
@@ -293,12 +277,12 @@ class VPNServerConfigurationAPIService(RESTService):
         super().__init__(**kwargs)
 
     def get_vpnserverconfig(self, server_uuid: str, user_uuid: str = None) -> APIResponse:
-        url = '%s/%s/configurations/user/%s' % (self._url, server_uuid, user_uuid)
+        url = f"{self._url}/{server_uuid}/configurations/user/{user_uuid}"
         api_response = self._get(url=url)
         return api_response
 
     def get_vpnserverconfig_by_uuid(self, suuid) -> APIResponse:
-        url = '%s/%s' % (self._url, suuid)
+        url = f"{self._url}/{suuid}"
         api_response = self._get(url=url)
         return api_response
 
@@ -314,7 +298,7 @@ class VPNServerStatusAPIService(RESTService):
         return api_response
 
     def get_vpnserverstatuse_by_id(self, sid) -> APIResponse:
-        url = '%s/%s' % (self._url, sid)
+        url = f"{self._url}/{sid}"
         api_response = self._get(url=url)
         return api_response
 
@@ -330,7 +314,7 @@ class GeoPositionAPIService(RESTService):
         return api_response
 
     def get_geopos_by_id(self, sid) -> APIResponse:
-        url = '%s/%s' % (self._url, sid)
+        url = f"{self._url}/{sid}"
         api_response = self._get(url=url)
         return api_response
 
@@ -346,7 +330,7 @@ class GeoCityAPIService(RESTService):
         return api_response
 
     def get_geocity_by_id(self, sid) -> APIResponse:
-        url = '%s/%s' % (self._url, sid)
+        url = f"{self._url}/{sid}"
         api_response = self._get(url=url)
         return api_response
 
@@ -362,7 +346,7 @@ class GeoCountryAPIService(RESTService):
         return api_response
 
     def get_geocountry_by_code(self, code) -> APIResponse:
-        url = '%s/%s' % (self._url, code)
+        url = f"{self._url}/{code}"
         api_response = self._get(url=url)
         return api_response
 
@@ -378,6 +362,6 @@ class GeoStateAPIService(RESTService):
         return api_response
 
     def get_geostate_by_code(self, code) -> APIResponse:
-        url = '%s/%s' % (self._url, code)
+        url = f"{self._url}/{code}"
         api_response = self._get(url=url)
         return api_response

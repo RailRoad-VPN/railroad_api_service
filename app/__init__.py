@@ -10,9 +10,9 @@ from app.resources.subscriptions import SubscriptionAPI
 from app.resources.users import UserAPI
 from app.resources.users.orders import OrderAPI
 from app.resources.users.subscriptions import UserSubscriptionAPI
-from app.resources.vpns.servers import VPNServersAPI
-from app.resources.vpns.servers.conditions import VPNServerConditionsAPI
-from app.resources.vpns.servers.configurations import VPNServersConfigurationsAPI
+from app.resources.users.servers import VPNServersAPI
+from app.resources.users.servers.conditions import VPNServerConditionsAPI
+from app.resources.users.servers.configurations import VPNServersConfigurationsAPI
 from app.resources.vpns.servers.meta import VPNServersMetaAPI
 from app.resources.users.devices import UserDeviceAPI
 from app.resources.payments import PaymentAPI

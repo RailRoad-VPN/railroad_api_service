@@ -25,7 +25,7 @@ class VPNServersMetaAPI(ResourceAPI):
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
-        url = "%s/%s" % (base_url, VPNServersMetaAPI.__api_url__)
+        url = f"{base_url}/{VPNServersMetaAPI.__api_url__}"
         api_urls = [
             APIResourceURL(base_url=url, resource_name='', methods=['GET']),
         ]

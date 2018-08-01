@@ -67,21 +67,15 @@ class UserSubscriptionAPI(ResourceAPI):
             return resp
 
         try:
-            api_response = self._user_policy.create_user_sub(user_uuid=user_uuid,
-                                                             subscription_id=subscription_id,
+            api_response = self._user_policy.create_user_sub(user_uuid=user_uuid, subscription_id=subscription_id,
                                                              order_uuid=order_uuid)
-            if api_response.is_ok:
-                us_uuid = api_response.headers['Location'].split('/')[-1]
-                api_url = self.__api_url__.replace('<string:user_uuid>', user_uuid)
 
-                response_data = APIResponse(status=APIResponseStatus.success.status, code=api_response.code)
-                resp = make_api_response(data=response_data, http_code=api_response.code)
-                resp.headers['Location'] = '%s/%s/%s' % (self._config['API_BASE_URI'], api_url, us_uuid)
-                return resp
-            else:
-                response_data = APIResponse(status=APIResponseStatus.failed.status, code=api_response.code,
-                                            errors=api_response.errors, headers=api_response.headers)
-                return make_api_response(data=response_data, http_code=api_response.code)
+            api_url = self.__api_url__.replace('<string:user_uuid>', user_uuid)
+
+            response_data = APIResponse(status=APIResponseStatus.success.status, code=api_response.code)
+            resp = make_api_response(data=response_data, http_code=api_response.code)
+            resp.headers['Location'] = f"{self._config['API_BASE_URI']}/{api_url}/{api_response.data['uuid']}"
+            return resp
         except APIException as e:
             logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
@@ -126,30 +120,14 @@ class UserSubscriptionAPI(ResourceAPI):
             return resp
 
         try:
-            api_response = self._user_policy.get_user_sub_by_uuid(user_uuid=user_uuid, suuid=user_subscription_uuid)
-            if not api_response.is_ok:
-                # user subscription does not exist
-                return make_error_request_response(HTTPStatus.NOT_FOUND,
-                                                   err=RailRoadAPIError.USER_SUBSCRIPTION_NOT_EXIST)
-        except APIException as e:
-            logging.debug(e.serialize())
-            response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
-            resp = make_api_response(data=response_data, http_code=e.http_code)
-            return resp
+            self._user_policy.get_user_sub_by_uuid(user_uuid=user_uuid, suuid=user_subscription_uuid)
+        except APIException:
+            return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.USER_SUBSCRIPTION_NOT_EXIST)
 
         try:
-            api_response = self._user_policy.update_user_sub(user_uuid=user_uuid,
-                                                             user_subscription_uuid=user_subscription_uuid,
-                                                             subscription_id=subscription_id,
-                                                             order_uuid=order_uuid, expire_date=expire_date,
-                                                             modify_date=modify_date,
-                                                             modify_reason=modify_reason)
-            if api_response.is_ok:
-                response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK)
-            else:
-                response_data = APIResponse(status=APIResponseStatus.failed.status, code=api_response.code,
-                                            errors=api_response.errors)
-            resp = make_api_response(data=response_data, http_code=api_response.code)
+            self._user_policy.update_user_sub(user_subscription=us_json)
+            response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK)
+            resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
             return resp
         except APIException as e:
             logging.debug(e.serialize())
@@ -169,32 +147,21 @@ class UserSubscriptionAPI(ResourceAPI):
             if not is_valid:
                 return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
             # get user subscription by subscription uuid
-            api_response = self._user_policy.get_user_sub_by_uuid(user_uuid=user_uuid,
-                                                                  suuid=user_subscription_uuid)
-            if api_response.is_ok:
-                response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK,
-                                            data=api_response.data)
-                resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
-                return resp
-            else:
-                response_data = APIResponse(status=api_response.status, code=api_response.code,
-                                            data=api_response.data, errors=api_response.errors)
-                resp = make_api_response(data=response_data, http_code=api_response.code)
-                return resp
+            try:
+                api_response = self._user_policy.get_user_sub_by_uuid(user_uuid=user_uuid, suuid=user_subscription_uuid)
+            except APIException as e:
+                return make_error_request_response(http_code=e.http_code, err=e.errors)
+            response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK,
+                                        data=api_response.data)
+            resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
+            return resp
         else:
             # get all user subscriptions
             try:
                 api_response = self._user_policy.get_user_subs(user_uuid=user_uuid)
-                if api_response.is_ok:
-                    subs = api_response.data
-                    response_data = APIResponse(status=api_response.status, code=api_response.code,
-                                                data=subs)
-                    resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
-                else:
-                    response_data = APIResponse(status=api_response.status, code=api_response.code,
-                                                data=api_response.data,
-                                                errors=api_response.errors)
-                    resp = make_api_response(data=response_data, http_code=api_response.code)
+                subs = api_response.data
+                response_data = APIResponse(status=api_response.status, code=api_response.code, data=subs)
+                resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
                 return resp
             except APIException as e:
                 logging.debug(e.serialize())
