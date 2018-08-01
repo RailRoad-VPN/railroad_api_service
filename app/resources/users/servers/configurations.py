@@ -5,6 +5,7 @@ from typing import List
 
 from flask import Response
 
+from app.exception import RailRoadAPIError
 from app.service import VPNServerConfigurationAPIService
 from rest import APIException, APIResourceURL
 from utils import check_uuid
