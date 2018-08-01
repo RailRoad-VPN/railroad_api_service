@@ -62,7 +62,8 @@ class VPNServersAPI(ResourceAPI):
             try:
                 server_uuid = self._vpn_policy.get_random_vpn_server(type_id=type_id, status_id=status_id)
 
-                response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK)
+                response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK,
+                                            data=server_uuid)
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
 
                 api_url = self.__api_url__.replace("<string:user_uuid>", user_uuid)
