@@ -80,13 +80,16 @@ class UserPolicy(object):
     def create_user(self, email: str, password: str, is_expired: bool = False, is_locked: bool = False,
                     is_password_expired: bool = False, enabled: bool = False, pin_code: str = None,
                     pin_code_expire_date: datetime = None) -> APIResponse:
-        logger.debug(f"create_user method with parameters user_subscription: {user_subscription}")
+        logger.debug(f"create_user method with parameters email: {email}, password: {password}, "
+                     f"is_expired: {is_expired}, is_locked: {is_locked}, is_password_expired: {is_password_expired}, "
+                     f"enabled: {enabled}, pin_code: {pin_code}, pin_code_expire_date: {pin_code_expire_date}")
         api_response = self._user_api_service.create_user(email=email, password=password, is_expired=is_expired,
                                                           is_locked=is_locked, is_password_expired=is_password_expired,
                                                           enabled=enabled, pin_code=pin_code,
                                                           pin_code_expire_date=pin_code_expire_date)
         location = api_response.headers.get('Location', None)
         if location is None:
+            logger.error(f"no Location header. raise APIException")
             raise APIException(http_code=api_response.code, errors=api_response.errors)
 
         suuid = location.split('/')[-1]

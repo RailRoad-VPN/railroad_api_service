@@ -14,7 +14,7 @@ from utils import check_uuid
 from response import make_api_response, make_error_request_response, check_required_api_fields
 from api import ResourceAPI
 from response import APIResponseStatus, APIResponse
-from rest import APIException, APIResourceURL
+from rest import APIException, APIResourceURL, APINotFoundException
 
 logger = logging.getLogger(__name__)
 
@@ -73,8 +73,10 @@ class UserAPI(ResourceAPI):
         try:
             self._user_policy.get_user(email=email)
             return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.USER_EMAIL_BUSY)
-        except APIException:
+        except APINotFoundException:
             pass
+        except APIException:
+            return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.UNKNOWN_ERROR_CODE)
 
         user_json['password'] = password
         user_json['is_expired'] = is_expired

@@ -13,7 +13,7 @@ from utils import check_uuid
 from response import make_api_response, make_error_request_response, check_required_api_fields
 from api import ResourceAPI
 from response import APIResponseStatus, APIResponse
-from rest import APIException, APIResourceURL
+from rest import APIException, APIResourceURL, APINotFoundException
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +70,7 @@ class OrderAPI(ResourceAPI):
         order_uuid = api_response.data['uuid']
         response_data = APIResponse(status=APIResponseStatus.success.status, code=api_response.code)
         resp = make_api_response(data=response_data, http_code=api_response.code)
-        resp.headers['Location'] = f"{self._config['API_BASE_URI']}/{self.__api_url__}/{order_uuid}"
+        resp.headers['Location'] = f"{self._config['API_BASE_URI']}/{self.__api_url__}/uuid/{order_uuid}"
         return resp
 
     def put(self, suuid: str) -> Response:
@@ -88,9 +88,11 @@ class OrderAPI(ResourceAPI):
 
         try:
             self._order_api_service.get_order(suuid=suuid)
-        except APIException as e:
+        except APINotFoundException as e:
             # order does not exist
             return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.ORDER_NOT_EXIST)
+        except APIException as e:
+            return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.BAD_ORDER_IDENTITY)
 
         code = request_json.get('code', None)
         status_id = request_json.get('status_id', None)
@@ -110,18 +112,18 @@ class OrderAPI(ResourceAPI):
             resp = make_api_response(data=response_data, http_code=response_data.code)
             return resp
 
-        req_fields['uuid'] = suuid,
-        req_fields['payment_uuid'] = payment_uuid,
+        req_fields['uuid'] = suuid
+        req_fields['payment_uuid'] = payment_uuid
 
         try:
-            api_response = self._order_api_service.update_order(order_json=req_fields)
+            self._order_api_service.update_order(order_json=req_fields)
         except APIException as e:
             logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
 
-        response_data = APIResponse(status=APIResponseStatus.success.status, code=api_response.code)
+        response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK)
         resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
         return resp
 
