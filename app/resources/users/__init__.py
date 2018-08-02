@@ -143,8 +143,7 @@ class UserAPI(ResourceAPI):
             pin_code_expire_date = now + datetime.timedelta(minutes=30)
 
         try:
-            api_response = self._user_policy.get_user(suuid=suuid)
-            user_dict = api_response.data
+            self._user_policy.get_user(suuid=suuid)
         except APIException as e:
             logging.debug(e.serialize())
             resp = make_error_request_response(http_code=e.http_code, err=e.errors)
@@ -178,13 +177,13 @@ class UserAPI(ResourceAPI):
 
         # uuid or email or pin_code is not None, let's get user
         try:
-            user = self._user_policy.get_user(suuid=suuid, email=email, pin_code=pin_code)
+            api_response = self._user_policy.get_user(suuid=suuid, email=email, pin_code=pin_code)
         except APIException as e:
             logging.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
 
-        response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK, data=user)
+        response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK, data=api_response.data)
         resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
         return resp
