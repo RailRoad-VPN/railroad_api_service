@@ -16,7 +16,8 @@ logger = logging.getLogger(__name__)
 class PaymentAPIService(RESTService):
     __version__ = 1
 
-    def create_ppg_payment(self, order_id: int, apn_dict: dict) -> APIResponse:
+    def create_ppg_payment(self, order_id: int, apn_dict: dict):
+        logger.debug(f"create_ppg_payment method with parameters order_id: {order_id}, apn_dict: {apn_dict}")
         data = {
             'order_id': order_id,
             'type_id': PaymentType.PPG.sid,
@@ -25,18 +26,18 @@ class PaymentAPIService(RESTService):
 
         logger.debug(f"Create PayProGlobal payment: {data}")
         api_response = self._post(data=data, headers=self._headers)
+        #
+        # if 'Location' in api_response.headers:
+        #     api_response = self._get(url=api_response.headers.get('Location'))
+        #     return api_response
+        # else:
+        #     logging.debug(api_response.serialize())
+        #     raise APIException(http_code=api_response.code, errors=api_response.errors)
 
-        if 'Location' in api_response.headers:
-            api_response = self._get(url=api_response.headers.get('Location'))
-            return api_response
-        else:
-            logging.debug(api_response.serialize())
-            raise APIException(http_code=api_response.code, errors=api_response.errors)
-
-    def get_payment(self, suuid: str) -> APIResponse:
-        url = f"{self._url}/{suuid}"
-        api_response = self._get(url=url)
-        return api_response
+    # def get_payment(self, suuid: str) -> APIResponse:
+    #     url = f"{self._url}/{suuid}"
+    #     api_response = self._get(url=url)
+    #     return api_response
 
 
 class OrderAPIService(RESTService):
