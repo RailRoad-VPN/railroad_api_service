@@ -82,9 +82,6 @@ subscription_api_service = SubscriptionAPIService(api_url=app_config['BILLING_SE
 order_api_service = OrderAPIService(api_url=app_config['BILLING_SERVICE_URL'],
                                     resource_name=app_config['BILLING_SERVICE_ORDERS_RESOURCE_NAME'])
 
-payment_api_service = PaymentAPIService(api_url=app_config['BILLING_SERVICE_URL'],
-                                        resource_name=app_config['BILLING_SERVICE_PAYMENTS_RESOURCE_NAME'])
-
 user_policy = UserPolicy(user_sub_api_service=user_sub_api_service, order_api_service=order_api_service,
                          user_api_service=user_api_service, user_device_api_service=user_device_api_service)
 
@@ -99,7 +96,7 @@ apis = [
     {'cls': OrderAPI, 'args': [order_api_service, app_config]},
     {'cls': UserSubscriptionAPI, 'args': [user_policy, app_config]},
     {'cls': UserDeviceAPI, 'args': [user_policy, app_config]},
-    {'cls': PaymentAPI, 'args': [payment_api_service, order_api_service, app_config]},
+    {'cls': PaymentAPI, 'args': [order_api_service, app_config]},
     {'cls': SubscriptionAPI, 'args': [subscription_api_service, app_config]},
     {'cls': VPNServersMetaAPI, 'args': [vpnserversmeta_api_service, app_config]},
     {'cls': VPNServerConditionsAPI, 'args': [vpn_policy, app_config]},

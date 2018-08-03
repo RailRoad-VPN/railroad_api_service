@@ -2,7 +2,7 @@ import sys
 from http import HTTPStatus
 from typing import List
 
-from flask import Response
+from flask import Response, request
 
 from app.service import PaymentAPIService
 
@@ -12,7 +12,7 @@ from api import ResourceAPI
 from rest import APIResourceURL
 
 
-class PaymentAPI(ResourceAPI):
+class OrderPaymentsAPI(ResourceAPI):
     __version__ = 1
 
     __endpoint_name__ = 'PaymentAPI'
@@ -23,7 +23,7 @@ class PaymentAPI(ResourceAPI):
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
-        url = "%s/%s" % (base_url, PaymentAPI.__api_url__)
+        url = "%s/%s" % (base_url, OrderPaymentsAPI.__api_url__)
         api_urls = [
             APIResourceURL(base_url=url, resource_name='', methods=['GET']),
             APIResourceURL(base_url=url, resource_name='<string:suuid>', methods=['GET', 'POST']),
@@ -43,6 +43,8 @@ class PaymentAPI(ResourceAPI):
         resp = make_api_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
         return resp
 
-    def get(self, suuid: str = None, email: str = None) -> Response:
+    def get(self, order_uuid: str, suuid: str = None) -> Response:
+        super(OrderPaymentsAPI, self).get(req=request)
+
         resp = make_api_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
         return resp

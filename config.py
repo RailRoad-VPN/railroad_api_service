@@ -16,8 +16,7 @@ class Config(object):
     BILLING_SERVICE_SUBSCRIPTIONS_RESOURCE_NAME = 'subscriptions'
     BILLING_SERVICE_USER_SUBSCRIPTION_RESOURCE_NAME = 'users/<string:user_uuid>/subscriptions'
     BILLING_SERVICE_ORDERS_RESOURCE_NAME = 'orders'
-    BILLING_SERVICE_PAYMENTS_RESOURCE_NAME = 'payments'
-
+    BILLING_SERVICE_PAYMENTS_RESOURCE_NAME = 'orders/<string:order_uuid>/payments'
 
     VPNC_SERVICE_VPNTYPE_RESOURCE_NAME = 'vpns/types'
     VPNC_SERVICE_VPNSERVER_RESOURCE_NAME = 'vpns/servers'
