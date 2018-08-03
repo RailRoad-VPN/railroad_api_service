@@ -32,7 +32,7 @@ class UserDeviceAPI(ResourceAPI):
         url = f"{base_url}/{UserDeviceAPI.__api_url__}"
         api_urls = [
             APIResourceURL(base_url=url, resource_name='', methods=['GET', 'POST', ]),
-            APIResourceURL(base_url=url, resource_name='<string:user_device_uuid>', methods=['GET', 'PUT', ]),
+            APIResourceURL(base_url=url, resource_name='<string:user_device_uuid>', methods=['GET', 'PUT', 'DELETE']),
         ]
         return api_urls
 
@@ -54,6 +54,7 @@ class UserDeviceAPI(ResourceAPI):
         user_uuid = request_json.get('user_uuid', None)
         device_token = request_json.get('device_token', None)
         device_id = request_json.get('device_id', None)
+        device_os = request_json.get('device_os', None)
         location = request_json.get('location', None)
         is_active = request_json.get('is_active', True)
 
@@ -72,6 +73,7 @@ class UserDeviceAPI(ResourceAPI):
 
         try:
             api_response = self._user_policy.create_user_device(user_uuid=user_uuid, device_id=device_id,
+                                                                device_os=device_os,
                                                                 device_token=device_token, location=location,
                                                                 is_active=is_active)
             user_device = api_response.data
@@ -220,3 +222,20 @@ class UserDeviceAPI(ResourceAPI):
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
                 resp = make_api_response(data=response_data, http_code=e.http_code)
                 return resp
+
+    def delete(self, user_uuid: str, user_device_uuid: str) -> Response:
+        is_valid_a = check_uuid(suuid=user_device_uuid)
+        is_valid_b = check_uuid(suuid=user_uuid)
+        if not is_valid_a or not is_valid_b:
+            return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
+
+        try:
+            self._user_policy.delete_user_device(user_uuid=user_uuid, suuid=user_device_uuid)
+            response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK)
+            resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
+            return resp
+        except APIException as e:
+            logging.debug(e.serialize())
+            response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
+            resp = make_api_response(data=response_data, http_code=e.http_code)
+            return resp

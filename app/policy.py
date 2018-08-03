@@ -100,13 +100,14 @@ class UserPolicy(object):
         logger.debug(f"update_user method with parameter user_dict: {user_dict}")
         self._user_api_service.update_user(user_dict=user_dict)
 
-    def create_user_device(self, user_uuid: str, device_id: str, device_token: str = None, location: str = None,
-                           is_active: bool = False) -> APIResponse:
+    def create_user_device(self, user_uuid: str, device_id: str, device_os: str = None, device_token: str = None,
+                           location: str = None, is_active: bool = False) -> APIResponse:
         logger.debug(f"create_user_device method with parameters user_uuid: {user_uuid}, device_id: {device_id}, "
-                     f"device_token: {device_token}, location: {location}, is_active: {is_active}")
+                     f"device_token: {device_token}, location: {location}, is_active: {is_active}, "
+                     f"device_os: {device_os}")
         api_response = self._user_device_api_service.create(user_uuid=user_uuid, device_id=device_id,
-                                                            device_token=device_token, location=location,
-                                                            is_active=is_active)
+                                                            device_os=device_os, device_token=device_token,
+                                                            location=location, is_active=is_active)
         x_device_token = api_response.headers.get('X-Device-Token', None)
         if x_device_token is None:
             raise APIException(http_code=api_response.code, errors=api_response.errors)
@@ -123,6 +124,10 @@ class UserPolicy(object):
     def update_user_device(self, user_device: dict):
         logger.debug(f"update_user_device method with parameters user_device: {user_device}")
         self._user_device_api_service.update(user_device=user_device)
+
+    def delete_user_device(self, user_uuid: str, suuid: str):
+        logger.debug(f"update_user_device method with parameters user_uuid: {user_uuid}, suuid: {suuid}")
+        self._user_device_api_service.delete(user_uuid=user_uuid, suuid=suuid)
 
     def get_user_device_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
         logger.debug(f"get_user_device_by_uuid method with parameters user_uuid: {user_uuid}, suuid: {suuid}")
@@ -284,7 +289,8 @@ class VPNServerPolicy(object):
         return self._get_vpn_server(server=api_response.data)
 
     def get_vpn_server_configuration(self, server_uuid: str, user_uuid: str = None) -> dict:
-        logger.debug(f"get_vpn_server_configuration method with parameters get_vpn_server_configuration: {get_vpn_server_configuration}")
+        logger.debug(
+            f"get_vpn_server_configuration method with parameters get_vpn_server_configuration: {get_vpn_server_configuration}")
         api_response = self.vpnserverconf_api_service.get_vpnserverconfig(server_uuid=server_uuid, user_uuid=user_uuid)
         return api_response.data
 

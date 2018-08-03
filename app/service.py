@@ -12,6 +12,7 @@ from api import ResourcePagination
 
 logger = logging.getLogger(__name__)
 
+
 class OrderAPIService(RESTService):
     __version__ = 1
 
@@ -77,11 +78,12 @@ class UserDeviceAPIService(RESTService):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def create(self, user_uuid: str, device_id: str, device_token: str = None, location: str = None,
-               is_active: bool = False) -> APIResponse:
+    def create(self, user_uuid: str, device_id: str, device_os: str = None, device_token: str = None,
+               location: str = None, is_active: bool = False) -> APIResponse:
         us_json = {
             'user_uuid': user_uuid,
             'device_id': device_id,
+            'device_os': device_os,
             'device_token': device_token,
             'location': location,
             'is_active': is_active,
@@ -95,6 +97,12 @@ class UserDeviceAPIService(RESTService):
         url = f"{url}/{user_device['uuid']}"
 
         self._put(data=user_device, url=url)
+
+    def delete(self, user_uuid: str, suuid: str):
+        url = self._url.replace('<string:user_uuid>', user_uuid)
+        url = f"{url}/{suuid}"
+
+        self._delete(url=url)
 
     def get_user_device_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
         url = self._url.replace('<string:user_uuid>', user_uuid)
