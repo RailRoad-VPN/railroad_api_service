@@ -174,14 +174,23 @@ class PaymentAPI(ResourceAPI):
         logger.debug(f"get user subscriptions")
         api_response = self._user_sub_api_service.get_user_subs_by_user_uuid(user_uuid=user_uuid)
         user_subs = api_response.data
+        logger.debug(f"got user subs: {user_subs}")
 
         logger.debug(f"find user subscription for which payment come by order_uuid")
         payment_user_sub = None
+        # TODO здесь падает
         for user_sub in user_subs:
+            logger.debug(f"process user sub: {user_sub}")
             if user_sub['order_uuid'] == order_uuid:
                 logger.debug(f"we found!")
                 payment_user_sub = user_sub
                 break
+
+        if payment_user_sub is None:
+            logger.error(f"we DID NOT find user sub for which payment come")
+            http_code = HTTPStatus.BAD_REQUEST
+            return make_error_request_response(http_code=http_code,
+                                               err=RailRoadAPIError.PAYMENT_APN_DID_NOT_FIND_USER_SUB)
 
         logger.debug(f"prepare updated user subscription")
         payment_user_sub['status_id'] = user_sub_status_id
