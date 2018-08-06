@@ -96,7 +96,7 @@ apis = [
     {'cls': OrderAPI, 'args': [order_api_service, app_config]},
     {'cls': UserSubscriptionAPI, 'args': [user_policy, app_config]},
     {'cls': UserDeviceAPI, 'args': [user_policy, app_config]},
-    {'cls': PaymentAPI, 'args': [order_api_service, app_config]},
+    {'cls': PaymentAPI, 'args': [order_api_service, user_sub_api_service, app_config]},
     {'cls': SubscriptionAPI, 'args': [subscription_api_service, app_config]},
     {'cls': VPNServersMetaAPI, 'args': [vpnserversmeta_api_service, app_config]},
     {'cls': VPNServerConditionsAPI, 'args': [vpn_policy, app_config]},

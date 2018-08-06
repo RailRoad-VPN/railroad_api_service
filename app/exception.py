@@ -44,3 +44,6 @@ class RailRoadAPIError(APIErrorEnum):
     REQUEST_NO_JSON = (name + str(count()), 'REQUEST_NO_JSON phrase', 'REQUEST_NO_JSON description')
 
     PAYMENT_DOES_NOT_UPDATE_ORDER = (name + str(count()), 'Order does not update for payment', 'We create payment, but did not link this payment with order')
+
+    PAYMENT_APN_DOES_NOT_CONTAIN_ORDER_CODE_CUSTOM_FIELD = (name + str(count()), 'APN does not contain ordercode custom field', 'We received APN but without x-ordercode custom field for some reason. Need manual work')
+    PAYMENT_APN_DOES_NOT_CONTAIN_USER_UUID_CUSTOM_FIELD = (name + str(count()), 'APN does not contain useruuid custom field', 'We received APN but without x-useruuid custom field for some reason. Need manual work')

@@ -17,6 +17,7 @@ class OrderAPIService(RESTService):
     __version__ = 1
 
     def create_order(self, status_id: int, payment_uuid: str = None) -> APIResponse:
+        logger.debug(f"create_order method with parameters status_id: {status_id}, payment_uuid: {payment_uuid}")
         data = {
             'status_id': status_id,
             'payment_uuid': payment_uuid,
@@ -30,10 +31,12 @@ class OrderAPIService(RESTService):
             raise APIException(http_code=api_response.code, errors=api_response.errors)
 
     def update_order(self, order_json: dict):
+        logger.debug(f"update_order method with parameters order_json: {order_json}")
         url = f"{self._url}/{order_json['uuid']}"
         self._put(url=url, data=order_json, headers=self._headers)
 
     def get_order(self, suuid: str = None, code: int = None) -> APIResponse:
+        logger.debug(f"get_order method with parameters suuid: {suuid}, code: {code}")
         if suuid:
             url = f"{self._url}/uuid/{suuid}"
         elif code:
@@ -44,19 +47,20 @@ class OrderAPIService(RESTService):
 
         return api_response
 
-    def create_ppg_payment(self, order_uuid: str, order_id: int, apn_dict: dict):
-        logger.debug(f"create_ppg_payment method with parameters order_uuid: {order_uuid}, order_id: {order_id}, "
-                     f"apn_dict: {apn_dict}")
+    def create_payment(self, order_uuid: str, type_id: int, status_id: int, json_data: dict):
+        logger.debug(f"create_payment method with parameters order_uuid: {order_uuid}, type_id: {type_id}, "
+                     f"status_id: {status_id}, json_data: {json_data}")
 
         url = f"{self._url}/{order_uuid}/payments"
 
         data = {
-            'order_id': order_id,
-            'type_id': PaymentType.PPG.sid,
-            'json_data': json.dumps(apn_dict)
+            'order_uuid': order_uuid,
+            'type_id': type_id,
+            'status_id': status_id,
+            'json_data': json.dumps(json_data),
         }
 
-        logger.debug(f"Create PayProGlobal payment: {data}")
+        logger.debug(f"Create payment: {data}")
         api_response = self._post(url=url, data=data, headers=self._headers)
 
         if 'Location' in api_response.headers:
@@ -67,7 +71,14 @@ class OrderAPIService(RESTService):
             raise APIException(http_code=api_response.code, errors=api_response.errors)
 
     def get_payment(self, order_uuid: str, suuid: str) -> APIResponse:
+        logger.debug(f"get_payment method with parameters order_uuid: {order_uuid}, suuid: {suuid}")
         url = f"{self._url}/{order_uuid}/payments/{suuid}"
+        api_response = self._get(url=url)
+        return api_response
+
+    def get_order_payments(self, order_uuid: str) -> APIResponse:
+        logger.debug(f"get_order_payments method with parameters order_uuid: {order_uuid}")
+        url = f"{self._url}/{order_uuid}/payments"
         api_response = self._get(url=url)
         return api_response
 
@@ -80,6 +91,8 @@ class UserDeviceAPIService(RESTService):
 
     def create(self, user_uuid: str, device_id: str, device_os: str = None, device_token: str = None,
                location: str = None, is_active: bool = False) -> APIResponse:
+        logger.debug(f"create method with parameters user_uuid: {user_uuid}, device_id={device_id}, "
+                     f"device_os={device_os}, device_token={device_token}, location={location}, is_active={is_active}")
         us_json = {
             'user_uuid': user_uuid,
             'device_id': device_id,
@@ -93,24 +106,28 @@ class UserDeviceAPIService(RESTService):
         return api_response
 
     def update(self, user_device: dict):
+        logger.debug(f"update method with parameters user_device: {user_device}")
         url = self._url.replace('<string:user_uuid>', user_device['user_uuid'])
         url = f"{url}/{user_device['uuid']}"
 
         self._put(data=user_device, url=url)
 
     def delete(self, user_uuid: str, suuid: str):
+        logger.debug(f"delete method with parameters user_uuid: {user_uuid}, suuid: {suuid}")
         url = self._url.replace('<string:user_uuid>', user_uuid)
         url = f"{url}/{suuid}"
 
         self._delete(url=url)
 
     def get_user_device_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
+        logger.debug(f"get_user_device_by_uuid method with parameters user_uuid: {user_uuid}, suuid: {suuid}")
         url = self._url.replace('<string:user_uuid>', user_uuid)
         url = f"{url}/{suuid}"
         api_response = self._get(url=url)
         return api_response
 
     def get_user_devices(self, user_uuid: str) -> APIResponse:
+        logger.debug(f"get_user_devices method with parameters user_uuid: {user_uuid}")
         url = self._url.replace('<string:user_uuid>', user_uuid)
         api_response = self._get(url=url)
         return api_response
