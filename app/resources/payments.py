@@ -139,12 +139,16 @@ class PaymentAPI(ResourceAPI):
         logger.debug(f"got order: {order}")
         order_uuid = order.get('uuid')
 
+        logger.debug(f"get order status id from apn")
         apn_order_status_id = json_data_dict['ORDER_STATUS_ID']
+        logger.debug(f"got apn_order_status_id: {apn_order_status_id}")
         if apn_order_status_id == PPGPaymentStatus.PROCESSED.sid:
+            logger.debug(f"it is {PPGPaymentStatus.PROCESSED.text} status: {PPGPaymentStatus.PROCESSED.sid}")
             payment_status_id = PaymentStatus.SUCCESS.sid
             order_status_id = OrderStatus.SUCCESS.sid
             user_sub_status_id = UserSubscriptionStatus.ACTIVE.sid
         elif apn_order_status_id == PPGPaymentStatus.WAITING.sid:
+            logger.debug(f"it is {PPGPaymentStatus.WAITING.text} status: {PPGPaymentStatus.WAITING.sid}")
             payment_status_id = PaymentStatus.PROCESSING.sid
             order_status_id = OrderStatus.PROCESSING.sid
             user_sub_status_id = UserSubscriptionStatus.INACTIVE.sid

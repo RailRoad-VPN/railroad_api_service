@@ -16,6 +16,7 @@ from app.resources.users.servers.configurations import VPNServersConfigurationsA
 from app.resources.vpns.servers.meta import VPNServersMetaAPI
 from app.resources.users.devices import UserDeviceAPI
 from app.resources.payments import PaymentAPI
+from users.orders.payments import OrderPaymentsAPI
 
 sys.path.insert(1, '../rest_api_library')
 from api import register_api
@@ -94,6 +95,7 @@ vpn_policy = VPNServerPolicy(vpnserver_service=vpnserver_api_service, vpntype_se
 apis = [
     {'cls': UserAPI, 'args': [user_policy, app_config]},
     {'cls': OrderAPI, 'args': [order_api_service, app_config]},
+    {'cls': OrderPaymentsAPI, 'args': [order_api_service, app_config]},
     {'cls': UserSubscriptionAPI, 'args': [user_policy, app_config]},
     {'cls': UserDeviceAPI, 'args': [user_policy, app_config]},
     {'cls': PaymentAPI, 'args': [order_api_service, user_sub_api_service, app_config]},

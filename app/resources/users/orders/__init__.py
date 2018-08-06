@@ -153,7 +153,6 @@ class OrderAPI(ResourceAPI):
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
-        response_data = APIResponse(status=api_response.status, code=api_response.code, data=api_response.data,
-                                    headers=api_response.headers)
+        response_data = APIResponse(status=api_response.status, code=api_response.code, data=api_response.data)
         resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
         return resp
