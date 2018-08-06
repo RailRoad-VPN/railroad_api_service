@@ -16,7 +16,7 @@ from app.resources.users.servers.configurations import VPNServersConfigurationsA
 from app.resources.vpns.servers.meta import VPNServersMetaAPI
 from app.resources.users.devices import UserDeviceAPI
 from app.resources.payments import PaymentAPI
-from users.orders.payments import OrderPaymentsAPI
+from app.resources.users.orders.payments import OrderPaymentsAPI
 
 sys.path.insert(1, '../rest_api_library')
 from api import register_api
