@@ -140,7 +140,7 @@ class PaymentAPI(ResourceAPI):
         order_uuid = order.get('uuid')
 
         logger.debug(f"get order status id from apn")
-        apn_order_status_id = json_data_dict['ORDER_STATUS_ID']
+        apn_order_status_id = int(json_data_dict.get('ORDER_STATUS_ID'))
         logger.debug(f"got apn_order_status_id: {apn_order_status_id}")
         if apn_order_status_id == PPGPaymentStatus.PROCESSED.sid:
             logger.debug(f"it is {PPGPaymentStatus.PROCESSED.text} status: {PPGPaymentStatus.PROCESSED.sid}")
@@ -164,7 +164,7 @@ class PaymentAPI(ResourceAPI):
                                                               status_id=payment_status_id, json_data=json_data_dict)
         payment = api_response.data
 
-        payment_uuid = payment.get('payment_uuid')
+        payment_uuid = payment.get('uuid')
         logger.debug(f"created payment uuid: {payment_uuid}")
 
         logger.debug(f"prepare updated order")
