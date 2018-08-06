@@ -139,10 +139,11 @@ class UserSubscriptionAPIService(RESTService):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def create(self, user_uuid: str, subscription_id: str, order_uuid: str) -> APIResponse:
+    def create(self, user_uuid: str, subscription_id: str, order_uuid: str, status_id: int) -> APIResponse:
         us_json = {
             'user_uuid': user_uuid,
             'subscription_id': subscription_id,
+            'status_id': status_id,
             'order_uuid': order_uuid,
         }
         url = self._url.replace('<string:user_uuid>', user_uuid)

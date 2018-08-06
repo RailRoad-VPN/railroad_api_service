@@ -24,12 +24,12 @@ class UserPolicy(object):
         self._user_sub_api_service = user_sub_api_service
         self._order_api_service = order_api_service
 
-    def create_user_sub(self, user_uuid: str, subscription_id: str, order_uuid: str) -> APIResponse:
+    def create_user_sub(self, user_uuid: str, subscription_id: str, order_uuid: str, status_id: int) -> APIResponse:
         logger.debug(f"create_user_sub method with parameter user_uuid: {user_uuid}, "
                      f"subscription_id: {subscription_id}, "
-                     f"order_uuid: {order_uuid}")
+                     f"order_uuid: {order_uuid}, status_id: {status_id}")
         api_response = self._user_sub_api_service.create(user_uuid=user_uuid, subscription_id=subscription_id,
-                                                         order_uuid=order_uuid)
+                                                         order_uuid=order_uuid, status_id=status_id)
         location = api_response.headers.get('Location', None)
         if location is None:
             raise APIException(http_code=api_response.code, errors=api_response.errors)

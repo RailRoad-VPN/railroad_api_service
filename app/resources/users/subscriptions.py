@@ -51,10 +51,12 @@ class UserSubscriptionAPI(ResourceAPI):
 
         user_uuid = request_json.get('user_uuid', None)
         subscription_id = request_json.get('subscription_id', None)
+        status_id = request_json.get('status_id', None)
         order_uuid = request_json.get('order_uuid', None)
 
         req_fields = {
             'user_uuid': user_uuid,
+            'status_id': status_id,
             'subscription_id': subscription_id,
             'order_uuid': order_uuid,
         }
@@ -68,7 +70,7 @@ class UserSubscriptionAPI(ResourceAPI):
 
         try:
             api_response = self._user_policy.create_user_sub(user_uuid=user_uuid, subscription_id=subscription_id,
-                                                             order_uuid=order_uuid)
+                                                             order_uuid=order_uuid, status_id=status_id)
 
             api_url = self.__api_url__.replace('<string:user_uuid>', user_uuid)
 
@@ -97,6 +99,7 @@ class UserSubscriptionAPI(ResourceAPI):
 
         user_uuid = request_json.get('user_uuid', None)
         subscription_id = request_json.get('subscription_id', None)
+        status_id = request_json.get('status_id', None)
         expire_date = request_json.get('expire_date', None)
         order_uuid = request_json.get('order_uuid', None)
         modify_date = request_json.get('modify_date', None)
@@ -106,6 +109,7 @@ class UserSubscriptionAPI(ResourceAPI):
             'uuid': us_uuid,
             'user_uuid': user_uuid,
             'subscription_id': subscription_id,
+            'status_id': status_id,
             'expire_date': expire_date,
             'order_uuid': order_uuid,
             'modify_date': modify_date,
