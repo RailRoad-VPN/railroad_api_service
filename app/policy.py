@@ -44,33 +44,13 @@ class UserPolicy(object):
 
     def get_user_sub_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
         api_response = self._user_sub_api_service.get_user_sub_by_uuid(user_uuid=user_uuid, suuid=suuid)
-        enriched_user_sub = self.__enrich_user_sub(user_sub=api_response.data)
-        api_response.data = enriched_user_sub
         return api_response
 
     def get_user_subs(self, user_uuid: str) -> APIResponse:
         logger.debug(f"get_user_subs method with parameter user_uuid: {user_uuid}")
         logger.debug(f"Get user subscriptions by user uuid")
         api_response = self._user_sub_api_service.get_user_subs_by_user_uuid(user_uuid=user_uuid)
-        enriched_user_subs = []
-        for user_sub in api_response.data:
-            enriched_user_sub = self.__enrich_user_sub(user_sub=user_sub)
-            enriched_user_subs.append(enriched_user_sub)
-        api_response.data = enriched_user_subs
         return api_response
-
-    def __enrich_user_sub(self, user_sub: dict) -> dict:
-        logger.debug(f"__enrich_user_sub method with parameters user_sub: {user_sub}")
-        # is expired
-        expire_date = user_sub['expire_date']
-        now = datetime.datetime.now()
-        is_expired = False
-        import dateutil.parser
-        expire_date = dateutil.parser.parse(expire_date)
-        if expire_date < now:
-            is_expired = True
-        user_sub['is_expired'] = is_expired
-        return user_sub
 
     def get_user(self, suuid: str = None, email: str = None, pin_code: str = None) -> APIResponse:
         logger.debug(f"get_user method with parameters suuid : {suuid}, email : {email}, pin_code: {pin_code}")
