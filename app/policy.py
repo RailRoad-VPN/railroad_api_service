@@ -270,7 +270,7 @@ class VPNServerPolicy(object):
 
     def get_vpn_server_configuration(self, server_uuid: str, user_uuid: str = None) -> dict:
         logger.debug(
-            f"get_vpn_server_configuration method with parameters get_vpn_server_configuration: {get_vpn_server_configuration}")
+            f"get_vpn_server_configuration method with parameters server_uuid: {server_uuid}, user_uuid: {user_uuid}")
         api_response = self.vpnserverconf_api_service.get_vpnserverconfig(server_uuid=server_uuid, user_uuid=user_uuid)
         return api_response.data
 
