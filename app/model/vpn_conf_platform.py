@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class PaymentType(Enum):
+class VPNConfigurationPlatform(Enum):
     __version__ = 1
 
     def __new__(cls, *args, **kwds):
@@ -14,4 +14,7 @@ class PaymentType(Enum):
         self.sid = sid
         self.text = text
 
-    PPG = (1, 'payproglobal')
+    IOS = (1, 'iOS')
+    ANDROID = (2, 'Android')
+    WINDOWS = (3, 'Windows')
+    MACOS = (4, 'macOS')

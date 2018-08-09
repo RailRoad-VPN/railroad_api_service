@@ -132,18 +132,21 @@ class OrderAPI(ResourceAPI):
 
         if (suuid is None and code is None) or (suuid is not None and code is not None):
             # find all orders - no parameters set
-            return make_error_request_response(HTTPStatus.METHOD_NOT_ALLOWED, err=RailRoadAPIError.METHOD_NOT_ALLOWED)
+            return make_error_request_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED,
+                                               err=RailRoadAPIError.METHOD_NOT_ALLOWED)
 
         if suuid is not None:
             is_valid = check_uuid(suuid=suuid)
             if not is_valid:
-                return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
+                return make_error_request_response(http_code=HTTPStatus.NOT_FOUND,
+                                                   err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
         if code is not None:
             try:
                 code = int(code)
             except ValueError:
-                return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
+                return make_error_request_response(http_code=HTTPStatus.BAD_REQUEST,
+                                                   err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
         # uuid or code is not None, let's get order
         try:
