@@ -54,13 +54,16 @@ class UserDeviceAPI(ResourceAPI):
         user_uuid = request_json.get('user_uuid', None)
         device_token = request_json.get('device_token', None)
         device_id = request_json.get('device_id', None)
-        device_os = request_json.get('device_os', None)
+        platform_id = request_json.get('platform_id', None)
+        vpn_type_id = request_json.get('vpn_type_id', None)
         location = request_json.get('location', None)
         is_active = request_json.get('is_active', True)
 
         req_fields = {
             'user_uuid': user_uuid,
             'device_id': device_id,
+            'platform_id': platform_id,
+            'vpn_type_id': vpn_type_id,
             'is_active': is_active,
         }
 
@@ -144,6 +147,8 @@ class UserDeviceAPI(ResourceAPI):
         user_uuid = request_json.get('user_uuid', None)
         device_token = request_json.get('device_token', None)
         device_id = request_json.get('device_id', None)
+        platform_id = request_json.get('platform_id', None)
+        vpn_type_id = request_json.get('vpn_type_id', None)
         location = request_json.get('location', None)
         is_active = request_json.get('is_active', None)
         modify_reason = request_json.get('modify_reason', None)
@@ -153,6 +158,8 @@ class UserDeviceAPI(ResourceAPI):
             'user_uuid': user_uuid,
             'device_token': device_token,
             'device_id': device_id,
+            'platform_id': platform_id,
+            'vpn_type_id': vpn_type_id,
             'is_active': is_active,
             'modify_reason': modify_reason,
         }

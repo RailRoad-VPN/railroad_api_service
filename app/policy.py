@@ -80,14 +80,15 @@ class UserPolicy(object):
         logger.debug(f"update_user method with parameter user_dict: {user_dict}")
         self._user_api_service.update_user(user_dict=user_dict)
 
-    def create_user_device(self, user_uuid: str, device_id: str, device_os: str = None, device_token: str = None,
-                           location: str = None, is_active: bool = False) -> APIResponse:
+    def create_user_device(self, user_uuid: str, device_id: str, platform_id: int = None, vpn_type_id: int = None,
+                           device_token: str = None, location: str = None, is_active: bool = False) -> APIResponse:
         logger.debug(f"create_user_device method with parameters user_uuid: {user_uuid}, device_id: {device_id}, "
                      f"device_token: {device_token}, location: {location}, is_active: {is_active}, "
-                     f"device_os: {device_os}")
+                     f"platform_id: {platform_id}, vpn_type_id: {vpn_type_id}")
         api_response = self._user_device_api_service.create(user_uuid=user_uuid, device_id=device_id,
-                                                            device_os=device_os, device_token=device_token,
-                                                            location=location, is_active=is_active)
+                                                            platform_id=platform_id, vpn_type_id=vpn_type_id,
+                                                            device_token=device_token, location=location,
+                                                            is_active=is_active)
         x_device_token = api_response.headers.get('X-Device-Token', None)
         if x_device_token is None:
             raise APIException(http_code=api_response.code, errors=api_response.errors)
@@ -145,6 +146,24 @@ class VPNServerPolicy(object):
         self.geocity_api_service = geocity_service
         self.geocountry_api_service = geocountry_service
         self.geostate_api_service = geostate_service
+
+    def create_vpn_server_user_configuration(self, server_uuid: str, user_uuid: str, cert: str):
+        logger.debug(f"create_vpn_server_user_configuration method with parameters server_uuid: {server_uuid}, "
+                     f"user_uuid: {user_uuid}, cert: {cert}")
+
+        logger.debug(f"get vpn server by uuid: {server_uuid}")
+        api_response = self.vpnserver_api_service.get_vpnserver_by_uuid(suuid=server_uuid)
+        server = api_response.data
+        logger.debug(f"vpn server: {server}")
+
+
+
+        logger.debug(f"create vpn Configuration")
+        configuration = ''
+        platform_id = 0
+
+        self.vpnserverconf_api_service.create(user_uuid=user_uuid, server_uuid=server_uuid,
+                                              configuration=configuration, platform_id=platform_id)
 
     def create_vpn_server(self, vpnserver: dict) -> APIResponse:
         logger.debug(f"create_vpn_server method with parameters vpnserver: {vpnserver}")

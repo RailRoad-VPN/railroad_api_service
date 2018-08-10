@@ -14,6 +14,9 @@ logger = logging.getLogger(__name__)
 class OrderAPIService(RESTService):
     __version__ = 1
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
     def create_order(self, status_id: int, payment_uuid: str = None) -> APIResponse:
         logger.debug(f"create_order method with parameters status_id: {status_id}, payment_uuid: {payment_uuid}")
         data = {
@@ -87,14 +90,16 @@ class UserDeviceAPIService(RESTService):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def create(self, user_uuid: str, device_id: str, device_os: str = None, device_token: str = None,
-               location: str = None, is_active: bool = False) -> APIResponse:
+    def create(self, user_uuid: str, device_id: str, platform_id: int = None, vpn_type_id: int = None,
+               device_token: str = None, location: str = None, is_active: bool = False) -> APIResponse:
         logger.debug(f"create method with parameters user_uuid: {user_uuid}, device_id={device_id}, "
-                     f"device_os={device_os}, device_token={device_token}, location={location}, is_active={is_active}")
+                     f"platform_id={platform_id}, vpn_type_id: {vpn_type_id}, device_token={device_token}, "
+                     f"location={location}, is_active={is_active}")
         us_json = {
             'user_uuid': user_uuid,
             'device_id': device_id,
-            'device_os': device_os,
+            'platform_id': platform_id,
+            'vpn_type_id': vpn_type_id,
             'device_token': device_token,
             'location': location,
             'is_active': is_active,
@@ -138,6 +143,8 @@ class UserSubscriptionAPIService(RESTService):
         super().__init__(**kwargs)
 
     def create(self, user_uuid: str, subscription_id: str, order_uuid: str, status_id: int) -> APIResponse:
+        logger.debug(f"create method with parameters user_uuid: {user_uuid}, subscription_id: {subscription_id}, "
+                     f"order_uuid: {order_uuid}, status_id: {status_id}")
         us_json = {
             'user_uuid': user_uuid,
             'subscription_id': subscription_id,
@@ -149,17 +156,20 @@ class UserSubscriptionAPIService(RESTService):
         return api_response
 
     def update(self, user_subscription: dict):
+        logger.debug(f"update method with parameters user_subscription: {user_subscription}")
         url = self._url.replace('<string:user_uuid>', user_subscription['user_uuid'])
         url = f"{url}/{user_subscription['uuid']}"
         self._put(data=user_subscription, url=url)
 
     def get_user_sub_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
+        logger.debug(f"get_user_sub_by_uuid method with parameters user_uuid: {user_uuid}, suuid: {suuid}")
         url = self._url.replace('<string:user_uuid>', user_uuid)
         url = f"{url}/{suuid}"
         api_response = self._get(url=url)
         return api_response
 
     def get_user_subs_by_user_uuid(self, user_uuid: str) -> APIResponse:
+        logger.debug(f"get_user_subs_by_user_uuid method with parameters user_uuid: {user_uuid}")
         url = self._url.replace('<string:user_uuid>', user_uuid)
         api_response = self._get(url=url)
         return api_response
@@ -172,6 +182,7 @@ class SubscriptionAPIService(RESTService):
         super().__init__(**kwargs)
 
     def get_subscriptions(self, lang_code: str) -> APIResponse:
+        logger.debug(f"get_subscriptions method with parameters lang_code: {lang_code}")
         headers = {
             'Accept-Language': lang_code
         }
@@ -189,6 +200,10 @@ class UserAPIService(RESTService):
     def create_user(self, email: str, password: str, is_expired: bool = False, is_locked: bool = False,
                     is_password_expired: bool = False, enabled: bool = False, pin_code: str = None,
                     pin_code_expire_date: datetime = None) -> APIResponse:
+        logger.debug(f"create_user method with parameters email: {email}, password: {password}, "
+                     f"is_expired: {is_expired}, "
+                     f"is_locked: {is_locked}, is_password_expired: {is_password_expired}, enabled: {enabled}, "
+                     f"pin_code: {pin_code}, pin_code_expire_date: {pin_code_expire_date}")
         user_json = {
             'email': email,
             'password': password,
@@ -204,12 +219,13 @@ class UserAPIService(RESTService):
         return api_response
 
     def update_user(self, user_dict: dict):
-        logger.debug(f"Updating user with dict: {user_dict}")
+        logger.debug(f"update_user method with parameters user_dict: {user_dict}")
 
         url = f"{self._url}/{user_dict['uuid']}"
         self._put(url=url, data=user_dict, headers=self._headers)
 
     def get_user(self, suuid: str = None, email: str = None, pin_code: int = None) -> APIResponse:
+        logger.debug(f"get_user method with parameters suuid: {suuid}, email: {email}, pin_code: {pin_code}")
         if suuid:
             url = f"{self._url}/uuid/{suuid}"
         elif email:
@@ -229,6 +245,7 @@ class VPNServersAPIService(RESTService):
         super().__init__(**kwargs)
 
     def get_vpnservers(self, pagination: ResourcePagination = None) -> APIResponse:
+        logger.debug(f"get_vpnservers method with parameters pagination: {pagination}")
         if pagination is not None and pagination.is_paginated:
             url = self._build_url_pagination(limit=pagination.limit, offset=pagination.offset)
             api_response = self._get(url=url)
@@ -237,6 +254,7 @@ class VPNServersAPIService(RESTService):
         return api_response
 
     def get_vpnservers_by_type(self, type_id: int, pagination: ResourcePagination) -> APIResponse:
+        logger.debug(f"get_vpnservers_by_type method with parameters type_id: {type_id}, pagination: {pagination}")
         url = f"{self._url}/type/{type_id}"
 
         if pagination is not None and pagination.is_paginated:
@@ -246,6 +264,7 @@ class VPNServersAPIService(RESTService):
         return api_response
 
     def get_vpnservers_by_status(self, status_id: int, pagination: ResourcePagination) -> APIResponse:
+        logger.debug(f"get_vpnservers_by_status method with parameters status_id: {status_id}, pagination: {pagination}")
         url = f"{self._url}/status/{status_id}"
         if pagination is not None and pagination.is_paginated:
             url = self._build_url_pagination(limit=pagination.limit, offset=pagination.offset, url=url)
@@ -254,15 +273,18 @@ class VPNServersAPIService(RESTService):
         return api_response
 
     def get_vpnserver_by_uuid(self, suuid: str) -> APIResponse:
+        logger.debug(f"get_vpnserver_by_uuid method with parameters suuid: {suuid}")
         url = f"{self._url}/{suuid}"
         api_response = self._get(url=url)
         return api_response
 
     def update_vpnserver(self, vpnserver: dict):
+        logger.debug(f"update_vpnserver method with parameters vpnserver: {vpnserver}")
         url = f"{self._url}/{vpnserver['uuid']}"
         self._put(url=url, data=vpnserver)
 
     def create_vpnserver(self, vpnserver: dict) -> APIResponse:
+        logger.debug(f"create_vpnserver method with parameters vpnserver: {vpnserver}")
         api_response = self._post(data=vpnserver)
         return api_response
 
@@ -274,6 +296,7 @@ class VPNServersMetaAPIService(RESTService):
         super().__init__(**kwargs)
 
     def get_meta(self) -> APIResponse:
+        logger.debug(f"get_meta method")
         api_response = self._get()
         return api_response
 
@@ -285,10 +308,12 @@ class VPNTypeAPIService(RESTService):
         super().__init__(**kwargs)
 
     def get_vpntypes(self) -> APIResponse:
+        logger.debug(f"get_vpntypes method")
         api_response = self._get()
         return api_response
 
     def get_vpntype_by_id(self, sid) -> APIResponse:
+        logger.debug(f"get_vpntype_by_id method with parameters sid: {sid}")
         url = f"{self._url}/{sid}"
         api_response = self._get(url=url)
         return api_response
@@ -301,16 +326,23 @@ class VPNServerConfigurationsAPIService(RESTService):
         super().__init__(**kwargs)
 
     def get_by_server_and_user(self, server_uuid: str, user_uuid: str = None) -> APIResponse:
+        logger.debug(
+            f"get_by_server_and_user method with parameters: server_uuid: {server_uuid}, user_uuid: {user_uuid}")
         url = self._url.replace("<string:server_uuid>", server_uuid)
         url = f"{url}?user_uuid={user_uuid}"
         api_response = self._get(url=url)
         return api_response
 
     def get_by_suuid(self, server_uuid: str, suuid: str) -> APIResponse:
+        logger.debug(f"get_by_suuid method with parameters: server_uuid: {server_uuid}, suuid: {suuid}")
         url = self._url.replace("<string:server_uuid>", server_uuid)
         url = f"{url}/{suuid}"
         api_response = self._get(url=url)
         return api_response
+
+    def create(self, user_uuid: str, server_uuid: str, configuration: str, platform_id: int):
+        logger.debug(f"create method with parameters: user_uuid: {user_uuid}, server_uuid: {server_uuid}, "
+                     f"configuration: {configuration}, platform_id: {platform_id}")
 
 
 class VPNServerConnectionsAPIService(RESTService):
@@ -320,12 +352,14 @@ class VPNServerConnectionsAPIService(RESTService):
         super().__init__(**kwargs)
 
     def get_by_server_and_user(self, server_uuid: str, user_uuid: str = None) -> APIResponse:
+        logger.debug(f"get_by_server_and_user method with parameters server_uuid: {server_uuid}, user_uuid: {user_uuid}")
         url = self._url.replace("<string:server_uuid>", server_uuid)
         url = f"{url}?user_uuid={user_uuid}"
         api_response = self._get(url=url)
         return api_response
 
     def get_by_suuid(self, server_uuid: str, suuid: str) -> APIResponse:
+        logger.debug(f"get_by_suuid method with parameters server_uuid: {server_uuid}, suuid: {suuid}")
         url = self._url.replace("<string:server_uuid>", server_uuid)
         url = f"{url}/{suuid}"
         api_response = self._get(url=url)
@@ -339,10 +373,12 @@ class VPNServerStatusAPIService(RESTService):
         super().__init__(**kwargs)
 
     def get_vpnserverstatuses(self) -> APIResponse:
+        logger.debug(f"get_vpnserverstatuses method with parameters ")
         api_response = self._get()
         return api_response
 
     def get_vpnserverstatuse_by_id(self, sid) -> APIResponse:
+        logger.debug(f"get_vpnserverstatuse_by_id method with parameters sid: {sid}")
         url = f"{self._url}/{sid}"
         api_response = self._get(url=url)
         return api_response
@@ -355,10 +391,12 @@ class GeoPositionAPIService(RESTService):
         super().__init__(**kwargs)
 
     def get_geoposes(self) -> APIResponse:
+        logger.debug(f"get_geoposes method with parameters ")
         api_response = self._get()
         return api_response
 
     def get_geopos_by_id(self, sid) -> APIResponse:
+        logger.debug(f"get_geopos_by_id method with parameters sid: {sid}")
         url = f"{self._url}/{sid}"
         api_response = self._get(url=url)
         return api_response
@@ -371,10 +409,12 @@ class GeoCityAPIService(RESTService):
         super().__init__(**kwargs)
 
     def get_geocities(self) -> APIResponse:
+        logger.debug(f"get_geocities method ")
         api_response = self._get()
         return api_response
 
     def get_geocity_by_id(self, sid) -> APIResponse:
+        logger.debug(f"get_geocity_by_id method with parameters sid: {sid} ")
         url = f"{self._url}/{sid}"
         api_response = self._get(url=url)
         return api_response
@@ -387,10 +427,12 @@ class GeoCountryAPIService(RESTService):
         super().__init__(**kwargs)
 
     def get_geocountries(self) -> APIResponse:
+        logger.debug(f"get_geocountries method")
         api_response = self._get()
         return api_response
 
     def get_geocountry_by_code(self, code) -> APIResponse:
+        logger.debug(f"get_geocountry_by_code method with parameters code: {code}")
         url = f"{self._url}/{code}"
         api_response = self._get(url=url)
         return api_response
@@ -403,10 +445,23 @@ class GeoStateAPIService(RESTService):
         super().__init__(**kwargs)
 
     def get_geostates(self) -> APIResponse:
+        logger.debug(f"get_geostates method")
         api_response = self._get()
         return api_response
 
     def get_geostate_by_code(self, code) -> APIResponse:
+        logger.debug(f"get_geostate_by_code method with parameters code: {code}")
         url = f"{self._url}/{code}"
         api_response = self._get(url=url)
         return api_response
+
+
+class VPNMgmtAPIService(RESTService):
+    __version__ = 1
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def generate_and_register_user_cert(self):
+        logger.debug(f"generate_and_register_user_cert ")
+        pass
