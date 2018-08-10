@@ -17,7 +17,6 @@ from app.resources.users.subscriptions import UserSubscriptionAPI
 from app.resources.vpns.servers.meta import VPNServersMetaAPI
 from app.service import *
 from users.servers.connections import VPNServersConnectionsAPI
-from vpns import VPNManagementAPI
 
 sys.path.insert(1, '../rest_api_library')
 from api import register_api
