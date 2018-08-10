@@ -8,10 +8,11 @@ from typing import List
 
 from flask import request, Response
 
-from app import OrderAPIService, PaymentType, UserSubscriptionAPIService
+from app.service import OrderAPIService, UserSubscriptionAPIService
 from app.exception import RailRoadAPIError
 from app.model.order_status import OrderStatus
 from app.model.payment_status import PaymentStatus, PPGPaymentStatus
+from app.model.payment_type import PaymentType
 from app.model.user_subscription_status import UserSubscriptionStatus
 
 sys.path.insert(0, '../rest_api_library')

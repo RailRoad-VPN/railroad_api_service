@@ -133,7 +133,7 @@ class VPNServerPolicy(object):
     geostate_api_service = None
 
     def __init__(self, vpnserver_service: VPNServersAPIService, vpntype_service: VPNTypeAPIService,
-                 vpnserverconfiguration_service: VPNServerConfigurationAPIService,
+                 vpnserverconfiguration_service: VPNServerConfigurationsAPIService,
                  vpnserverstatus_service: VPNServerStatusAPIService, geoposition_service: GeoPositionAPIService,
                  geocity_service: GeoCityAPIService, geocountry_service: GeoCountryAPIService,
                  geostate_service: GeoStateAPIService):
@@ -267,12 +267,6 @@ class VPNServerPolicy(object):
         logger.debug(f"get_vpn_server method with parameters suuid: {suuid}")
         api_response = self.vpnserver_api_service.get_vpnserver_by_uuid(suuid=suuid)
         return self._get_vpn_server(server=api_response.data)
-
-    def get_vpn_server_configuration(self, server_uuid: str, user_uuid: str = None) -> dict:
-        logger.debug(
-            f"get_vpn_server_configuration method with parameters server_uuid: {server_uuid}, user_uuid: {user_uuid}")
-        api_response = self.vpnserverconf_api_service.get_vpnserverconfig(server_uuid=server_uuid, user_uuid=user_uuid)
-        return api_response.data
 
     def _get_vpn_server(self, server: dict) -> dict:
         logger.debug(f"_get_vpn_server method with parameters server: {server}")

@@ -3,8 +3,6 @@ import json
 import logging
 import sys
 
-from app.model.payment_type import PaymentType
-
 sys.path.insert(0, '../rest_api_library')
 from rest import RESTService, APIException
 from response import APIResponse
@@ -296,19 +294,40 @@ class VPNTypeAPIService(RESTService):
         return api_response
 
 
-class VPNServerConfigurationAPIService(RESTService):
+class VPNServerConfigurationsAPIService(RESTService):
     __version__ = 1
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def get_vpnserverconfig(self, server_uuid: str, user_uuid: str = None) -> APIResponse:
-        url = f"{self._url}/{server_uuid}/configurations/user/{user_uuid}"
+    def get_by_server_and_user(self, server_uuid: str, user_uuid: str = None) -> APIResponse:
+        url = self._url.replace("<string:server_uuid>", server_uuid)
+        url = f"{url}?user_uuid={user_uuid}"
         api_response = self._get(url=url)
         return api_response
 
-    def get_vpnserverconfig_by_uuid(self, suuid) -> APIResponse:
-        url = f"{self._url}/{suuid}"
+    def get_by_suuid(self, server_uuid: str, suuid: str) -> APIResponse:
+        url = self._url.replace("<string:server_uuid>", server_uuid)
+        url = f"{url}/{suuid}"
+        api_response = self._get(url=url)
+        return api_response
+
+
+class VPNServerConnectionsAPIService(RESTService):
+    __version__ = 1
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def get_by_server_and_user(self, server_uuid: str, user_uuid: str = None) -> APIResponse:
+        url = self._url.replace("<string:server_uuid>", server_uuid)
+        url = f"{url}?user_uuid={user_uuid}"
+        api_response = self._get(url=url)
+        return api_response
+
+    def get_by_suuid(self, server_uuid: str, suuid: str) -> APIResponse:
+        url = self._url.replace("<string:server_uuid>", server_uuid)
+        url = f"{url}/{suuid}"
         api_response = self._get(url=url)
         return api_response
 

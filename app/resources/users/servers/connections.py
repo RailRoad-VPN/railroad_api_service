@@ -6,7 +6,7 @@ from typing import List
 from flask import Response
 
 from app.exception import RailRoadAPIError
-from app.service import VPNServerConfigurationsAPIService
+from app.service import VPNServerConnectionsAPIService
 from rest import APIException, APIResourceURL
 from utils import check_uuid
 
@@ -18,28 +18,28 @@ from response import make_api_response
 logger = logging.getLogger(__name__)
 
 
-class VPNServersConfigurationsAPI(ResourceAPI):
+class VPNServersConnectionsAPI(ResourceAPI):
     __version__ = 1
 
-    __endpoint_name__ = 'VPNServersConfigurationsAPI'
-    __api_url__ = 'users/<string:user_uuid>/servers/<string:server_uuid>/configurations'
+    __endpoint_name__ = 'VPNServersConnectionsAPI'
+    __api_url__ = 'users/<string:user_uuid>/servers/<string:server_uuid>/connections'
 
     _config = None
 
-    _confs_api_service = None
+    _connections_api_service = None
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
-        url = f"{base_url}/{VPNServersConfigurationsAPI.__api_url__}"
+        url = f"{base_url}/{VPNServersConnectionsAPI.__api_url__}"
         api_urls = [
             APIResourceURL(base_url=url, resource_name='', methods=['GET']),
             APIResourceURL(base_url=url, resource_name='<string:suuid>', methods=['GET']),
         ]
         return api_urls
 
-    def __init__(self, vpnserversconfigurations_service: VPNServerConfigurationsAPIService, config: dict) -> None:
+    def __init__(self, vpnserversconnections_service: VPNServerConnectionsAPIService, config: dict) -> None:
         super().__init__()
-        self._confs_api_service = vpnserversconfigurations_service
+        self._connections_api_service = vpnserversconnections_service
         self._config = config
 
     def post(self) -> Response:
@@ -53,8 +53,8 @@ class VPNServersConfigurationsAPI(ResourceAPI):
     def get(self, server_uuid: str, user_uuid: str, suuid: str = None) -> Response:
         if suuid is None:
             try:
-                api_response = self._confs_api_service.get_by_server_and_user(server_uuid=server_uuid,
-                                                                              user_uuid=user_uuid)
+                api_response = self._connections_api_service.get_by_server_and_user(server_uuid=server_uuid,
+                                                                                    user_uuid=user_uuid)
                 response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK,
                                             data=api_response.data)
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
@@ -75,7 +75,7 @@ class VPNServersConfigurationsAPI(ResourceAPI):
                 resp = make_api_response(data=response_data, http_code=code)
                 return resp
             try:
-                api_response = self._confs_api_service.get_by_suuid(suuid=suuid)
+                api_response = self._connections_api_service.get_by_suuid(suuid=suuid)
                 response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK,
                                             data=api_response.data)
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)

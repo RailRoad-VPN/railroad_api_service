@@ -22,7 +22,9 @@ class Config(object):
     VPNC_SERVICE_VPNSERVER_RESOURCE_NAME = 'vpns/servers'
     VPNC_SERVICE_VPNSERVERSTATUS_RESOURCE_NAME = 'vpns/servers/statuses'
     VPNC_SERVICE_VPNSERVERSMETA_RESOURCE_NAME = 'vpns/servers/meta'
-    VPNC_SERVICE_VPNSERVERCONFIGURATION_RESOURCE_NAME = 'vpns/servers'
+    VPNC_SERVICE_VPNSERVERCONFIGURATIONS_RESOURCE_NAME = 'vpns/servers/<string:server_uuid>/configurations'
+    VPNC_SERVICE_VPNSERVERCONNECTIONS_RESOURCE_NAME = 'vpns/servers/<string:server_uuid>/connections'
+
     VPNC_SERVICE_GEOPOSITION_RESOURCE_NAME = 'geo_positions'
     VPNC_SERVICE_GEOCITY_RESOURCE_NAME = 'geo_positions/cities'
     VPNC_SERVICE_GEOCOUNTRY_RESOURCE_NAME = 'geo_positions/countries'

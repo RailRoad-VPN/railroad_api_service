@@ -1,22 +1,23 @@
-import logging
 import os
 from http import HTTPStatus
 
 from flask import Flask, request
 
 from app.policy import *
-from app.service import *
+from app.resources.payments import PaymentAPI
 from app.resources.subscriptions import SubscriptionAPI
 from app.resources.users import UserAPI
+from app.resources.users.devices import UserDeviceAPI
 from app.resources.users.orders import OrderAPI
-from app.resources.users.subscriptions import UserSubscriptionAPI
+from app.resources.users.orders.payments import OrderPaymentsAPI
 from app.resources.users.servers import VPNServersAPI
 from app.resources.users.servers.conditions import VPNServerConditionsAPI
 from app.resources.users.servers.configurations import VPNServersConfigurationsAPI
+from app.resources.users.subscriptions import UserSubscriptionAPI
 from app.resources.vpns.servers.meta import VPNServersMetaAPI
-from app.resources.users.devices import UserDeviceAPI
-from app.resources.payments import PaymentAPI
-from app.resources.users.orders.payments import OrderPaymentsAPI
+from app.service import *
+from users.servers.connections import VPNServersConnectionsAPI
+from vpns import VPNManagementAPI
 
 sys.path.insert(1, '../rest_api_library')
 from api import register_api
@@ -47,9 +48,12 @@ vpnserversmeta_api_service = VPNServersMetaAPIService(api_url=app_config['VPNC_S
 vpntype_api_service = VPNTypeAPIService(api_url=app_config['VPNC_SERVICE_URL'],
                                         resource_name=app_config['VPNC_SERVICE_VPNTYPE_RESOURCE_NAME'])
 
-vpnserverconf_api_service = VPNServerConfigurationAPIService(api_url=app_config['VPNC_SERVICE_URL'],
-                                                             resource_name=app_config[
-                                                                 'VPNC_SERVICE_VPNSERVERCONFIGURATION_RESOURCE_NAME'])
+vpnserverconf_api_service = VPNServerConfigurationsAPIService(api_url=app_config['VPNC_SERVICE_URL'],
+                                                              resource_name=app_config[
+                                                                  'VPNC_SERVICE_VPNSERVERCONFIGURATIONS_RESOURCE_NAME'])
+vpnserverconn_api_service = VPNServerConnectionsAPIService(api_url=app_config['VPNC_SERVICE_URL'],
+                                                           resource_name=app_config[
+                                                               'VPNC_SERVICE_VPNSERVERCONNECTIONS_RESOURCE_NAME'])
 vpnserverstatus_api_service = VPNServerStatusAPIService(api_url=app_config['VPNC_SERVICE_URL'],
                                                         resource_name=app_config[
                                                             'VPNC_SERVICE_VPNSERVERSTATUS_RESOURCE_NAME'])
@@ -92,6 +96,8 @@ vpn_policy = VPNServerPolicy(vpnserver_service=vpnserver_api_service, vpntype_se
                              geoposition_service=geoposition_api_service, geocity_service=geocity_api_service,
                              geocountry_service=geocountry_api_service, geostate_service=geostate_api_service)
 
+vpn_mgmt_service = None
+
 apis = [
     {'cls': UserAPI, 'args': [user_policy, app_config]},
     {'cls': OrderAPI, 'args': [order_api_service, app_config]},
@@ -104,6 +110,7 @@ apis = [
     {'cls': VPNServerConditionsAPI, 'args': [vpn_policy, app_config]},
     {'cls': VPNServersAPI, 'args': [vpn_policy, app_config]},
     {'cls': VPNServersConfigurationsAPI, 'args': [vpnserverconf_api_service, app_config]},
+    {'cls': VPNServersConnectionsAPI, 'args': [vpnserverconn_api_service, app_config]},
 ]
 
 register_api(app, api_base_uri, apis)
