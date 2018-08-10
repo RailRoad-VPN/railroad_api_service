@@ -38,11 +38,11 @@ class SubscriptionAPI(ResourceAPI):
         self._subscription_api_service = subscription_service
 
     def post(self) -> Response:
-        resp = make_api_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
+        resp = make_error_request_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
         return resp
 
     def put(self, uuid: str = None) -> Response:
-        resp = make_api_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
+        resp = make_error_request_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
         return resp
 
     def get(self) -> Response:

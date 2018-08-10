@@ -11,7 +11,7 @@ from app.policy import VPNServerPolicy
 sys.path.insert(0, '../rest_api_library')
 from rest import APIException, APIResourceURL
 from api import ResourceAPI
-from response import APIResponseStatus, APIResponse
+from response import APIResponseStatus, APIResponse, make_error_request_response
 from utils import check_uuid
 from response import make_api_response
 
@@ -41,11 +41,11 @@ class VPNServerConditionsAPI(ResourceAPI):
         super().__init__()
 
     def post(self) -> Response:
-        resp = make_api_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
+        resp = make_error_request_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
         return resp
 
     def put(self) -> Response:
-        resp = make_api_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
+        resp = make_error_request_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
         return resp
 
     def get(self, user_uuid: str, suuid: str = None) -> Response:

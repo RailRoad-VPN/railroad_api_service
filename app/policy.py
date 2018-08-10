@@ -165,6 +165,8 @@ class VPNServerPolicy(object):
         self.vpnserverconf_api_service.create(user_uuid=user_uuid, server_uuid=server_uuid,
                                               configuration=configuration, platform_id=platform_id)
 
+        # TODO
+
     def create_vpn_server(self, vpnserver: dict) -> APIResponse:
         logger.debug(f"create_vpn_server method with parameters vpnserver: {vpnserver}")
         api_response = self.vpnserver_api_service.create_vpnserver(vpnserver=vpnserver)

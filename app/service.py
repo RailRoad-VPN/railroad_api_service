@@ -264,7 +264,8 @@ class VPNServersAPIService(RESTService):
         return api_response
 
     def get_vpnservers_by_status(self, status_id: int, pagination: ResourcePagination) -> APIResponse:
-        logger.debug(f"get_vpnservers_by_status method with parameters status_id: {status_id}, pagination: {pagination}")
+        logger.debug(
+            f"get_vpnservers_by_status method with parameters status_id: {status_id}, pagination: {pagination}")
         url = f"{self._url}/status/{status_id}"
         if pagination is not None and pagination.is_paginated:
             url = self._build_url_pagination(limit=pagination.limit, offset=pagination.offset, url=url)
@@ -340,9 +341,41 @@ class VPNServerConfigurationsAPIService(RESTService):
         api_response = self._get(url=url)
         return api_response
 
-    def create(self, user_uuid: str, server_uuid: str, configuration: str, platform_id: int):
-        logger.debug(f"create method with parameters: user_uuid: {user_uuid}, server_uuid: {server_uuid}, "
-                     f"configuration: {configuration}, platform_id: {platform_id}")
+    def create(self, user_uuid: str, server_uuid: str, configuration: str, vpn_device_platform_id: int,
+               vpn_type_id: int) -> APIResponse:
+        logger.debug(f"create method with parameters: user_uuid: {user_uuid}, server_uuid: {server_uuid},"
+                     f"configuration: {configuration}, vpn_device_platform_id: {vpn_device_platform_id}, "
+                     f"vpn_type_id: {vpn_type_id}")
+        data = {
+            'user_uuid': user_uuid,
+            'server_uuid': server_uuid,
+            'configuration': configuration,
+            'vpn_device_platform_id': vpn_device_platform_id,
+            'vpn_type_id': vpn_type_id,
+        }
+        url = self._url.replace("<string:server_uuid>", server_uuid)
+        api_response = self._post(data=data, url=url)
+        return api_response
+
+
+class VPNServerConfigTemplates(RESTService):
+    __version__ = 1
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def find_by_uuid(self, server_uuid: str, suuid: str):
+        logger.debug(f"find_by_uuid method server_uuid: {server_uuid}, suuid: {suuid}")
+        url = self._url.replace("<string:server_uuid>", server_uuid)
+        api_response = self._get(url=url)
+        return api_response
+
+    def find_by_device_and_type(self, server_uuid: str, vpn_device_platform_id: int, vpn_type_id: int):
+        logger.debug(f"find_by_device_and_type method server_uuid: {server_uuid}, "
+                     f"vpn_device_platform_id: {vpn_device_platform_id}, vpn_type_id: {vpn_type_id}")
+        url = self._url.replace("<string:server_uuid>", server_uuid)
+        api_response = self._get(url=url)
+        return api_response
 
 
 class VPNServerConnectionsAPIService(RESTService):
@@ -351,8 +384,30 @@ class VPNServerConnectionsAPIService(RESTService):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+    def create(self, server_uuid: str, user_uuid: str, user_device_uuid: str, ip_device: str, virtual_ip: str,
+               bytes_i: str, bytes_o: str, last_ref: str, connected_since: str) -> APIResponse:
+        logger.debug(f"create method with parameters server_uuid: {server_uuid}, user_uuid: {user_uuid},"
+                     f"user_device_uuid: {user_device_uuid}, ip_device: {ip_device}, virtual_ip: {virtual_ip},"
+                     f"bytes_i: {bytes_i}, bytes_o: {bytes_o}, last_ref: {last_ref}, connected_since: {connected_since}")
+        data = {
+            'server_uuid': server_uuid,
+            'user_uuid': user_uuid,
+            'user_device_uuid': user_device_uuid,
+            'ip_device': ip_device,
+            'virtual_ip': virtual_ip,
+            'bytes_i': bytes_i,
+            'bytes_o': bytes_o,
+            'last_ref': last_ref,
+            'connected_since': connected_since,
+        }
+
+        url = self._url.replace("<string:server_uuid>", server_uuid)
+        api_response = self._post(data=data, url=url)
+        return api_response
+
     def get_by_server_and_user(self, server_uuid: str, user_uuid: str = None) -> APIResponse:
-        logger.debug(f"get_by_server_and_user method with parameters server_uuid: {server_uuid}, user_uuid: {user_uuid}")
+        logger.debug(
+            f"get_by_server_and_user method with parameters server_uuid: {server_uuid}, user_uuid: {user_uuid}")
         url = self._url.replace("<string:server_uuid>", server_uuid)
         url = f"{url}?user_uuid={user_uuid}"
         api_response = self._get(url=url)
@@ -465,3 +520,21 @@ class VPNMgmtAPIService(RESTService):
     def generate_and_register_user_cert(self):
         logger.debug(f"generate_and_register_user_cert ")
         pass
+
+
+class VPNDevicePlatformsAPIService(RESTService):
+    __version__ = 1
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def find(self) -> APIResponse:
+        logger.debug(f"find method with parameters ")
+        api_response = self._get()
+        return api_response
+
+    def find_by_id(self, sid: int) -> APIResponse:
+        logger.debug(f"find_by_id method with parameters ")
+        url = f"{self._url}/{sid}"
+        api_response = self._get(url=url)
+        return api_response

@@ -17,6 +17,7 @@ from app.resources.users.subscriptions import UserSubscriptionAPI
 from app.resources.vpns.servers.meta import VPNServersMetaAPI
 from app.service import *
 from users.servers.connections import VPNServersConnectionsAPI
+from vpns.device_platforms import VPNDevicePlatformsAPI
 
 sys.path.insert(1, '../rest_api_library')
 from api import register_api
@@ -57,6 +58,16 @@ vpnserverstatus_api_service = VPNServerStatusAPIService(api_url=app_config['VPNC
                                                         resource_name=app_config[
                                                             'VPNC_SERVICE_VPNSERVERSTATUS_RESOURCE_NAME'])
 
+vpn_mgmt_api_service = VPNMgmtAPIService(api_url=app_config['VPNC_SERVICE_URL'],
+                                         resource_name=app_config['VPNC_SERVICE_VPNMGMT_RESOURCE_NAME'])
+
+vpnserver_config_templates_api_service = VPNServerConfigTemplates(api_url=app_config['VPNC_SERVICE_URL'],
+                                                                  resource_name=app_config[
+                                                                      'VPNC_SERVICE_VPNSERVER_CONFIG_TEMPLATES_RESOURCE_NAME'])
+vpn_device_platforms_api_service = VPNDevicePlatformsAPIService(api_url=app_config['VPNC_SERVICE_URL'],
+                                                                resource_name=app_config[
+                                                                    'VPNC_SERVICE_DEVICE_PLATFORMS_RESOURCE_NAME'])
+
 geoposition_api_service = GeoPositionAPIService(api_url=app_config['VPNC_SERVICE_URL'],
                                                 resource_name=app_config['VPNC_SERVICE_GEOPOSITION_RESOURCE_NAME'])
 
@@ -95,8 +106,6 @@ vpn_policy = VPNServerPolicy(vpnserver_service=vpnserver_api_service, vpntype_se
                              geoposition_service=geoposition_api_service, geocity_service=geocity_api_service,
                              geocountry_service=geocountry_api_service, geostate_service=geostate_api_service)
 
-vpn_mgmt_service = None
-
 apis = [
     {'cls': UserAPI, 'args': [user_policy, app_config]},
     {'cls': OrderAPI, 'args': [order_api_service, app_config]},
@@ -110,6 +119,7 @@ apis = [
     {'cls': VPNServersAPI, 'args': [vpn_policy, app_config]},
     {'cls': VPNServersConfigurationsAPI, 'args': [vpnserverconf_api_service, app_config]},
     {'cls': VPNServersConnectionsAPI, 'args': [vpnserverconn_api_service, app_config]},
+    {'cls': VPNDevicePlatformsAPI, 'args': [vpn_device_platforms_api_service, app_config]},
 ]
 
 register_api(app, api_base_uri, apis)

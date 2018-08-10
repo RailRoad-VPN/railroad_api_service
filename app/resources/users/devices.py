@@ -13,7 +13,7 @@ from utils import check_uuid
 from response import make_api_response, make_error_request_response, check_required_api_fields
 from api import ResourceAPI
 from response import APIResponseStatus, APIResponse
-from rest import APIException, APIResourceURL
+from rest import APIException, APIResourceURL, APINotFoundException
 
 logger = logging.getLogger(__name__)
 
@@ -198,31 +198,30 @@ class UserDeviceAPI(ResourceAPI):
             if not is_valid:
                 return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
             # get all user device by uuid
-            api_response = self._user_policy.get_user_device_by_uuid(user_uuid=user_uuid, suuid=user_device_uuid)
-            if api_response.is_ok:
+            try:
+                api_response = self._user_policy.get_user_device_by_uuid(user_uuid=user_uuid, suuid=user_device_uuid)
                 response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK,
                                             data=api_response.data)
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
                 return resp
-            else:
-                response_data = APIResponse(status=api_response.status, code=api_response.code,
-                                            data=api_response.data, errors=api_response.errors)
-                resp = make_api_response(data=response_data, http_code=api_response.code)
+            except APINotFoundException as e:
+                logging.debug(e.serialize())
+                response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.NOT_FOUND, errors=e.errors)
+                resp = make_api_response(data=response_data, http_code=HTTPStatus.NOT_FOUND)
+                return resp
+            except APIException as e:
+                logging.debug(e.serialize())
+                response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST, errors=e.errors)
+                resp = make_api_response(data=response_data, http_code=HTTPStatus.BAD_REQUEST)
                 return resp
         else:
             # get all user devices
             try:
                 api_response = self._user_policy.get_user_devices(user_uuid=user_uuid)
-                if api_response.is_ok:
-                    subs = api_response.data
-                    response_data = APIResponse(status=api_response.status, code=api_response.code,
-                                                data=subs)
-                    resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
-                else:
-                    response_data = APIResponse(status=api_response.status, code=api_response.code,
-                                                data=api_response.data,
-                                                errors=api_response.errors)
-                    resp = make_api_response(data=response_data, http_code=api_response.code)
+                subs = api_response.data
+                response_data = APIResponse(status=api_response.status, code=api_response.code,
+                                            data=subs)
+                resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
                 return resp
             except APIException as e:
                 logging.debug(e.serialize())
