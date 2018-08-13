@@ -75,7 +75,7 @@ class VPNServersConnectionsAPI(ResourceAPI):
                 resp = make_api_response(data=response_data, http_code=code)
                 return resp
             try:
-                api_response = self._connections_api_service.get_by_suuid(suuid=suuid)
+                api_response = self._connections_api_service.get_by_suuid(suuid=suuid, server_uuid=server_uuid)
                 response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK,
                                             data=api_response.data)
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
