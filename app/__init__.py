@@ -15,8 +15,8 @@ from app.resources.users.servers.conditions import VPNServerConditionsAPI
 from app.resources.users.servers.configurations import VPNServersConfigurationsAPI
 from app.resources.users.subscriptions import UserSubscriptionAPI
 from app.resources.vpns.servers.meta import VPNServersMetaAPI
+from app.resources.users.servers.connections import VPNServersConnectionsAPI
 from app.service import *
-from users.servers.connections import VPNServersConnectionsAPI
 from vpns.device_platforms import VPNDevicePlatformsAPI
 
 sys.path.insert(1, '../rest_api_library')
