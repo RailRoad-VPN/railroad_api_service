@@ -4,7 +4,7 @@ from typing import List
 
 from flask import Response
 
-from app.service import VPNServersMetaAPIService
+from app.service import VPNServerConnectionsAPIService
 from rest import APIResourceURL
 
 sys.path.insert(0, '../rest_api_library')
@@ -13,7 +13,7 @@ from response import APIResponseStatus, APIResponse, make_error_request_response
 from response import make_api_response
 
 
-class VPNSServersMetaAPI(ResourceAPI):
+class VPNSServersConnectionsAPI(ResourceAPI):
     __version__ = 1
 
     __endpoint_name__ = __qualname__
@@ -25,13 +25,13 @@ class VPNSServersMetaAPI(ResourceAPI):
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
-        url = f"{base_url}/{VPNSServersMetaAPI.__api_url__}"
+        url = f"{base_url}/{VPNSServersConnectionsAPI.__api_url__}"
         api_urls = [
             APIResourceURL(base_url=url, resource_name='', methods=['GET']),
         ]
         return api_urls
 
-    def __init__(self, vpnserversmeta_service: VPNServersMetaAPIService, config: dict) -> None:
+    def __init__(self, vpnserversmeta_service: VPNServerConnectionsAPIService, config: dict) -> None:
         super().__init__()
         self.vpnserversmeta_api_service = vpnserversmeta_service
 

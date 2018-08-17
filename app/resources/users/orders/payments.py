@@ -17,10 +17,10 @@ from rest import APIResourceURL, APIException, APINotFoundException
 logger = logging.getLogger(__name__)
 
 
-class OrderPaymentsAPI(ResourceAPI):
+class UsersOrdersPaymentsAPI(ResourceAPI):
     __version__ = 1
 
-    __endpoint_name__ = 'OrderPaymentsAPI'
+    __endpoint_name__ = __qualname__
     __api_url__ = 'orders/<string:order_uuid>/payments'
 
     _config = None
@@ -28,7 +28,7 @@ class OrderPaymentsAPI(ResourceAPI):
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
-        url = "%s/%s" % (base_url, OrderPaymentsAPI.__api_url__)
+        url = "%s/%s" % (base_url, UsersOrdersPaymentsAPI.__api_url__)
         api_urls = [
             APIResourceURL(base_url=url, resource_name='', methods=['GET', 'POST']),
             APIResourceURL(base_url=url, resource_name='<string:suuid>', methods=['GET', 'PUT']),
@@ -49,7 +49,7 @@ class OrderPaymentsAPI(ResourceAPI):
         return resp
 
     def get(self, order_uuid: str, suuid: str = None) -> Response:
-        super(OrderPaymentsAPI, self).get(req=request)
+        super(UsersOrdersPaymentsAPI, self).get(req=request)
 
         if suuid is not None:
             logger.debug(f"check order_payment uuid")

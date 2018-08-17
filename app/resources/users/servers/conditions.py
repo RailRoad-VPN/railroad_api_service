@@ -16,10 +16,10 @@ from utils import check_uuid
 from response import make_api_response
 
 
-class VPNServerConditionsAPI(ResourceAPI):
+class UsersServersConditionsAPI(ResourceAPI):
     __version__ = 1
 
-    __endpoint_name__ = 'VPNServerConditionsAPI'
+    __endpoint_name__ = __qualname__
     __api_url__ = 'users/<string:user_uuid>/servers/conditions'
 
     _vpn_policy = None
@@ -27,7 +27,7 @@ class VPNServerConditionsAPI(ResourceAPI):
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
-        url = f"{base_url}/{VPNServerConditionsAPI.__api_url__}"
+        url = f"{base_url}/{UsersServersConditionsAPI.__api_url__}"
         api_urls = [
             APIResourceURL(base_url=url, resource_name='', methods=['GET']),
             APIResourceURL(base_url=url, resource_name='<string:suuid>', methods=['GET']),
@@ -49,7 +49,7 @@ class VPNServerConditionsAPI(ResourceAPI):
         return resp
 
     def get(self, user_uuid: str, suuid: str = None) -> Response:
-        super(VPNServerConditionsAPI, self).get(req=request)
+        super(UsersServersConditionsAPI, self).get(req=request)
 
         type_id = request.args.get('type', None)
         status_id = request.args.get('status', None)

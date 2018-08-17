@@ -18,10 +18,10 @@ from rest import APIException, APIResourceURL, APINotFoundException
 logger = logging.getLogger(__name__)
 
 
-class OrderAPI(ResourceAPI):
+class UsersOrdersAPI(ResourceAPI):
     __version__ = 1
 
-    __endpoint_name__ = 'OrderAPI'
+    __endpoint_name__ = __qualname__
     __api_url__ = 'orders'
 
     _config = None
@@ -29,7 +29,7 @@ class OrderAPI(ResourceAPI):
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
-        url = "%s/%s" % (base_url, OrderAPI.__api_url__)
+        url = "%s/%s" % (base_url, UsersOrdersAPI.__api_url__)
         api_urls = [
             APIResourceURL(base_url=url, resource_name='', methods=['GET', 'POST']),
             APIResourceURL(base_url=url, resource_name='<string:suuid>', methods=['PUT']),
@@ -128,7 +128,7 @@ class OrderAPI(ResourceAPI):
         return resp
 
     def get(self, suuid: str = None, code: int = None) -> Response:
-        super(OrderAPI, self).get(req=request)
+        super(UsersOrdersAPI, self).get(req=request)
 
         if (suuid is None and code is None) or (suuid is not None and code is not None):
             # find all orders - no parameters set

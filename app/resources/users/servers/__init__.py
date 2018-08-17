@@ -18,10 +18,10 @@ from response import make_api_response, make_error_request_response
 logger = logging.getLogger(__name__)
 
 
-class VPNServersAPI(ResourceAPI):
+class UsersServersAPI(ResourceAPI):
     __version__ = 1
 
-    __endpoint_name__ = 'VPNServersAPI'
+    __endpoint_name__ = __qualname__
     __api_url__ = 'users/<string:user_uuid>/servers'
 
     _vpn_policy = None
@@ -29,7 +29,7 @@ class VPNServersAPI(ResourceAPI):
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
-        url = f"{base_url}/{VPNServersAPI.__api_url__}"
+        url = f"{base_url}/{UsersServersAPI.__api_url__}"
         api_urls = [
             APIResourceURL(base_url=url, resource_name='', methods=['GET']),
             APIResourceURL(base_url=url, resource_name='<string:suuid>', methods=['GET']),
@@ -51,7 +51,7 @@ class VPNServersAPI(ResourceAPI):
         return resp
 
     def get(self, user_uuid: str, suuid: str = None) -> Response:
-        super(VPNServersAPI, self).get(req=request)
+        super(UsersServersAPI, self).get(req=request)
 
         type_id = request.args.get('type', None)
         status_id = request.args.get('status', None)

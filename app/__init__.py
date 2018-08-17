@@ -4,19 +4,19 @@ from http import HTTPStatus
 from flask import Flask, request
 
 from app.policy import *
-from app.resources.payments import PaymentAPI
-from app.resources.subscriptions import SubscriptionAPI
-from app.resources.users import UserAPI
-from app.resources.users.devices import UserDeviceAPI
-from app.resources.users.orders import OrderAPI
-from app.resources.users.orders.payments import OrderPaymentsAPI
-from app.resources.users.servers import VPNServersAPI
-from app.resources.users.servers.conditions import VPNServerConditionsAPI
-from app.resources.users.servers.configurations import VPNServersConfigurationsAPI
-from app.resources.users.subscriptions import UserSubscriptionAPI
-from app.resources.vpns.servers.meta import VPNServersMetaAPI
-from app.resources.users.servers.connections import VPNServersConnectionsAPI
-from app.resources.vpns.device_platforms import VPNDevicePlatformsAPI
+from app.resources.payments import PaymentsAPI
+from app.resources.subscriptions import SubscriptionsAPI
+from app.resources.users import UsersAPI
+from app.resources.users.devices import UsersDevicesAPI
+from app.resources.users.orders import UsersOrdersAPI
+from app.resources.users.orders.payments import UsersOrdersPaymentsAPI
+from app.resources.users.servers import UsersServersAPI
+from app.resources.users.servers.conditions import UsersServersConditionsAPI
+from app.resources.users.servers.configurations import UsersServersConfigurationsAPI
+from app.resources.users.subscriptions import UsersSubscriptionsAPI
+from app.resources.vpns.servers.meta import VPNSServersMetaAPI
+from app.resources.users.servers.connections import UsersServersConnectionsAPI
+from app.resources.vpns.device_platforms import VPNSDevicePlatformsAPI
 from app.service import *
 
 sys.path.insert(1, '../rest_api_library')
@@ -107,19 +107,19 @@ vpn_policy = VPNServerPolicy(vpnserver_service=vpnserver_api_service, vpntype_se
                              geocountry_service=geocountry_api_service, geostate_service=geostate_api_service)
 
 apis = [
-    {'cls': UserAPI, 'args': [user_policy, app_config]},
-    {'cls': OrderAPI, 'args': [order_api_service, app_config]},
-    {'cls': OrderPaymentsAPI, 'args': [order_api_service, app_config]},
-    {'cls': UserSubscriptionAPI, 'args': [user_policy, app_config]},
-    {'cls': UserDeviceAPI, 'args': [user_policy, app_config]},
-    {'cls': PaymentAPI, 'args': [order_api_service, user_sub_api_service, app_config]},
-    {'cls': SubscriptionAPI, 'args': [subscription_api_service, app_config]},
-    {'cls': VPNServersMetaAPI, 'args': [vpnserversmeta_api_service, app_config]},
-    {'cls': VPNServerConditionsAPI, 'args': [vpn_policy, app_config]},
-    {'cls': VPNServersAPI, 'args': [vpn_policy, app_config]},
-    {'cls': VPNServersConfigurationsAPI, 'args': [vpnserverconf_api_service, app_config]},
-    {'cls': VPNServersConnectionsAPI, 'args': [vpnserverconn_api_service, app_config]},
-    {'cls': VPNDevicePlatformsAPI, 'args': [vpn_device_platforms_api_service, app_config]},
+    {'cls': UsersAPI, 'args': [user_policy, app_config]},
+    {'cls': UsersOrdersAPI, 'args': [order_api_service, app_config]},
+    {'cls': UsersOrdersPaymentsAPI, 'args': [order_api_service, app_config]},
+    {'cls': UsersSubscriptionsAPI, 'args': [user_policy, app_config]},
+    {'cls': UsersDevicesAPI, 'args': [user_policy, app_config]},
+    {'cls': PaymentsAPI, 'args': [order_api_service, user_sub_api_service, app_config]},
+    {'cls': SubscriptionsAPI, 'args': [subscription_api_service, app_config]},
+    {'cls': VPNSServersMetaAPI, 'args': [vpnserversmeta_api_service, app_config]},
+    {'cls': UsersServersConditionsAPI, 'args': [vpn_policy, app_config]},
+    {'cls': UsersServersAPI, 'args': [vpn_policy, app_config]},
+    {'cls': UsersServersConfigurationsAPI, 'args': [vpnserverconf_api_service, app_config]},
+    {'cls': UsersServersConnectionsAPI, 'args': [vpnserverconn_api_service, app_config]},
+    {'cls': VPNSDevicePlatformsAPI, 'args': [vpn_device_platforms_api_service, app_config]},
 ]
 
 register_api(app, api_base_uri, apis)

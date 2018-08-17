@@ -16,10 +16,10 @@ from response import APIResponseStatus, APIResponse
 from rest import APIException, APIResourceURL
 
 
-class UserSubscriptionAPI(ResourceAPI):
+class UsersSubscriptionsAPI(ResourceAPI):
     __version__ = 1
 
-    __endpoint_name__ = 'UserSubscriptionAPI'
+    __endpoint_name__ = __qualname__
     __api_url__ = 'users/<string:user_uuid>/subscriptions'
 
     _config = None
@@ -27,7 +27,7 @@ class UserSubscriptionAPI(ResourceAPI):
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
-        url = "%s/%s" % (base_url, UserSubscriptionAPI.__api_url__)
+        url = "%s/%s" % (base_url, UsersSubscriptionsAPI.__api_url__)
         api_urls = [
             APIResourceURL(base_url=url, resource_name='', methods=['GET', 'POST', ]),
             APIResourceURL(base_url=url, resource_name='<string:user_subscription_uuid>', methods=['GET', 'PUT', ]),
@@ -140,7 +140,7 @@ class UserSubscriptionAPI(ResourceAPI):
             return resp
 
     def get(self, user_uuid: str, user_subscription_uuid: str = None) -> Response:
-        super(UserSubscriptionAPI, self).get(req=request)
+        super(UsersSubscriptionsAPI, self).get(req=request)
 
         is_valid = check_uuid(suuid=user_uuid)
         if not is_valid:

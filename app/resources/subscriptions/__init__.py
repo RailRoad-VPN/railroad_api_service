@@ -15,10 +15,10 @@ from response import APIResponseStatus, APIResponse
 from rest import APIResourceURL, APIException
 
 
-class SubscriptionAPI(ResourceAPI):
+class SubscriptionsAPI(ResourceAPI):
     __version__ = 1
 
-    __endpoint_name__ = 'SubscriptionAPI'
+    __endpoint_name__ = __qualname__
     __api_url__ = 'subscriptions'
 
     _config = None
@@ -26,7 +26,7 @@ class SubscriptionAPI(ResourceAPI):
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
-        url = "%s/%s" % (base_url, SubscriptionAPI.__api_url__)
+        url = "%s/%s" % (base_url, SubscriptionsAPI.__api_url__)
         api_urls = [
             APIResourceURL(base_url=url, resource_name='', methods=['GET']),
         ]
@@ -46,7 +46,7 @@ class SubscriptionAPI(ResourceAPI):
         return resp
 
     def get(self) -> Response:
-        super(SubscriptionAPI, self).get(req=request)
+        super(SubscriptionsAPI, self).get(req=request)
 
         lang_code = request.headers.get('Accept-Language', None)
 

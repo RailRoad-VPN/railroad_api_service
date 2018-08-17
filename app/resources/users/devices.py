@@ -18,10 +18,10 @@ from rest import APIException, APIResourceURL, APINotFoundException
 logger = logging.getLogger(__name__)
 
 
-class UserDeviceAPI(ResourceAPI):
+class UsersDevicesAPI(ResourceAPI):
     __version__ = 1
 
-    __endpoint_name__ = 'UserDeviceAPI'
+    __endpoint_name__ = __qualname__
     __api_url__ = 'users/<string:user_uuid>/devices'
 
     _config = None
@@ -29,7 +29,7 @@ class UserDeviceAPI(ResourceAPI):
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
-        url = f"{base_url}/{UserDeviceAPI.__api_url__}"
+        url = f"{base_url}/{UsersDevicesAPI.__api_url__}"
         api_urls = [
             APIResourceURL(base_url=url, resource_name='', methods=['GET', 'POST', ]),
             APIResourceURL(base_url=url, resource_name='<string:user_device_uuid>', methods=['GET', 'PUT', 'DELETE']),
@@ -187,7 +187,7 @@ class UserDeviceAPI(ResourceAPI):
             return resp
 
     def get(self, user_uuid: str, user_device_uuid: str = None) -> Response:
-        super(UserDeviceAPI, self).get(req=request)
+        super(UsersDevicesAPI, self).get(req=request)
 
         is_valid = check_uuid(suuid=user_uuid)
         if not is_valid:

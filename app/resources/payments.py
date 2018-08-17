@@ -24,10 +24,10 @@ from rest import APIResourceURL, APINotFoundException
 logger = logging.getLogger(__name__)
 
 
-class PaymentAPI(ResourceAPI):
+class PaymentsAPI(ResourceAPI):
     __version__ = 1
 
-    __endpoint_name__ = 'PaymentAPI'
+    __endpoint_name__ = __qualname__
     __api_url__ = 'payments'
 
     _config = None
@@ -36,7 +36,7 @@ class PaymentAPI(ResourceAPI):
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
-        url = f"{base_url}/{PaymentAPI.__api_url__}"
+        url = f"{base_url}/{PaymentsAPI.__api_url__}"
         api_urls = [
             APIResourceURL(base_url=url, resource_name='', methods=['POST']),
         ]
