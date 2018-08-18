@@ -90,11 +90,13 @@ class UserDeviceAPIService(RESTService):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def create(self, user_uuid: str, device_id: str, platform_id: int = None, vpn_type_id: int = None,
-               device_token: str = None, location: str = None, is_active: bool = False) -> APIResponse:
-        logger.debug(f"create method with parameters user_uuid: {user_uuid}, device_id={device_id}, "
-                     f"platform_id={platform_id}, vpn_type_id: {vpn_type_id}, device_token={device_token}, "
-                     f"location={location}, is_active={is_active}")
+    def create(self, user_uuid: str, device_token: str, virtual_ip: str, device_id: str, platform_id: int,
+               vpn_type_id: int, location: str, is_active: bool, is_connected: bool,
+               device_ip: str = None, connected_since: datetime = None) -> APIResponse:
+        logger.debug(f"create method with parameters user_uuid: {user_uuid}, device_id: {device_id}, "
+                     f"device_token: {device_token}, location: {location}, is_active: {is_active}, "
+                     f"platform_id: {platform_id}, vpn_type_id: {vpn_type_id}, virtual_ip: {virtual_ip}, "
+                     f"device_ip: {device_ip}, is_connected: {is_connected}, connected_since: {connected_since}")
         us_json = {
             'user_uuid': user_uuid,
             'device_id': device_id,
@@ -103,6 +105,10 @@ class UserDeviceAPIService(RESTService):
             'device_token': device_token,
             'location': location,
             'is_active': is_active,
+            'virtual_ip': virtual_ip,
+            'device_ip': device_ip,
+            'is_connected': is_connected,
+            'connected_since': connected_since,
         }
         url = self._url.replace('<string:user_uuid>', user_uuid)
         api_response = self._post(data=us_json, url=url)
@@ -384,25 +390,33 @@ class VPNServerConnectionsAPIService(RESTService):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def create(self, server_uuid: str, user_uuid: str, user_device_uuid: str, ip_device: str, virtual_ip: str,
-               bytes_i: str, bytes_o: str, last_ref: str, connected_since: str) -> APIResponse:
+    def create(self, server_uuid: str, user_uuid: str, user_device_uuid: str, device_ip: str, virtual_ip: str,
+               bytes_i: str, bytes_o: str, is_connected: bool, connected_since: str) -> APIResponse:
         logger.debug(f"create method with parameters server_uuid: {server_uuid}, user_uuid: {user_uuid},"
-                     f"user_device_uuid: {user_device_uuid}, ip_device: {ip_device}, virtual_ip: {virtual_ip},"
-                     f"bytes_i: {bytes_i}, bytes_o: {bytes_o}, last_ref: {last_ref}, connected_since: {connected_since}")
+                     f"user_device_uuid: {user_device_uuid}, ip_device: {device_ip}, virtual_ip: {virtual_ip},"
+                     f"bytes_i: {bytes_i}, bytes_o: {bytes_o}, is_connected: {is_connected}, "
+                     f"connected_since: {connected_since}")
         data = {
             'server_uuid': server_uuid,
             'user_uuid': user_uuid,
             'user_device_uuid': user_device_uuid,
-            'ip_device': ip_device,
+            'ip_device': device_ip,
             'virtual_ip': virtual_ip,
             'bytes_i': bytes_i,
             'bytes_o': bytes_o,
-            'last_ref': last_ref,
+            'is_connected': is_connected,
             'connected_since': connected_since,
         }
 
         url = self._url.replace("<string:server_uuid>", server_uuid)
         api_response = self._post(data=data, url=url)
+        return api_response
+
+    def update(self, server_connection_dict: dict):
+        logger.debug(f"update method with parameters server_connection_dict: {server_connection_dict}")
+        url = self._url.replace("<string:server_uuid>", server_connection_dict.get('server_uuid'))
+        url = f"{url}/{server_connection_dict.get('uuid')}"
+        api_response = self._put(url=url)
         return api_response
 
     def get_by_server_and_user(self, server_uuid: str, user_uuid: str = None) -> APIResponse:

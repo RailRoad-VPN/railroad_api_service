@@ -58,6 +58,10 @@ class UsersDevicesAPI(ResourceAPI):
         vpn_type_id = request_json.get('vpn_type_id', None)
         location = request_json.get('location', None)
         is_active = request_json.get('is_active', True)
+        virtual_ip = request_json.get('virtual_ip', True)
+        device_ip = request_json.get('device_ip', True)
+        is_connected = request_json.get('is_connected', True)
+        connected_since = request_json.get('connected_since', True)
 
         req_fields = {
             'user_uuid': user_uuid,
@@ -65,6 +69,8 @@ class UsersDevicesAPI(ResourceAPI):
             'platform_id': platform_id,
             'vpn_type_id': vpn_type_id,
             'is_active': is_active,
+            'virtual_ip': virtual_ip,
+            'is_connected': is_connected,
         }
 
         error_fields = check_required_api_fields(req_fields)
@@ -76,9 +82,11 @@ class UsersDevicesAPI(ResourceAPI):
 
         try:
             api_response = self._user_policy.create_user_device(user_uuid=user_uuid, device_id=device_id,
-                                                                device_os=device_os,
-                                                                device_token=device_token, location=location,
-                                                                is_active=is_active)
+                                                                is_connected=is_connected, virtual_ip=virtual_ip,
+                                                                device_ip=device_ip, device_token=device_token,
+                                                                location=location, is_active=is_active,
+                                                                connected_since=connected_since, platform_id=platform_id,
+                                                                vpn_type_id=vpn_type_id)
             user_device = api_response.data
 
             logger.debug("Get X-Device-Token from headers")
@@ -151,6 +159,10 @@ class UsersDevicesAPI(ResourceAPI):
         vpn_type_id = request_json.get('vpn_type_id', None)
         location = request_json.get('location', None)
         is_active = request_json.get('is_active', None)
+        virtual_ip = request_json.get('virtual_ip', True)
+        device_ip = request_json.get('device_ip', True)
+        is_connected = request_json.get('is_connected', True)
+        connected_since = request_json.get('connected_since', True)
         modify_reason = request_json.get('modify_reason', None)
 
         req_fields = {
@@ -161,6 +173,8 @@ class UsersDevicesAPI(ResourceAPI):
             'platform_id': platform_id,
             'vpn_type_id': vpn_type_id,
             'is_active': is_active,
+            'virtual_ip': virtual_ip,
+            'is_connected': is_connected,
             'modify_reason': modify_reason,
         }
 
@@ -176,6 +190,8 @@ class UsersDevicesAPI(ResourceAPI):
             self._user_policy.get_user_device_by_uuid(user_uuid=user_uuid, suuid=user_device_uuid)
             # reuse variable
             req_fields['location'] = location
+            req_fields['device_ip'] = device_ip
+            req_fields['connected_since'] = connected_since
             self._user_policy.update_user_device(req_fields)
             response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK)
             resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
@@ -206,12 +222,14 @@ class UsersDevicesAPI(ResourceAPI):
                 return resp
             except APINotFoundException as e:
                 logging.debug(e.serialize())
-                response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.NOT_FOUND, errors=e.errors)
+                response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.NOT_FOUND,
+                                            errors=e.errors)
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.NOT_FOUND)
                 return resp
             except APIException as e:
                 logging.debug(e.serialize())
-                response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST, errors=e.errors)
+                response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST,
+                                            errors=e.errors)
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.BAD_REQUEST)
                 return resp
         else:

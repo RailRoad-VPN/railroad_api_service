@@ -62,7 +62,7 @@ class UsersOrdersAPI(ResourceAPI):
         try:
             api_response = self._order_api_service.create_order(status_id=status_id, payment_uuid=payment_uuid)
         except APIException as e:
-            logging.debug(e.serialize())
+            logger.error(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
@@ -118,7 +118,7 @@ class UsersOrdersAPI(ResourceAPI):
         try:
             self._order_api_service.update_order(order_json=req_fields)
         except APIException as e:
-            logging.debug(e.serialize())
+            logger.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
@@ -152,7 +152,7 @@ class UsersOrdersAPI(ResourceAPI):
         try:
             api_response = self._order_api_service.get_order(suuid=suuid, code=code)
         except APIException as e:
-            logging.debug(e.serialize())
+            logger.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp

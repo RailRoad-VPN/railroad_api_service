@@ -80,15 +80,19 @@ class UserPolicy(object):
         logger.debug(f"update_user method with parameter user_dict: {user_dict}")
         self._user_api_service.update_user(user_dict=user_dict)
 
-    def create_user_device(self, user_uuid: str, device_id: str, platform_id: int = None, vpn_type_id: int = None,
-                           device_token: str = None, location: str = None, is_active: bool = False) -> APIResponse:
+    def create_user_device(self, user_uuid: str, device_token: str, virtual_ip: str, device_id: str, platform_id: int,
+                           vpn_type_id: int, location: str, is_active: bool, is_connected: bool,
+                           connected_since: datetime = None, device_ip: str = None) -> APIResponse:
         logger.debug(f"create_user_device method with parameters user_uuid: {user_uuid}, device_id: {device_id}, "
                      f"device_token: {device_token}, location: {location}, is_active: {is_active}, "
-                     f"platform_id: {platform_id}, vpn_type_id: {vpn_type_id}")
-        api_response = self._user_device_api_service.create(user_uuid=user_uuid, device_id=device_id,
-                                                            platform_id=platform_id, vpn_type_id=vpn_type_id,
-                                                            device_token=device_token, location=location,
-                                                            is_active=is_active)
+                     f"platform_id: {platform_id}, vpn_type_id: {vpn_type_id}, virtual_ip: {virtual_ip}, "
+                     f"device_ip: {device_ip}, is_connected: {is_connected}, connected_since: {connected_since}")
+        api_response = self._user_device_api_service.create(user_uuid=user_uuid, device_token=device_token,
+                                                            vpn_type_id=vpn_type_id, device_id=device_id,
+                                                            virtual_ip=virtual_ip, device_ip=device_ip,
+                                                            platform_id=platform_id, location=location,
+                                                            is_active=is_active, connected_since=connected_since,
+                                                            is_connected=is_connected)
         x_device_token = api_response.headers.get('X-Device-Token', None)
         if x_device_token is None:
             raise APIException(http_code=api_response.code, errors=api_response.errors)
@@ -155,8 +159,6 @@ class VPNServerPolicy(object):
         api_response = self.vpnserver_api_service.get_vpnserver_by_uuid(suuid=server_uuid)
         server = api_response.data
         logger.debug(f"vpn server: {server}")
-
-
 
         logger.debug(f"create vpn Configuration")
         configuration = ''
