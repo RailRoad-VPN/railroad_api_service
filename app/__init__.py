@@ -18,6 +18,7 @@ from app.resources.vpns.servers.meta import VPNSServersMetaAPI
 from app.resources.users.servers.connections import UsersServersConnectionsAPI
 from app.resources.vpns.device_platforms import VPNSDevicePlatformsAPI
 from app.service import *
+from vpns.servers.connections import VPNSServersConnectionsAPI
 
 sys.path.insert(1, '../rest_api_library')
 from api import register_api
@@ -120,6 +121,7 @@ apis = [
     {'cls': UsersServersConfigurationsAPI, 'args': [vpnserverconf_api_service, app_config]},
     {'cls': UsersServersConnectionsAPI, 'args': [vpnserverconn_api_service, app_config]},
     {'cls': VPNSDevicePlatformsAPI, 'args': [vpn_device_platforms_api_service, app_config]},
+    {'cls': VPNSServersConnectionsAPI, 'args': [vpnserverconn_api_service, user_policy, app_config]},
 ]
 
 register_api(app, api_base_uri, apis)

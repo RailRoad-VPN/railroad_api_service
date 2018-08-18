@@ -2,7 +2,7 @@ import sys
 from http import HTTPStatus
 from typing import List
 
-import dateutil
+import dateutil.parser
 from flask import Response, request
 
 from app.exception import RailRoadAPIError
@@ -33,7 +33,7 @@ class VPNSServersConnectionsAPI(ResourceAPI):
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
         url = f"{base_url}/{VPNSServersConnectionsAPI.__api_url__}"
         api_urls = [
-            APIResourceURL(base_url=url, resource_name='', methods=['GET']),
+            APIResourceURL(base_url=url, resource_name='', methods=['POST']),
         ]
         return api_urls
 
@@ -75,18 +75,18 @@ class VPNSServersConnectionsAPI(ResourceAPI):
             return resp
 
         try:
-            for user in user_list:
-                email = user.get('email')
-                bytes_i = user.get('bytes_i')
-                bytes_o = user.get('bytes_o')
-                connected_since = user.get('connected_since')
+            for k, connection_user in user_list.items():
+                email = connection_user.get('email')
+                bytes_i = connection_user.get('bytes_i')
+                bytes_o = connection_user.get('bytes_o')
+                connected_since = connection_user.get('connected_since')
                 connected_since = dateutil.parser.parse(connected_since)
-                device_ip = user.get('device_ip')
-                virtual_ip = user.get('virtual_ip')
+                device_ip = connection_user.get('device_ip')
+                virtual_ip = connection_user.get('virtual_ip')
 
                 api_response = self._user_policy.get_user(email=email)
-                user_d = api_response.data
-                user_uuid = user_d.get('uuid')
+                user = api_response.data
+                user_uuid = user.get('uuid')
 
                 api_response = self._user_policy.get_user_devices(user_uuid=user_uuid)
                 user_devices = api_response.data
@@ -101,22 +101,27 @@ class VPNSServersConnectionsAPI(ResourceAPI):
                         break
 
                 if user_device is None:
-                    logger.error(f"We did not found user device for received connection information")
-                    resp = make_error_request_response(http_code=HTTPStatus.NOT_FOUND)
-                    return resp
+                    user_device_uuid = None
+                    logger.debug(f"We did not found user device for received connection information. "
+                                 f"This means it is OpenVPN configuration or something else.")
 
-                try:
-                    self._user_policy.update_user_device(user_device=user_device)
-                except APIException as e:
-                    logger.error(e)
-                    logger.error(f"Error while update user device: {user_device}")
+                else:
+                    user_device_uuid = user_device.get('uuid')
+                    try:
+                        self._user_policy.update_user_device(user_device=user_device)
+                    except APIException as e:
+                        logger.error(e)
+                        logger.error(f"Error while update user device: {user_device}")
 
-                try:
-                    api_response = self._vpnserverconn_api_service.get_by_server_and_user(server_uuid=server_uuid,
-                                                                                          user_uuid=user_uuid)
+                    api_response = self._vpnserverconn_api_service.get_current_by_user_device(
+                        server_uuid=server_uuid,
+                        user_device_uuid=user_device_uuid)
                     server_connection = api_response.data
+
+                try:
                     logger.debug(f"Got VPN server connection: {server_connection}")
 
+                    server_connection['user_device_uuid'] = user_device_uuid
                     server_connection['device_ip'] = device_ip
                     server_connection['virtual_ip'] = virtual_ip
                     server_connection['bytes_i'] = bytes_i
@@ -144,8 +149,8 @@ class VPNSServersConnectionsAPI(ResourceAPI):
                     logger.info("No existed vpn server connection.")
                     try:
                         self._vpnserverconn_api_service.create(server_uuid=server_uuid,
-                                                               user_uuid=user_device.get('user_uuid'),
-                                                               user_device_uuid=user_device.get('uuid'),
+                                                               user_uuid=user_uuid,
+                                                               user_device_uuid=user_device_uuid,
                                                                device_ip=device_ip, virtual_ip=virtual_ip,
                                                                bytes_i=bytes_i, bytes_o=bytes_o,
                                                                is_connected=True,
