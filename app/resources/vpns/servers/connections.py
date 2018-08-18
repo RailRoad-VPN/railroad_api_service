@@ -104,7 +104,9 @@ class VPNSServersConnectionsAPI(ResourceAPI):
                     user_device_uuid = None
                     logger.debug(f"We did not found user device for received connection information. "
                                  f"This means it is OpenVPN configuration or something else.")
-
+                    api_response = self._vpnserverconn_api_service.get_current_by_user_and_vip(server_uuid=server_uuid,
+                                                                                               virtual_ip=virtual_ip)
+                    server_connection = api_response.data
                 else:
                     user_device_uuid = user_device.get('uuid')
                     try:

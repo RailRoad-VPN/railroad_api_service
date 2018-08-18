@@ -441,11 +441,11 @@ class VPNServerConnectionsAPIService(RESTService):
         api_response = self._get(url=url)
         return api_response
 
-    def get_current_by_user_and_vip(self, server_uuid: str, user_uuid: str):
+    def get_current_by_user_and_vip(self, server_uuid: str, virtual_ip: str):
         logger.debug(f"get_current_by_user_device method with parameters server_uuid: {server_uuid}, "
-                     f"user_device_uuid: {user_device_uuid}")
+                     f"virtual_ip: {virtual_ip}")
         url = self._url.replace("<string:server_uuid>", server_uuid)
-        url = f"{url}?user_device_uuid={user_device_uuid}&is_connected=True"
+        url = f"{url}?virtual_ip={virtual_ip}&is_connected=True"
         api_response = self._get(url=url)
         return api_response
 
