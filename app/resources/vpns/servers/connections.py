@@ -170,7 +170,7 @@ class VPNSServersConnectionsAPI(ResourceAPI):
                                                            device_ip=device_ip, virtual_ip=virtual_ip,
                                                            bytes_i=bytes_i, bytes_o=bytes_o,
                                                            is_connected=True,
-                                                           connected_since=connected_since)
+                                                           connected_since=connected_since.isoformat())
                 except APIException as e:
                     logger.error(e)
                     logger.error(f"Error while create server connection")
