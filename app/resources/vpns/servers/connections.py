@@ -105,11 +105,15 @@ class VPNSServersConnectionsAPI(ResourceAPI):
 
             user_device = None
             user_device_uuid = None
+            NEW_CONNECTION = False
             for ud in user_devices:
-                if ud.get('virtual_ip') == virtual_ip and ud.get('is_connected') is True:
+                if ud.get('virtual_ip') == virtual_ip:
                     user_device = ud
+                    if not user_device.get('is_connected'):
+                        NEW_CONNECTION = True
                     user_device['connected_since'] = connected_since
                     user_device['device_ip'] = device_ip
+                    user_device['is_connected'] = True
                     user_device['modify_reason'] = 'update connection information'
                     break
 
@@ -134,6 +138,10 @@ class VPNSServersConnectionsAPI(ResourceAPI):
                         user_device_uuid=user_device_uuid)
                     server_connection = api_response.data
 
+                if NEW_CONNECTION:
+                    raise APINotFoundException
+                else:
+                    logger.debug("Update existed connection")
                 logger.debug(f"Got VPN server connection: {server_connection}")
 
                 server_connection['user_device_uuid'] = user_device_uuid
@@ -153,8 +161,8 @@ class VPNSServersConnectionsAPI(ResourceAPI):
                                                 errors=e.errors)
                     resp = make_api_response(data=response_data, http_code=e.http_code)
                     return resp
-            except APINotFoundException as e:
-                logger.info("No existed vpn server connection.")
+            except APINotFoundException:
+                logger.info("No existed vpn server connection or user device was disconnected")
                 try:
                     self._vpnserverconn_api_service.create(server_uuid=server_uuid,
                                                            user_uuid=user_uuid,
