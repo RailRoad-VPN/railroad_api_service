@@ -91,12 +91,12 @@ class UserDeviceAPIService(RESTService):
         super().__init__(**kwargs)
 
     def create(self, user_uuid: str, device_token: str, virtual_ip: str, device_id: str, platform_id: int,
-               vpn_type_id: int, location: str, is_active: bool, is_connected: bool,
-               device_ip: str = None, connected_since: datetime = None) -> APIResponse:
+               vpn_type_id: int, location: str, is_active: bool, device_ip: str = None,
+               connected_since: datetime = None) -> APIResponse:
         logger.debug(f"create method with parameters user_uuid: {user_uuid}, device_id: {device_id}, "
                      f"device_token: {device_token}, location: {location}, is_active: {is_active}, "
                      f"platform_id: {platform_id}, vpn_type_id: {vpn_type_id}, virtual_ip: {virtual_ip}, "
-                     f"device_ip: {device_ip}, is_connected: {is_connected}, connected_since: {connected_since}")
+                     f"device_ip: {device_ip}, connected_since: {connected_since}")
         us_json = {
             'user_uuid': user_uuid,
             'device_id': device_id,
@@ -107,7 +107,6 @@ class UserDeviceAPIService(RESTService):
             'is_active': is_active,
             'virtual_ip': virtual_ip,
             'device_ip': device_ip,
-            'is_connected': is_connected,
             'connected_since': connected_since,
         }
         url = self._url.replace('<string:user_uuid>', user_uuid)
@@ -425,7 +424,8 @@ class VPNServerConnectionsAPIService(RESTService):
         return api_response
 
     def get_by_server_and_user(self, server_uuid: str, user_uuid: str = None) -> APIResponse:
-        logger.debug(f"get_by_server_and_user method with parameters server_uuid: {server_uuid}, user_uuid: {user_uuid}")
+        logger.debug(
+            f"get_by_server_and_user method with parameters server_uuid: {server_uuid}, user_uuid: {user_uuid}")
         url = self._url.replace("<string:server_uuid>", server_uuid)
         url = f"{url}?user_uuid={user_uuid}"
         api_response = self._get(url=url)

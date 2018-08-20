@@ -60,7 +60,6 @@ class UsersDevicesAPI(ResourceAPI):
         is_active = request_json.get('is_active', True)
         virtual_ip = request_json.get('virtual_ip', True)
         device_ip = request_json.get('device_ip', True)
-        is_connected = request_json.get('is_connected', True)
         connected_since = request_json.get('connected_since', True)
 
         req_fields = {
@@ -70,7 +69,6 @@ class UsersDevicesAPI(ResourceAPI):
             'vpn_type_id': vpn_type_id,
             'is_active': is_active,
             'virtual_ip': virtual_ip,
-            'is_connected': is_connected,
         }
 
         error_fields = check_required_api_fields(req_fields)
@@ -82,7 +80,7 @@ class UsersDevicesAPI(ResourceAPI):
 
         try:
             api_response = self._user_policy.create_user_device(user_uuid=user_uuid, device_id=device_id,
-                                                                is_connected=is_connected, virtual_ip=virtual_ip,
+                                                                virtual_ip=virtual_ip,
                                                                 device_ip=device_ip, device_token=device_token,
                                                                 location=location, is_active=is_active,
                                                                 connected_since=connected_since, platform_id=platform_id,
@@ -161,7 +159,6 @@ class UsersDevicesAPI(ResourceAPI):
         is_active = request_json.get('is_active', None)
         virtual_ip = request_json.get('virtual_ip', True)
         device_ip = request_json.get('device_ip', True)
-        is_connected = request_json.get('is_connected', True)
         connected_since = request_json.get('connected_since', True)
         modify_reason = request_json.get('modify_reason', None)
 
@@ -174,7 +171,6 @@ class UsersDevicesAPI(ResourceAPI):
             'vpn_type_id': vpn_type_id,
             'is_active': is_active,
             'virtual_ip': virtual_ip,
-            'is_connected': is_connected,
             'modify_reason': modify_reason,
         }
 
