@@ -8,6 +8,7 @@ from flask import Response, request
 from app.exception import RailRoadAPIError
 from app.policy import UserPolicy, logging
 from app.service import VPNServerConnectionsAPIService
+from utils import check_uuid
 
 sys.path.insert(0, '../rest_api_library')
 from rest import APIResourceURL, APIException, APINotFoundException
@@ -33,6 +34,7 @@ class VPNSServersConnectionsAPI(ResourceAPI):
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
         url = f"{base_url}/{VPNSServersConnectionsAPI.__api_url__}"
         api_urls = [
+            APIResourceURL(base_url=url.replace('/<string:server_uuid>/', '/'), resource_name='', methods=['GET']),
             APIResourceURL(base_url=url, resource_name='', methods=['POST']),
         ]
         return api_urls
@@ -112,8 +114,8 @@ class VPNSServersConnectionsAPI(ResourceAPI):
                 user_device_uuid = None
                 logger.debug(f"We did not found user device for received connection information. "
                              f"This means it is OpenVPN configuration or something else.")
-                api_response = self._vpnserverconn_api_service.get_current_by_user_and_vip(server_uuid=server_uuid,
-                                                                                           virtual_ip=virtual_ip)
+                api_response = self._vpnserverconn_api_service.get_current_by_server_and_user_and_vip(server_uuid=server_uuid,
+                                                                                                      virtual_ip=virtual_ip)
                 server_connection = api_response.data
             else:
                 user_device_uuid = user_device.get('uuid')
@@ -123,7 +125,7 @@ class VPNSServersConnectionsAPI(ResourceAPI):
                     logger.error(e)
                     logger.error(f"Error while update user device: {user_device}")
 
-                api_response = self._vpnserverconn_api_service.get_current_by_user_device(
+                api_response = self._vpnserverconn_api_service.get_current_by_server_and_user_device(
                     server_uuid=server_uuid,
                     user_device_uuid=user_device_uuid)
                 server_connection = api_response.data
@@ -182,5 +184,26 @@ class VPNSServersConnectionsAPI(ResourceAPI):
         return resp
 
     def get(self) -> Response:
-        resp = make_error_request_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
-        return resp
+        super(VPNSServersConnectionsAPI, self).get(req=request)
+
+        user_device_uuid = request.args.get('user_device_uuid', None)
+        is_connected = request.args.get('is_connected', None)
+
+        is_valid = check_uuid(user_device_uuid)
+        if not is_valid:
+            return make_error_request_response(http_code=HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
+
+        try:
+            if is_connected:
+                api_response = self._vpnserverconn_api_service.get_current_by_user_device(user_device_uuid=user_device_uuid)
+            else:
+                api_response = self._vpnserverconn_api_service.get_all_by_user_device_uuid(user_device_uuid=user_device_uuid)
+            response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK,
+                                        data=api_response.data)
+            resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
+            return resp
+        except APIException as e:
+            response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST,
+                                        errors=e.errors)
+            resp = make_api_response(data=response_data, http_code=response_data.code)
+            return resp

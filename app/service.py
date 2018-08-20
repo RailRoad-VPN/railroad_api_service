@@ -419,35 +419,51 @@ class VPNServerConnectionsAPIService(RESTService):
         api_response = self._put(url=url, data=server_connection_dict)
         return api_response
 
-    def get_by_user(self, server_uuid: str, user_uuid: str = None) -> APIResponse:
-        logger.debug(f"get_by_user method with parameters server_uuid: {server_uuid}, user_uuid: {user_uuid}")
+    def get_by_server_and_user(self, server_uuid: str, user_uuid: str = None) -> APIResponse:
+        logger.debug(f"get_by_server_and_user method with parameters server_uuid: {server_uuid}, user_uuid: {user_uuid}")
         url = self._url.replace("<string:server_uuid>", server_uuid)
         url = f"{url}?user_uuid={user_uuid}"
         api_response = self._get(url=url)
         return api_response
 
-    def get_by_suuid(self, server_uuid: str, suuid: str) -> APIResponse:
-        logger.debug(f"get_by_suuid method with parameters server_uuid: {server_uuid}, suuid: {suuid}")
+    def get_by_server_and_suuid(self, server_uuid: str, suuid: str) -> APIResponse:
+        logger.debug(f"get_by_server_and_suuid method with parameters server_uuid: {server_uuid}, suuid: {suuid}")
         url = self._url.replace("<string:server_uuid>", server_uuid)
         url = f"{url}/{suuid}"
         api_response = self._get(url=url)
         return api_response
 
-    def get_current_by_user_device(self, server_uuid: str, user_device_uuid: str):
-        logger.debug(f"get_current_by_user_device method with parameters server_uuid: {server_uuid}, "
+    def get_current_by_server_and_user_device(self, server_uuid: str, user_device_uuid: str):
+        logger.debug(f"get_current_by_server_and_user_device method with parameters server_uuid: {server_uuid}, "
                      f"user_device_uuid: {user_device_uuid}")
         url = self._url.replace("<string:server_uuid>", server_uuid)
         url = f"{url}?user_device_uuid={user_device_uuid}&is_connected=True"
         api_response = self._get(url=url)
         return api_response
 
-    def get_current_by_user_and_vip(self, server_uuid: str, virtual_ip: str):
+    def get_current_by_server_and_user_and_vip(self, server_uuid: str, virtual_ip: str):
         logger.debug(f"get_current_by_user_device method with parameters server_uuid: {server_uuid}, "
                      f"virtual_ip: {virtual_ip}")
         url = self._url.replace("<string:server_uuid>", server_uuid)
         url = f"{url}?virtual_ip={virtual_ip}&is_connected=True"
         api_response = self._get(url=url)
         return api_response
+
+    def get_all_by_user_device_uuid(self, user_device_uuid: str) -> APIResponse:
+        logger.debug(f"get_all_by_user_device_uuid method with parameters user_device_uuid: {user_device_uuid}")
+        url = self._url.replace("/<string:server_uuid>/", "/")
+        url = f"{url}?user_device_uuid={user_device_uuid}"
+        api_response = self._get(url=url)
+        return api_response
+
+    def get_current_by_user_device(self, user_device_uuid: str):
+        logger.debug(f"get_current_by_server_and_user_device method with parameters "
+                     f"user_device_uuid: {user_device_uuid}")
+        url = self._url.replace("/<string:server_uuid>/", "/")
+        url = f"{url}?user_device_uuid={user_device_uuid}&is_connected=True"
+        api_response = self._get(url=url)
+        return api_response
+
 
 class VPNServerStatusAPIService(RESTService):
     __version__ = 1

@@ -32,6 +32,8 @@ class RailRoadAPIError(APIErrorEnum):
     BAD_ACCEPT_LANGUAGE_HEADER = (name + str(count()), 'BAD_ACCEPT_LANGUAGE_HEADER phrase', 'BAD_ACCEPT_LANGUAGE_HEADER description')
     BAD_IDENTITY_ERROR = (name + str(count()), 'BAD_IDENTITY_ERROR phrase', 'BAD_IDENTITY_ERROR description')
 
+    API_DOES_NOT_EXIST = (name + str(count()), 'API_DOES_NOT_EXIST phrase', 'API_DOES_NOT_EXIST description')
+
     USER_EMAIL_BUSY = (name + str(count()), 'USER_EMAIL_BUSY phrase', 'USER_EMAIL_BUSY description')
     USER_NOT_EXIST = (name + str(count()), 'USER_NOT_EXIST phrase', 'USER_NOT_EXIST description')
 

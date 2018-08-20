@@ -3,6 +3,7 @@ from http import HTTPStatus
 
 from flask import Flask, request
 
+from app.exception import RailRoadAPIError
 from app.policy import *
 from app.resources.payments import PaymentsAPI
 from app.resources.subscriptions import SubscriptionsAPI
@@ -13,12 +14,12 @@ from app.resources.users.orders.payments import UsersOrdersPaymentsAPI
 from app.resources.users.servers import UsersServersAPI
 from app.resources.users.servers.conditions import UsersServersConditionsAPI
 from app.resources.users.servers.configurations import UsersServersConfigurationsAPI
-from app.resources.users.subscriptions import UsersSubscriptionsAPI
-from app.resources.vpns.servers.meta import VPNSServersMetaAPI
 from app.resources.users.servers.connections import UsersServersConnectionsAPI
+from app.resources.users.subscriptions import UsersSubscriptionsAPI
 from app.resources.vpns.device_platforms import VPNSDevicePlatformsAPI
-from app.service import *
 from app.resources.vpns.servers.connections import VPNSServersConnectionsAPI
+from app.resources.vpns.servers.meta import VPNSServersMetaAPI
+from app.service import *
 
 sys.path.insert(1, '../rest_api_library')
 from api import register_api
@@ -99,7 +100,8 @@ order_api_service = OrderAPIService(api_url=app_config['BILLING_SERVICE_URL'],
                                     resource_name=app_config['BILLING_SERVICE_ORDERS_RESOURCE_NAME'])
 
 user_policy = UserPolicy(user_sub_api_service=user_sub_api_service, order_api_service=order_api_service,
-                         user_api_service=user_api_service, user_device_api_service=user_device_api_service)
+                         user_api_service=user_api_service, user_device_api_service=user_device_api_service,
+                         vpnserversconnections_service=vpnserverconn_api_service)
 
 vpn_policy = VPNServerPolicy(vpnserver_service=vpnserver_api_service, vpntype_service=vpntype_api_service,
                              vpnserverconfiguration_service=vpnserverconf_api_service,
@@ -134,14 +136,14 @@ def wants_json_response():
 
 @app.errorhandler(400)
 def not_found_error(error):
-    return make_error_request_response(HTTPStatus.BAD_REQUEST)
+    return make_error_request_response(http_code=HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.API_DOES_NOT_EXIST)
 
 
 @app.errorhandler(404)
 def not_found_error(error):
-    return make_error_request_response(HTTPStatus.NOT_FOUND)
+    return make_error_request_response(http_code=HTTPStatus.NOT_FOUND, err=RailRoadAPIError.API_DOES_NOT_EXIST)
 
 
 @app.errorhandler(500)
 def internal_error(error):
-    return make_error_request_response(HTTPStatus.INTERNAL_SERVER_ERROR)
+    return make_error_request_response(http_code=HTTPStatus.INTERNAL_SERVER_ERROR, err=RailRoadAPIError.API_DOES_NOT_EXIST)

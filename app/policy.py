@@ -18,11 +18,13 @@ class UserPolicy(object):
     payment_api_service = None
 
     def __init__(self, user_sub_api_service: UserSubscriptionAPIService, user_api_service: UserAPIService,
-                 order_api_service: OrderAPIService, user_device_api_service: UserDeviceAPIService):
+                 order_api_service: OrderAPIService, user_device_api_service: UserDeviceAPIService,
+                 vpnserversconnections_service: VPNServerConnectionsAPIService):
         self._user_api_service = user_api_service
         self._user_device_api_service = user_device_api_service
         self._user_sub_api_service = user_sub_api_service
         self._order_api_service = order_api_service
+        self._vpnserversconnections_service = vpnserversconnections_service
 
     def create_user_sub(self, user_uuid: str, subscription_id: str, order_uuid: str, status_id: int) -> APIResponse:
         logger.debug(f"create_user_sub method with parameter user_uuid: {user_uuid}, "
@@ -117,12 +119,27 @@ class UserPolicy(object):
     def get_user_device_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
         logger.debug(f"get_user_device_by_uuid method with parameters user_uuid: {user_uuid}, suuid: {suuid}")
         api_response = self._user_device_api_service.get_user_device_by_uuid(user_uuid=user_uuid, suuid=suuid)
-        return api_response
+        try:
+            api_response.data['connections'] = self._get_user_device_connections(user_device=api_response.data)
+        except APIException as e:
+            return api_response
 
     def get_user_devices(self, user_uuid: str) -> APIResponse:
         logger.debug(f"get_user_devices method with parameters user_uuid: {user_uuid}")
         api_response = self._user_device_api_service.get_user_devices(user_uuid=user_uuid)
+        try:
+            for ud in api_response.data:
+                user_device_connection_list = self._get_user_device_connections(user_device=ud)
+                if user_device_connection_list:
+                    ud['_connections'] = user_device_connection_list
+        except APIException as e:
+            pass
         return api_response
+
+    def _get_user_device_connections(self, user_device: dict):
+        user_device_connection = self._vpnserversconnections_service.get_all_by_user_device_uuid(
+            user_device_uuid=user_device.get('uuid')).data
+        return user_device_connection
 
 
 class VPNServerPolicy(object):

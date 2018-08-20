@@ -236,9 +236,8 @@ class UsersDevicesAPI(ResourceAPI):
             # get all user devices
             try:
                 api_response = self._user_policy.get_user_devices(user_uuid=user_uuid)
-                subs = api_response.data
-                response_data = APIResponse(status=api_response.status, code=api_response.code,
-                                            data=subs)
+                user_device_list = api_response.data
+                response_data = APIResponse(status=api_response.status, code=api_response.code, data=user_device_list)
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
                 return resp
             except APIException as e:

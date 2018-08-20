@@ -53,8 +53,8 @@ class UsersServersConnectionsAPI(ResourceAPI):
     def get(self, server_uuid: str, user_uuid: str, suuid: str = None) -> Response:
         if suuid is None:
             try:
-                api_response = self._connections_api_service.get_by_user(server_uuid=server_uuid,
-                                                                         user_uuid=user_uuid)
+                api_response = self._connections_api_service.get_by_server_and_user(server_uuid=server_uuid,
+                                                                                    user_uuid=user_uuid)
                 response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK,
                                             data=api_response.data)
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
@@ -75,7 +75,7 @@ class UsersServersConnectionsAPI(ResourceAPI):
                 resp = make_api_response(data=response_data, http_code=code)
                 return resp
             try:
-                api_response = self._connections_api_service.get_by_suuid(suuid=suuid, server_uuid=server_uuid)
+                api_response = self._connections_api_service.get_by_server_and_suuid(suuid=suuid, server_uuid=server_uuid)
                 response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK,
                                             data=api_response.data)
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
