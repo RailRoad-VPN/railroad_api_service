@@ -80,7 +80,9 @@ class VPNSServersConnectionsAPI(ResourceAPI):
 
         if len(user_list) == 0:
             logger.debug(f"No connections for server.")
-            # TODO check database and cleanup
+
+            self._vpnserverconn_api_service.disconnect_by_server(server_uuid=server_uuid)
+
             response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.NOT_MODIFIED)
             resp = make_api_response(data=response_data, http_code=response_data.code)
             return resp

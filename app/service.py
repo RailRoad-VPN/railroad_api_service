@@ -412,6 +412,11 @@ class VPNServerConnectionsAPIService(RESTService):
         api_response = self._post(data=data, url=url)
         return api_response
 
+    def disconnect_by_server(self, server_uuid: str):
+        logger.debug(f"disconnect_by_server method with parameters server_uuid: {server_uuid}")
+        url = self._url.replace("<string:server_uuid>", server_uuid)
+        self._delete(url=url)
+
     def update(self, server_connection_dict: dict):
         logger.debug(f"update method with parameters server_connection_dict: {server_connection_dict}")
         url = self._url.replace("<string:server_uuid>", server_connection_dict.get('server_uuid'))
