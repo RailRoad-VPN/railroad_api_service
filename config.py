@@ -23,11 +23,10 @@ class Config(object):
     VPNC_SERVICE_VPNSERVERSTATUS_RESOURCE_NAME = 'vpns/servers/statuses'
     VPNC_SERVICE_VPNSERVERSMETA_RESOURCE_NAME = 'vpns/servers/meta'
     VPNC_SERVICE_VPNSERVERCONFIGURATIONS_RESOURCE_NAME = 'vpns/servers/<string:server_uuid>/configurations'
-    VPNC_SERVICE_VPNSERVER_CONFIG_TEMPLATES_RESOURCE_NAME = 'vpns/servers/<server_uuid>/config_templates'
     VPNC_SERVICE_VPNSERVERCONNECTIONS_RESOURCE_NAME = 'vpns/servers/<string:server_uuid>/connections'
 
-    VPNC_SERVICE_VPNMGMT_RESOURCE_NAME = 'vpns/mgmt'
-    VPNC_SERVICE_VPNMGMT_USER_CERTS_RESOURCE_NAME = 'vpns/mgmt/users/<string:user_uuid>/certs'
+    VPNMGMT_USERS_RESOURCE_NAME = 'vpns/mgmt/users/<string:user_email>'
+    VPNMGMT_SERVER_CONNECTIONS_RESOURCE_NAME = 'vpns/mgmt/servers/connections'
 
     VPNC_SERVICE_DEVICE_PLATFORMS_RESOURCE_NAME = 'vpns/device_platforms'
 
@@ -42,6 +41,7 @@ class ProductionConfig(Config):
 
     AUTH_SERVICE_URL = ''
     VNPC_SERVICE_URL = ''
+    VPNMGMT_SERVICE_URL = ''
     BILLING_SERVICE_URL = ''
 
 
@@ -52,6 +52,7 @@ class DevelopmentConfig(Config):
 
     AUTH_SERVICE_URL = 'http://127.0.0.1:6000/api/v1'
     VPNC_SERVICE_URL = 'http://127.0.0.1:9000/api/v1'
+    VPNMGMT_SERVICE_URL = 'http://127.0.0.1:10000/api/v1'
     BILLING_SERVICE_URL = 'http://127.0.0.1:7000/api/v1'
 
     APN_PATH = '/Users/dikkini/Developing/workspaces/my/DFN/railroad_api_service/%s.apn'
@@ -65,6 +66,7 @@ class TestingConfig(Config):
 
     AUTH_SERVICE_URL = 'http://127.0.0.1:6000/api/v1'
     VPNC_SERVICE_URL = 'http://127.0.0.1:9000/api/v1'
+    VPNMGMT_SERVICE_URL = 'http://127.0.0.1:10000/api/v1'
     BILLING_SERVICE_URL = 'http://127.0.0.1:7000/api/v1'
 
     APN_PATH = '/opt/apps/dfn/apn/%s.apn'

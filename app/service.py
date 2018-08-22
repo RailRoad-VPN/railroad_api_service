@@ -3,6 +3,8 @@ import json
 import logging
 import sys
 
+from app.model import VPNTypeEnum
+
 sys.path.insert(0, '../rest_api_library')
 from rest import RESTService, APIException
 from response import APIResponse
@@ -87,6 +89,8 @@ class OrderAPIService(RESTService):
 class UserDeviceAPIService(RESTService):
     __version__ = 1
 
+    logger = logging.getLogger(__name__)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -144,6 +148,8 @@ class UserDeviceAPIService(RESTService):
 class UserSubscriptionAPIService(RESTService):
     __version__ = 1
 
+    logger = logging.getLogger(__name__)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -183,6 +189,8 @@ class UserSubscriptionAPIService(RESTService):
 class SubscriptionAPIService(RESTService):
     __version__ = 1
 
+    logger = logging.getLogger(__name__)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -198,6 +206,8 @@ class SubscriptionAPIService(RESTService):
 
 class UserAPIService(RESTService):
     __version__ = 1
+
+    logger = logging.getLogger(__name__)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -245,6 +255,8 @@ class UserAPIService(RESTService):
 
 class VPNServersAPIService(RESTService):
     __version__ = 1
+
+    logger = logging.getLogger(__name__)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -298,6 +310,8 @@ class VPNServersAPIService(RESTService):
 class VPNServersMetaAPIService(RESTService):
     __version__ = 1
 
+    logger = logging.getLogger(__name__)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -309,6 +323,8 @@ class VPNServersMetaAPIService(RESTService):
 
 class VPNTypeAPIService(RESTService):
     __version__ = 1
+
+    logger = logging.getLogger(__name__)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -327,6 +343,8 @@ class VPNTypeAPIService(RESTService):
 
 class VPNServerConfigurationsAPIService(RESTService):
     __version__ = 1
+
+    logger = logging.getLogger(__name__)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -363,28 +381,49 @@ class VPNServerConfigurationsAPIService(RESTService):
         return api_response
 
 
-class VPNServerConfigTemplates(RESTService):
+class VPNMGMTUsersAPIService(RESTService):
     __version__ = 1
+
+    logger = logging.getLogger(__name__)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def find_by_uuid(self, server_uuid: str, suuid: str):
-        self.logger.debug(f"find_by_uuid method server_uuid: {server_uuid}, suuid: {suuid}")
-        url = self._url.replace("<string:server_uuid>", server_uuid)
-        api_response = self._get(url=url)
+    def create_vpn_user(self, email: str):
+        self.logger.debug(f"create_vpn_user with parameters email: {email}")
+        url = self._url.replace("<string:user_email>", email)
+        api_response = self._post(data={}, url=url)
         return api_response
 
-    def find_by_device_and_type(self, server_uuid: str, vpn_device_platform_id: int, vpn_type_id: int):
-        self.logger.debug(f"find_by_device_and_type method server_uuid: {server_uuid}, "
-                          f"vpn_device_platform_id: {vpn_device_platform_id}, vpn_type_id: {vpn_type_id}")
-        url = self._url.replace("<string:server_uuid>", server_uuid)
-        api_response = self._get(url=url)
+    def withdraw_vpn_user(self, email: str):
+        self.logger.debug(f"withdraw_vpn_user with parameters email: {email}")
+        url = self._url.replace("<string:user_email>", email)
+        api_response = self._delete(url=url)
+        return api_response
+
+
+class VPNMGMTServerConnectionsAPIService(RESTService):
+    __version__ = 1
+
+    logger = logging.getLogger(__name__)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def update_server_connections(self, ip_address: str, vpn_type: VPNTypeEnum):
+        self.logger.debug(f"update_server_connections with parameters ip_address: {ip_address}, vpn_type: {vpn_type}")
+        data = {
+            'ip_list': [ip_address, ],
+            'vpn_type_name': vpn_type.name
+        }
+        api_response = self._post(data=data)
         return api_response
 
 
 class VPNServerConnectionsAPIService(RESTService):
     __version__ = 1
+
+    logger = logging.getLogger(__name__)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -473,6 +512,8 @@ class VPNServerConnectionsAPIService(RESTService):
 class VPNServerStatusAPIService(RESTService):
     __version__ = 1
 
+    logger = logging.getLogger(__name__)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -490,6 +531,8 @@ class VPNServerStatusAPIService(RESTService):
 
 class GeoPositionAPIService(RESTService):
     __version__ = 1
+
+    logger = logging.getLogger(__name__)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -509,6 +552,8 @@ class GeoPositionAPIService(RESTService):
 class GeoCityAPIService(RESTService):
     __version__ = 1
 
+    logger = logging.getLogger(__name__)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -526,6 +571,8 @@ class GeoCityAPIService(RESTService):
 
 class GeoCountryAPIService(RESTService):
     __version__ = 1
+
+    logger = logging.getLogger(__name__)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -545,6 +592,8 @@ class GeoCountryAPIService(RESTService):
 class GeoStateAPIService(RESTService):
     __version__ = 1
 
+    logger = logging.getLogger(__name__)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -560,19 +609,10 @@ class GeoStateAPIService(RESTService):
         return api_response
 
 
-class VPNMgmtAPIService(RESTService):
-    __version__ = 1
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    def generate_and_register_user_cert(self):
-        self.logger.debug(f"generate_and_register_user_cert ")
-        pass
-
-
 class VPNDevicePlatformsAPIService(RESTService):
     __version__ = 1
+
+    logger = logging.getLogger(__name__)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

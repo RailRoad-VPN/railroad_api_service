@@ -8,12 +8,13 @@ from typing import List
 
 from flask import request, Response
 
+from app import UserPolicy
 from app.exception import RailRoadAPIError
 from app.model.order_status import OrderStatus
 from app.model.payment_status import PaymentStatus, PPGPaymentStatus
 from app.model.payment_type import PaymentType
 from app.model.user_subscription_status import UserSubscriptionStatus
-from app.service import OrderAPIService, UserSubscriptionAPIService
+from app.service import OrderAPIService, UserSubscriptionAPIService, VPNMGMTUsersAPIService
 
 sys.path.insert(0, '../rest_api_library')
 from response import make_api_response, make_error_request_response
@@ -33,6 +34,8 @@ class PaymentsAPI(ResourceAPI):
     _config = None
     _order_api_service = None
     _user_sub_api_service = None
+    _vpn_mgmt_users_api_service = None
+    _user_policy = None
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
@@ -43,11 +46,14 @@ class PaymentsAPI(ResourceAPI):
         return api_urls
 
     def __init__(self, order_api_service: OrderAPIService, user_sub_api_service: UserSubscriptionAPIService,
+                 vpn_mgmt_users_api_service: VPNMGMTUsersAPIService, user_policy: UserPolicy,
                  config: dict):
         super().__init__()
         self._config = config
         self._order_api_service = order_api_service
         self._user_sub_api_service = user_sub_api_service
+        self._vpn_mgmt_users_api_service = vpn_mgmt_users_api_service
+        self._user_policy = user_policy
 
     def post(self) -> Response:
         self.logger.debug(f"PaymentAPI -> POST method with parameters")
@@ -204,6 +210,17 @@ class PaymentsAPI(ResourceAPI):
 
         self.logger.debug(f"update user subscription")
         self._user_sub_api_service.update(user_subscription=payment_user_sub)
+
+        self.logger.debug("Launch MANAGEMENT API")
+        self.logger.debug("create VPN user")
+
+        api_response = self._user_policy.get_user(suuid=str(uuid))
+        user = api_response.data
+
+        api_response = self._vpn_mgmt_users_api_service.create_vpn_user(email=user.get('email'))
+        config_base64_str = api_response.data
+
+        # TODO save use configuration
 
         response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK)
         resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
