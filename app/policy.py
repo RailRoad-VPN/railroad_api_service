@@ -7,7 +7,6 @@ from rest import APIException
 from api import ResourcePagination
 
 
-
 class UserPolicy(object):
     __version__ = 1
 
@@ -29,8 +28,8 @@ class UserPolicy(object):
 
     def create_user_sub(self, user_uuid: str, subscription_id: str, order_uuid: str, status_id: int) -> APIResponse:
         self.logger.debug(f"create_user_sub method with parameter user_uuid: {user_uuid}, "
-                     f"subscription_id: {subscription_id}, "
-                     f"order_uuid: {order_uuid}, status_id: {status_id}")
+                          f"subscription_id: {subscription_id}, "
+                          f"order_uuid: {order_uuid}, status_id: {status_id}")
         api_response = self._user_sub_api_service.create(user_uuid=user_uuid, subscription_id=subscription_id,
                                                          order_uuid=order_uuid, status_id=status_id)
         location = api_response.headers.get('Location', None)
@@ -64,8 +63,8 @@ class UserPolicy(object):
                     is_password_expired: bool = False, enabled: bool = False, pin_code: str = None,
                     pin_code_expire_date: datetime = None) -> APIResponse:
         self.logger.debug(f"create_user method with parameters email: {email}, password: {password}, "
-                     f"is_expired: {is_expired}, is_locked: {is_locked}, is_password_expired: {is_password_expired}, "
-                     f"enabled: {enabled}, pin_code: {pin_code}, pin_code_expire_date: {pin_code_expire_date}")
+                          f"is_expired: {is_expired}, is_locked: {is_locked}, is_password_expired: {is_password_expired}, "
+                          f"enabled: {enabled}, pin_code: {pin_code}, pin_code_expire_date: {pin_code_expire_date}")
         api_response = self._user_api_service.create_user(email=email, password=password, is_expired=is_expired,
                                                           is_locked=is_locked, is_password_expired=is_password_expired,
                                                           enabled=enabled, pin_code=pin_code,
@@ -87,9 +86,9 @@ class UserPolicy(object):
                            vpn_type_id: int, location: str, is_active: bool, connected_since: datetime = None,
                            device_ip: str = None) -> APIResponse:
         self.logger.debug(f"create_user_device method with parameters user_uuid: {user_uuid}, device_id: {device_id}, "
-                     f"device_token: {device_token}, location: {location}, is_active: {is_active}, "
-                     f"platform_id: {platform_id}, vpn_type_id: {vpn_type_id}, virtual_ip: {virtual_ip}, "
-                     f"device_ip: {device_ip}, connected_since: {connected_since}")
+                          f"device_token: {device_token}, location: {location}, is_active: {is_active}, "
+                          f"platform_id: {platform_id}, vpn_type_id: {vpn_type_id}, virtual_ip: {virtual_ip}, "
+                          f"device_ip: {device_ip}, connected_since: {connected_since}")
         api_response = self._user_device_api_service.create(user_uuid=user_uuid, device_token=device_token,
                                                             vpn_type_id=vpn_type_id, device_id=device_id,
                                                             virtual_ip=virtual_ip, device_ip=device_ip,
@@ -170,7 +169,7 @@ class VPNServerPolicy(object):
 
     def create_vpn_server_user_configuration(self, server_uuid: str, user_uuid: str, cert: str):
         self.logger.debug(f"create_vpn_server_user_configuration method with parameters server_uuid: {server_uuid}, "
-                     f"user_uuid: {user_uuid}, cert: {cert}")
+                          f"user_uuid: {user_uuid}, cert: {cert}")
 
         self.logger.debug(f"get vpn server by uuid: {server_uuid}")
         api_response = self.vpnserver_api_service.get_vpnserver_by_uuid(suuid=server_uuid)
@@ -232,7 +231,8 @@ class VPNServerPolicy(object):
         return servers_list
 
     def get_vpn_server_list_by_type(self, type_id: int, pagination: ResourcePagination) -> List[dict]:
-        self.logger.debug(f"get_vpn_server_list_by_type method with parameters type_id: {type_id}, pagination: {pagination}")
+        self.logger.debug(
+            f"get_vpn_server_list_by_type method with parameters type_id: {type_id}, pagination: {pagination}")
         api_response = self.vpnserver_api_service.get_vpnservers_by_type(type_id=type_id, pagination=pagination)
 
         servers_list = []
@@ -244,7 +244,7 @@ class VPNServerPolicy(object):
 
     def get_vpn_server_list_by_status(self, status_id: int, pagination: ResourcePagination) -> List[dict]:
         self.logger.debug(f"get_vpn_server_list_by_status method with parameters status_id: {status_id}, "
-                     f"pagination: {pagination}")
+                          f"pagination: {pagination}")
         api_response = self.vpnserver_api_service.get_vpnservers_by_status(status_id=status_id, pagination=pagination)
 
         servers_list = []
@@ -267,7 +267,7 @@ class VPNServerPolicy(object):
 
     def get_vpn_server_condition_list_by_type(self, type_id: int, pagination: ResourcePagination) -> List[dict]:
         self.logger.debug(f"get_vpn_server_condition_list_by_type method with parameters type_id: {type_id}. "
-                     f"pagination: {pagination}")
+                          f"pagination: {pagination}")
         api_response = self.vpnserver_api_service.get_vpnservers_by_type(type_id=type_id, pagination=pagination)
 
         servers_list = []
@@ -279,7 +279,7 @@ class VPNServerPolicy(object):
 
     def get_vpn_server_condition_list_by_status(self, status_id: int, pagination: ResourcePagination) -> List[dict]:
         self.logger.debug(f"get_vpn_server_condition_list_by_status method with parameters status_id: {status_id}, "
-                     f"pagination: {pagination}")
+                          f"pagination: {pagination}")
         api_response = self.vpnserver_api_service.get_vpnservers_by_status(status_id=status_id, pagination=pagination)
 
         servers_list = []
