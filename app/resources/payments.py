@@ -214,11 +214,15 @@ class PaymentsAPI(ResourceAPI):
         self.logger.debug("Launch MANAGEMENT API")
         self.logger.debug("create VPN user")
 
-        api_response = self._user_policy.get_user(suuid=str(uuid))
+        self.logger.debug(f"get user by user_uuid: {user_uuid}")
+        api_response = self._user_policy.get_user(suuid=user_uuid)
         user = api_response.data
+        self.logger.debug(f"got user: {user}")
 
+        self.logger.debug(f"call vpn mgmt users api service")
         api_response = self._vpn_mgmt_users_api_service.create_vpn_user(email=user.get('email'))
         config_base64_str = api_response.data
+        self.logger.debug(f"got config base64 {config_base64_str}")
 
         # TODO save use configuration
 
