@@ -15,11 +15,11 @@ from api import ResourceAPI
 from response import APIResponseStatus, APIResponse
 from rest import APIException, APIResourceURL, APINotFoundException
 
-logger = logging.getLogger(__name__)
-
 
 class UsersDevicesAPI(ResourceAPI):
     __version__ = 1
+
+    logger = logging.getLogger(__name__)
 
     __endpoint_name__ = __qualname__
     __api_url__ = 'users/<string:user_uuid>/devices'
@@ -83,55 +83,56 @@ class UsersDevicesAPI(ResourceAPI):
                                                                 virtual_ip=virtual_ip,
                                                                 device_ip=device_ip, device_token=device_token,
                                                                 location=location, is_active=is_active,
-                                                                connected_since=connected_since, platform_id=platform_id,
+                                                                connected_since=connected_since,
+                                                                platform_id=platform_id,
                                                                 vpn_type_id=vpn_type_id)
             user_device = api_response.data
 
-            logger.debug("Get X-Device-Token from headers")
+            self.logger.debug("Get X-Device-Token from headers")
             x_device_token = api_response.headers['X-Device-Token']
 
-            logger.debug(f'Get user by uuid: {user_uuid}')
+            self.logger.debug(f'Get user by uuid: {user_uuid}')
             try:
                 api_response = self._user_policy.get_user(suuid=user_uuid)
             except APIException as e:
-                logger.debug(f"Failed to get user by uuid: {user_uuid}")
+                self.logger.debug(f"Failed to get user by uuid: {user_uuid}")
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code,
                                             errors=e.errors)
                 return make_api_response(data=response_data, http_code=e.http_code)
 
             user_dict = api_response.data
-            logger.debug(f'Got user {user_dict}')
+            self.logger.debug(f'Got user {user_dict}')
 
-            logger.debug('Add modify_reason')
+            self.logger.debug('Add modify_reason')
             user_dict['modify_reason'] = 'update pin code expire date'
 
-            logger.debug('Set pin code activate True')
+            self.logger.debug('Set pin code activate True')
             user_dict['is_pin_code_activated'] = True
 
             self._user_policy.update_user(user_dict=user_dict)
 
-            logger.debug("Get user device uuid from response of creating user device")
+            self.logger.debug("Get user device uuid from response of creating user device")
             ud_uuid = user_device['uuid']
-            logger.debug(f"User Device uuid: {ud_uuid}")
+            self.logger.debug(f"User Device uuid: {ud_uuid}")
 
-            logger.debug("Prepare API URL")
+            self.logger.debug("Prepare API URL")
             api_url = self.__api_url__.replace('<string:user_uuid>', user_uuid)
-            logger.debug(f"API URL: {api_url}")
+            self.logger.debug(f"API URL: {api_url}")
 
             response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.CREATED)
             resp = make_api_response(data=response_data, http_code=HTTPStatus.CREATED)
             location_header = f"{self._config['API_BASE_URI']}/{api_url}/{ud_uuid}"
 
-            logger.debug(f"Set Location Header: {location_header}")
+            self.logger.debug(f"Set Location Header: {location_header}")
             resp.headers['Location'] = location_header
 
-            logger.debug(f"Set X-Device-Token: {x_device_token}")
+            self.logger.debug(f"Set X-Device-Token: {x_device_token}")
             resp.headers['X-Device-Token'] = x_device_token
 
-            logger.debug("Return response")
+            self.logger.debug("Return response")
             return resp
         except APIException as e:
-            logging.debug(e.serialize())
+            self.logger.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
@@ -193,7 +194,7 @@ class UsersDevicesAPI(ResourceAPI):
             resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
             return resp
         except APIException as e:
-            logging.debug(e.serialize())
+            self.logger.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
@@ -217,13 +218,13 @@ class UsersDevicesAPI(ResourceAPI):
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
                 return resp
             except APINotFoundException as e:
-                logging.debug(e.serialize())
+                self.logger.debug(e.serialize())
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.NOT_FOUND,
                                             errors=e.errors)
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.NOT_FOUND)
                 return resp
             except APIException as e:
-                logging.debug(e.serialize())
+                self.logger.debug(e.serialize())
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST,
                                             errors=e.errors)
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.BAD_REQUEST)
@@ -237,7 +238,7 @@ class UsersDevicesAPI(ResourceAPI):
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
                 return resp
             except APIException as e:
-                logging.debug(e.serialize())
+                self.logger.debug(e.serialize())
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
                 resp = make_api_response(data=response_data, http_code=e.http_code)
                 return resp
@@ -254,7 +255,7 @@ class UsersDevicesAPI(ResourceAPI):
             resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
             return resp
         except APIException as e:
-            logging.debug(e.serialize())
+            self.logger.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp

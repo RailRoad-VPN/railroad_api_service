@@ -16,11 +16,11 @@ from api import ResourceAPI
 from response import APIResponseStatus, APIResponse, make_error_request_response, check_required_api_fields
 from response import make_api_response
 
-logger = logging.getLogger(__name__)
-
 
 class VPNSServersConnectionsAPI(ResourceAPI):
     __version__ = 1
+
+    logger = logging.getLogger(__name__)
 
     __endpoint_name__ = __qualname__
     __api_url__ = 'vpns/servers/<string:server_uuid>/connections'
@@ -69,7 +69,7 @@ class VPNSServersConnectionsAPI(ResourceAPI):
             'users': user_list,
         }
 
-        logger.debug(f"Check required fields: {req_fields}")
+        self.logger.debug(f"Check required fields: {req_fields}")
 
         error_fields = check_required_api_fields(req_fields)
         if len(error_fields) > 0:
@@ -79,7 +79,7 @@ class VPNSServersConnectionsAPI(ResourceAPI):
             return resp
 
         if len(user_list) == 0:
-            logger.debug(f"No connections for server.")
+            self.logger.debug(f"No connections for server.")
 
             self._vpnserverconn_api_service.disconnect_by_server(server_uuid=server_uuid)
 
@@ -120,8 +120,8 @@ class VPNSServersConnectionsAPI(ResourceAPI):
             try:
                 if user_device is None:
                     user_device_uuid = None
-                    logger.debug(f"We did not found user device for received connection information. "
-                                 f"This means it is OpenVPN configuration or something else.")
+                    self.logger.debug(f"We did not found user device for received connection information. "
+                                      f"This means it is OpenVPN configuration or something else.")
                     api_response = self._vpnserverconn_api_service.get_current_by_server_and_user_and_vip(
                         server_uuid=server_uuid,
                         virtual_ip=virtual_ip)
@@ -131,8 +131,8 @@ class VPNSServersConnectionsAPI(ResourceAPI):
                     try:
                         self._user_policy.update_user_device(user_device=user_device)
                     except APIException as e:
-                        logger.error(e)
-                        logger.error(f"Error while update user device: {user_device}")
+                        self.logger.error(e)
+                        self.logger.error(f"Error while update user device: {user_device}")
                     api_response = self._vpnserverconn_api_service.get_current_by_server_and_user_device(
                         server_uuid=server_uuid,
                         user_device_uuid=user_device_uuid)
@@ -141,8 +141,8 @@ class VPNSServersConnectionsAPI(ResourceAPI):
                 if NEW_CONNECTION:
                     raise APINotFoundException
                 else:
-                    logger.debug("Update existed connection")
-                logger.debug(f"Got VPN server connection: {server_connection}")
+                    self.logger.debug("Update existed connection")
+                self.logger.debug(f"Got VPN server connection: {server_connection}")
 
                 server_connection['user_device_uuid'] = user_device_uuid
                 server_connection['device_ip'] = device_ip
@@ -155,14 +155,14 @@ class VPNSServersConnectionsAPI(ResourceAPI):
                 try:
                     self._vpnserverconn_api_service.update(server_connection_dict=server_connection)
                 except APIException as e:
-                    logger.error("Error while updating vpn server connection")
-                    logger.error(e)
+                    self.logger.error("Error while updating vpn server connection")
+                    self.logger.error(e)
                     response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code,
                                                 errors=e.errors)
                     resp = make_api_response(data=response_data, http_code=e.http_code)
                     return resp
             except APINotFoundException:
-                logger.info("No existed vpn server connection or user device was disconnected")
+                self.logger.info("No existed vpn server connection or user device was disconnected")
                 try:
                     self._vpnserverconn_api_service.create(server_uuid=server_uuid,
                                                            user_uuid=user_uuid,
@@ -172,15 +172,15 @@ class VPNSServersConnectionsAPI(ResourceAPI):
                                                            is_connected=True,
                                                            connected_since=connected_since.isoformat())
                 except APIException as e:
-                    logger.error(e)
-                    logger.error(f"Error while create server connection")
+                    self.logger.error(e)
+                    self.logger.error(f"Error while create server connection")
                     response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code,
                                                 errors=e.errors)
                     resp = make_api_response(data=response_data, http_code=e.http_code)
                     return resp
             except APIException as e:
-                logger.debug(e.serialize())
-                logger.error("Error when getting vpn server connection")
+                self.logger.debug(e.serialize())
+                self.logger.error("Error when getting vpn server connection")
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code,
                                             errors=e.errors)
                 resp = make_api_response(data=response_data, http_code=e.http_code)
@@ -202,13 +202,16 @@ class VPNSServersConnectionsAPI(ResourceAPI):
 
         is_valid = check_uuid(user_device_uuid)
         if not is_valid:
-            return make_error_request_response(http_code=HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
+            return make_error_request_response(http_code=HTTPStatus.BAD_REQUEST,
+                                               err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
         try:
             if is_connected:
-                api_response = self._vpnserverconn_api_service.get_current_by_user_device(user_device_uuid=user_device_uuid)
+                api_response = self._vpnserverconn_api_service.get_current_by_user_device(
+                    user_device_uuid=user_device_uuid)
             else:
-                api_response = self._vpnserverconn_api_service.get_all_by_user_device_uuid(user_device_uuid=user_device_uuid)
+                api_response = self._vpnserverconn_api_service.get_all_by_user_device_uuid(
+                    user_device_uuid=user_device_uuid)
             response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK,
                                         data=api_response.data)
             resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)

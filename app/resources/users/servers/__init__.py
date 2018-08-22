@@ -15,11 +15,11 @@ from response import APIResponseStatus, APIResponse
 from utils import check_uuid
 from response import make_api_response, make_error_request_response
 
-logger = logging.getLogger(__name__)
-
 
 class UsersServersAPI(ResourceAPI):
     __version__ = 1
+
+    logger = logging.getLogger(__name__)
 
     __endpoint_name__ = __qualname__
     __api_url__ = 'users/<string:user_uuid>/servers'
@@ -70,7 +70,7 @@ class UsersServersAPI(ResourceAPI):
                 resp.headers['Location'] = f"{self._config['API_BASE_URI']}/{api_url}/{server_uuid}"
                 return resp
             except APIException as e:
-                logging.debug(e.serialize())
+                self.logger.debug(e.serialize())
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
                 resp = make_api_response(data=response_data, http_code=e.http_code)
                 return resp
@@ -80,7 +80,7 @@ class UsersServersAPI(ResourceAPI):
             try:
                 server_list = self._vpn_policy.get_vpn_server_list(pagination=self.pagination)
             except APIException as e:
-                logging.debug(e.serialize())
+                self.logger.debug(e.serialize())
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
                 resp = make_api_response(data=response_data, http_code=e.http_code)
                 return resp
@@ -101,7 +101,7 @@ class UsersServersAPI(ResourceAPI):
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
                 return resp
             except APIException as e:
-                logging.debug(e.serialize())
+                self.logger.debug(e.serialize())
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
                 resp = make_api_response(data=response_data, http_code=e.http_code)
                 return resp
@@ -110,7 +110,7 @@ class UsersServersAPI(ResourceAPI):
             try:
                 server_list = self._vpn_policy.get_vpn_server_list_by_type(type_id=type_id, pagination=self.pagination)
             except APIException as e:
-                logging.debug(e.serialize())
+                self.logger.debug(e.serialize())
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
                 resp = make_api_response(data=response_data, http_code=e.http_code)
                 return resp
@@ -126,7 +126,7 @@ class UsersServersAPI(ResourceAPI):
                 server_list = self._vpn_policy.get_vpn_server_list_by_status(status_id=status_id,
                                                                              pagination=self.pagination)
             except APIException as e:
-                logging.debug(e.serialize())
+                self.logger.debug(e.serialize())
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
                 resp = make_api_response(data=response_data, http_code=e.http_code)
                 return resp

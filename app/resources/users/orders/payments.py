@@ -14,11 +14,11 @@ from response import make_api_response, make_error_request_response, APIResponse
 from api import ResourceAPI
 from rest import APIResourceURL, APIException, APINotFoundException
 
-logger = logging.getLogger(__name__)
-
 
 class UsersOrdersPaymentsAPI(ResourceAPI):
     __version__ = 1
+
+    logger = logging.getLogger(__name__)
 
     __endpoint_name__ = __qualname__
     __api_url__ = 'orders/<string:order_uuid>/payments'
@@ -52,7 +52,7 @@ class UsersOrdersPaymentsAPI(ResourceAPI):
         super(UsersOrdersPaymentsAPI, self).get(req=request)
 
         if suuid is not None:
-            logger.debug(f"check order_payment uuid")
+            self.logger.debug(f"check order_payment uuid")
             is_valid = check_uuid(suuid)
             if not is_valid:
                 return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.ORDERPAYMENT_IDENTIFIER)
@@ -62,7 +62,7 @@ class UsersOrdersPaymentsAPI(ResourceAPI):
                 # order payment does not exist
                 return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.ORDERPAYMENT_NOT_EXIST)
             except APIException as e:
-                logging.debug(e.serialize())
+                self.logger.debug(e.serialize())
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
                 resp = make_api_response(data=response_data, http_code=e.http_code)
                 return resp
@@ -70,7 +70,7 @@ class UsersOrdersPaymentsAPI(ResourceAPI):
             try:
                 api_response = self._order_service.get_order_payments(order_uuid=order_uuid)
             except APIException as e:
-                logging.debug(e.serialize())
+                self.logger.debug(e.serialize())
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
                 resp = make_api_response(data=response_data, http_code=e.http_code)
                 return resp

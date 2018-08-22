@@ -15,11 +15,11 @@ from api import ResourceAPI
 from response import APIResponseStatus, APIResponse, make_error_request_response
 from response import make_api_response
 
-logger = logging.getLogger(__name__)
-
 
 class UsersServersConfigurationsAPI(ResourceAPI):
     __version__ = 1
+
+    logger = logging.getLogger(__name__)
 
     __endpoint_name__ = __qualname__
     __api_url__ = 'users/<string:user_uuid>/servers/<string:server_uuid>/configurations'
@@ -60,7 +60,7 @@ class UsersServersConfigurationsAPI(ResourceAPI):
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
                 return resp
             except APIException as e:
-                logger.debug(e.serialize())
+                self.logger.debug(e.serialize())
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code,
                                             errors=e.errors)
                 resp = make_api_response(data=response_data, http_code=e.http_code)
@@ -81,7 +81,7 @@ class UsersServersConfigurationsAPI(ResourceAPI):
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
                 return resp
             except APIException as e:
-                logger.debug(e.serialize())
+                self.logger.debug(e.serialize())
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code,
                                             errors=e.errors)
                 resp = make_api_response(data=response_data, http_code=e.http_code)

@@ -15,11 +15,11 @@ from api import ResourceAPI
 from response import APIResponseStatus, APIResponse
 from rest import APIException, APIResourceURL, APINotFoundException
 
-logger = logging.getLogger(__name__)
-
 
 class UsersOrdersAPI(ResourceAPI):
     __version__ = 1
+
+    logger = logging.getLogger(__name__)
 
     __endpoint_name__ = __qualname__
     __api_url__ = 'orders'
@@ -62,7 +62,7 @@ class UsersOrdersAPI(ResourceAPI):
         try:
             api_response = self._order_api_service.create_order(status_id=status_id, payment_uuid=payment_uuid)
         except APIException as e:
-            logger.error(e.serialize())
+            self.logger.error(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
@@ -118,7 +118,7 @@ class UsersOrdersAPI(ResourceAPI):
         try:
             self._order_api_service.update_order(order_json=req_fields)
         except APIException as e:
-            logger.debug(e.serialize())
+            self.logger.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
@@ -152,7 +152,7 @@ class UsersOrdersAPI(ResourceAPI):
         try:
             api_response = self._order_api_service.get_order(suuid=suuid, code=code)
         except APIException as e:
-            logger.debug(e.serialize())
+            self.logger.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp

@@ -1,8 +1,8 @@
+import logging
 import sys
 from http import HTTPStatus
 from typing import List
 
-import logging
 from flask import request, Response
 
 from app.exception import RailRoadAPIError
@@ -17,6 +17,8 @@ from rest import APIResourceURL, APIException
 
 class SubscriptionsAPI(ResourceAPI):
     __version__ = 1
+
+    logger = logging.getLogger(__name__)
 
     __endpoint_name__ = __qualname__
     __api_url__ = 'subscriptions'
@@ -56,7 +58,7 @@ class SubscriptionsAPI(ResourceAPI):
         try:
             api_response = self._subscription_api_service.get_subscriptions(lang_code=lang_code)
         except APIException as e:
-            logging.debug(e.serialize())
+            self.logger.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp

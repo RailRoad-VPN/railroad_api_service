@@ -79,7 +79,7 @@ class UsersSubscriptionsAPI(ResourceAPI):
             resp.headers['Location'] = f"{self._config['API_BASE_URI']}/{api_url}/{api_response.data['uuid']}"
             return resp
         except APIException as e:
-            logging.debug(e.serialize())
+            self.logger.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
@@ -134,7 +134,7 @@ class UsersSubscriptionsAPI(ResourceAPI):
             resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
             return resp
         except APIException as e:
-            logging.debug(e.serialize())
+            self.logger.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
@@ -168,7 +168,7 @@ class UsersSubscriptionsAPI(ResourceAPI):
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
                 return resp
             except APIException as e:
-                logging.debug(e.serialize())
+                self.logger.debug(e.serialize())
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
                 resp = make_api_response(data=response_data, http_code=e.http_code)
                 return resp

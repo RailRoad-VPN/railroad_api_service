@@ -1,8 +1,8 @@
+import logging
 import sys
 from http import HTTPStatus
 from typing import List
 
-import logging
 from flask import Response
 
 from app.exception import RailRoadAPIError
@@ -14,11 +14,11 @@ from api import ResourceAPI
 from response import APIResponseStatus, APIResponse, make_error_request_response
 from response import make_api_response
 
-logger = logging.getLogger(__name__)
-
 
 class VPNSDevicePlatformsAPI(ResourceAPI):
     __version__ = 1
+
+    logger = logging.getLogger(__name__)
 
     __endpoint_name__ = __qualname__
     __api_url__ = 'vpns/device_platforms'
@@ -64,12 +64,12 @@ class VPNSDevicePlatformsAPI(ResourceAPI):
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
                 return resp
             except APINotFoundException as e:
-                logger.error(e)
+                self.logger.error(e)
                 http_code = HTTPStatus.NOT_FOUND
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=http_code, errors=e.errors)
                 return make_api_response(data=response_data, http_code=http_code)
             except APIException as e:
-                logger.error(e)
+                self.logger.error(e)
                 http_code = HTTPStatus.BAD_REQUEST
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=http_code, errors=e.errors)
                 return make_api_response(data=response_data, http_code=http_code)
@@ -81,12 +81,12 @@ class VPNSDevicePlatformsAPI(ResourceAPI):
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
                 return resp
             except APINotFoundException as e:
-                logger.error(e)
+                self.logger.error(e)
                 http_code = HTTPStatus.NOT_FOUND
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=http_code, errors=e.errors)
                 return make_api_response(data=response_data, http_code=http_code)
             except APIException as e:
-                logger.error(e)
+                self.logger.error(e)
                 http_code = HTTPStatus.BAD_REQUEST
                 response_data = APIResponse(status=APIResponseStatus.failed.status, code=http_code, errors=e.errors)
                 return make_api_response(data=response_data, http_code=http_code)

@@ -16,11 +16,11 @@ from api import ResourceAPI
 from response import APIResponseStatus, APIResponse
 from rest import APIException, APIResourceURL, APINotFoundException
 
-logger = logging.getLogger(__name__)
-
 
 class UsersAPI(ResourceAPI):
     __version__ = 1
+
+    logger = logging.getLogger(__name__)
 
     __endpoint_name__ = __qualname__
     __api_url__ = 'users'
@@ -94,7 +94,7 @@ class UsersAPI(ResourceAPI):
                                                           api_response.data['uuid'])
             return resp
         except APIException as e:
-            logging.debug(e.serialize())
+            self.logger.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
@@ -147,7 +147,7 @@ class UsersAPI(ResourceAPI):
         try:
             self._user_policy.get_user(suuid=suuid)
         except APIException as e:
-            logging.debug(e.serialize())
+            self.logger.debug(e.serialize())
             resp = make_error_request_response(http_code=e.http_code, err=e.errors)
             return resp
 
@@ -157,7 +157,7 @@ class UsersAPI(ResourceAPI):
         try:
             self._user_policy.update_user(user_dict=user_dict)
         except APIException as e:
-            logging.debug(e.serialize())
+            self.logger.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
@@ -181,7 +181,7 @@ class UsersAPI(ResourceAPI):
         try:
             api_response = self._user_policy.get_user(suuid=suuid, email=email, pin_code=pin_code)
         except APIException as e:
-            logging.debug(e.serialize())
+            self.logger.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
