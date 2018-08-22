@@ -10,9 +10,9 @@ class VPNTypeEnum(Enum):
         obj._value_ = value
         return obj
 
-    def __init__(self, sid, name, description):
+    def __init__(self, sid, type_name, description):
         self.sid = sid
-        self.name = name
+        self.type_name = type_name
         self.description = description
 
     UNKNOWN = (0, 'unknown', 'Unknown, for reports only')
