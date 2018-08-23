@@ -25,6 +25,7 @@ class Config(object):
     VPNC_SERVICE_VPNSERVERCONFIGURATIONS_RESOURCE_NAME = 'vpns/servers/<string:server_uuid>/configurations'
     VPNC_SERVICE_VPNSERVERCONNECTIONS_RESOURCE_NAME = 'vpns/servers/<string:server_uuid>/connections'
 
+    VPNMGMT_BASIC_AUTH = ('dfnadm', 'jdn@94nfju%HFn1m3')
     VPNMGMT_USERS_RESOURCE_NAME = 'vpns/mgmt/users/<string:user_email>'
     VPNMGMT_SERVER_CONNECTIONS_RESOURCE_NAME = 'vpns/mgmt/servers/connections'
 
@@ -66,7 +67,7 @@ class TestingConfig(Config):
 
     AUTH_SERVICE_URL = 'http://127.0.0.1:6000/api/v1'
     VPNC_SERVICE_URL = 'http://127.0.0.1:9000/api/v1'
-    VPNMGMT_SERVICE_URL = 'http://127.0.0.1:10000/api/v1'
+    VPNMGMT_SERVICE_URL = 'http://77.37.138.16:45270/api/v1'
     BILLING_SERVICE_URL = 'http://127.0.0.1:7000/api/v1'
 
     APN_PATH = '/opt/apps/dfn/apn/%s.apn'
