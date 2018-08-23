@@ -349,11 +349,11 @@ class VPNServerConfigurationsAPIService(RESTService):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def get_by_server_and_user(self, server_uuid: str, user_uuid: str = None) -> APIResponse:
-        self.logger.debug(
-            f"get_by_user method with parameters: server_uuid: {server_uuid}, user_uuid: {user_uuid}")
+    def find(self, server_uuid: str, user_uuid: str, platform_id: int, vpn_type_id: int) -> APIResponse:
+        self.logger.debug(f"find method with parameters: server_uuid: {server_uuid}, user_uuid: {user_uuid}, "
+                          f"platform_id: {platform_id}, vpn_type_id: {vpn_type_id}")
         url = self._url.replace("<string:server_uuid>", server_uuid)
-        url = f"{url}?user_uuid={user_uuid}"
+        url = f"{url}?user_uuid={user_uuid}&platform_id={platform_id}&vpn_type_id={vpn_type_id}"
         api_response = self._get(url=url)
         return api_response
 

@@ -65,7 +65,7 @@ vpnserverstatus_api_service = VPNServerStatusAPIService(api_url=app_config['VPNC
                                                         resource_name=app_config[
                                                             'VPNC_SERVICE_VPNSERVERSTATUS_RESOURCE_NAME'])
 
-vpn_mgmt_users_api_service = VPNMGMTUsersAPIService(api_url=app_config['VPNC_SERVICE_URL'],
+vpn_mgmt_users_api_service = VPNMGMTUsersAPIService(api_url=app_config['VPNMGMT_SERVICE_URL'],
                                                     resource_name=app_config['VPNMGMT_USERS_RESOURCE_NAME'])
 
 vpn_mgmt_server_conns_api_service = VPNMGMTServerConnectionsAPIService(api_url=app_config['VPNC_SERVICE_URL'],
