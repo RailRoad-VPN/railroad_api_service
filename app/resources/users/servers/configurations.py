@@ -64,7 +64,7 @@ class UsersServersConfigurationsAPI(ResourceAPI):
                 api_response = self._confs_api_service.find(server_uuid=server_uuid, user_uuid=user_uuid,
                                                             platform_id=platform_id, vpn_type_id=vpn_type_id)
 
-                config_b64_str = api_response.data
+                config_b64_str = api_response.data.configuration
 
                 api_response = self._vpnservers_api_service.get_vpnserver_by_uuid(suuid=server_uuid)
                 server = api_response.data
