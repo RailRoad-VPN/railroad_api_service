@@ -226,7 +226,7 @@ class PaymentsAPI(ResourceAPI):
 
         self.logger.debug(f"call vpn mgmt users api service")
         api_response = self._vpn_mgmt_users_api_service.create_vpn_user(email=user.get('email'))
-        self.logger.debug(f"got user configurations response: {api_response}")
+        self.logger.debug(f"got user configurations response: {api_response.serialize()}")
         user_configurations = api_response.data
 
         self.logger.debug(f"get openvpn user configs")
@@ -241,31 +241,37 @@ class PaymentsAPI(ResourceAPI):
         ikev2_win_config = None
 
         if openvpn is not None:
+            self.logger.debug(f"we have openvpn configs. check platforms")
             openvpn_win_config = openvpn.get(VPNConfigurationPlatform.WINDOWS.sid)
             openvpn_android_config = openvpn.get(VPNConfigurationPlatform.ANDROID.sid)
 
         if ikev2 is not None:
+            self.logger.debug(f"we have ikev2 configs. check platforms")
             ikev2_win_config = ikev2.get(VPNConfigurationPlatform.WINDOWS.sid)
             ikev2_ios_config = ikev2.get(VPNConfigurationPlatform.IOS.sid)
 
         if openvpn_win_config is not None:
+            self.logger.debug(f"we have openvpn for windows configuration. save it")
             self._vpn_server_confs_service.create(user_uuid=user_uuid,
                                                   configuration=openvpn_win_config,
                                                   vpn_device_platform_id=VPNConfigurationPlatform.WINDOWS.sid,
                                                   vpn_type_id=VPNType.OPENVPN.sid)
         if openvpn_android_config is not None:
+            self.logger.debug(f"we have openvpn for android configuration. save it")
             self._vpn_server_confs_service.create(user_uuid=user_uuid,
                                                   configuration=openvpn_win_config,
                                                   vpn_device_platform_id=VPNConfigurationPlatform.ANDROID.sid,
                                                   vpn_type_id=VPNType.OPENVPN.sid)
 
         if ikev2_ios_config is not None:
+            self.logger.debug(f"we have ikev2 for ios configuration. save it")
             self._vpn_server_confs_service.create(user_uuid=user_uuid,
                                                   configuration=ikev2_ios_config,
                                                   vpn_device_platform_id=VPNConfigurationPlatform.IOS.sid,
                                                   vpn_type_id=VPNType.IKEV2.sid)
 
         if ikev2_win_config is not None:
+            self.logger.debug(f"we have ikev2 for windows configuration. save it")
             self._vpn_server_confs_service.create(user_uuid=user_uuid,
                                                   configuration=ikev2_win_config,
                                                   vpn_device_platform_id=VPNConfigurationPlatform.WINDOWS.sid,
