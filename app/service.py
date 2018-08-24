@@ -418,7 +418,7 @@ class VPNMGMTServerConnectionsAPIService(RESTService):
         self.logger.debug(f"update_server_connections with parameters ip_address: {ip_address}, vpn_type: {vpn_type}")
         data = {
             'ip_list': [ip_address, ],
-            'vpn_type_name': vpn_type.type_name
+            'vpn_type_name': vpn_type.text
         }
         api_response = self._post(data=data)
         return api_response

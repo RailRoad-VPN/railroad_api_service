@@ -12,7 +12,7 @@ class VPNType(Enum):
 
     def __init__(self, sid, tname, description):
         self.sid = sid
-        self.tname = tname
+        self.text = text
         self.description = description
 
     UNKNOWN = (0, 'unknown', 'Unknown, for reports only')

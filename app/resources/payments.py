@@ -230,10 +230,10 @@ class PaymentsAPI(ResourceAPI):
         user_configurations = api_response.data
 
         self.logger.debug(f"get openvpn user configs")
-        openvpn = user_configurations.get(VPNType.OPENVPN.sid, None)
+        openvpn = user_configurations.get(VPNType.OPENVPN.tname, None)
 
         self.logger.debug(f"get ikev2 user configs")
-        ikev2 = user_configurations.get(VPNType.IKEV2.sid, None)
+        ikev2 = user_configurations.get(VPNType.IKEV2.tname, None)
 
         openvpn_win_config = None
         openvpn_android_config = None
@@ -242,40 +242,44 @@ class PaymentsAPI(ResourceAPI):
 
         if openvpn is not None:
             self.logger.debug(f"we have openvpn configs. check platforms")
-            openvpn_win_config = openvpn.get(VPNConfigurationPlatform.WINDOWS.sid)
-            openvpn_android_config = openvpn.get(VPNConfigurationPlatform.ANDROID.sid)
+            openvpn_win_config = openvpn.get(VPNConfigurationPlatform.WINDOWS.text)
+            openvpn_android_config = openvpn.get(VPNConfigurationPlatform.ANDROID.text)
+        else:
+            self.logger.debug(f"we have NO openvpn configs")
 
         if ikev2 is not None:
             self.logger.debug(f"we have ikev2 configs. check platforms")
-            ikev2_win_config = ikev2.get(VPNConfigurationPlatform.WINDOWS.sid)
-            ikev2_ios_config = ikev2.get(VPNConfigurationPlatform.IOS.sid)
+            ikev2_win_config = ikev2.get(VPNConfigurationPlatform.WINDOWS.text)
+            ikev2_ios_config = ikev2.get(VPNConfigurationPlatform.IOS.text)
+        else:
+            self.logger.debug(f"we have NO ikev2 configs")
 
         if openvpn_win_config is not None:
             self.logger.debug(f"we have openvpn for windows configuration. save it")
             self._vpn_server_confs_service.create(user_uuid=user_uuid,
                                                   configuration=openvpn_win_config,
-                                                  vpn_device_platform_id=VPNConfigurationPlatform.WINDOWS.sid,
-                                                  vpn_type_id=VPNType.OPENVPN.sid)
+                                                  vpn_device_platform_id=VPNConfigurationPlatform.WINDOWS.text,
+                                                  vpn_type_id=VPNType.OPENVPN.text)
         if openvpn_android_config is not None:
             self.logger.debug(f"we have openvpn for android configuration. save it")
             self._vpn_server_confs_service.create(user_uuid=user_uuid,
                                                   configuration=openvpn_win_config,
-                                                  vpn_device_platform_id=VPNConfigurationPlatform.ANDROID.sid,
-                                                  vpn_type_id=VPNType.OPENVPN.sid)
+                                                  vpn_device_platform_id=VPNConfigurationPlatform.ANDROID.text,
+                                                  vpn_type_id=VPNType.OPENVPN.text)
 
         if ikev2_ios_config is not None:
             self.logger.debug(f"we have ikev2 for ios configuration. save it")
             self._vpn_server_confs_service.create(user_uuid=user_uuid,
                                                   configuration=ikev2_ios_config,
-                                                  vpn_device_platform_id=VPNConfigurationPlatform.IOS.sid,
-                                                  vpn_type_id=VPNType.IKEV2.sid)
+                                                  vpn_device_platform_id=VPNConfigurationPlatform.IOS.text,
+                                                  vpn_type_id=VPNType.IKEV2.text)
 
         if ikev2_win_config is not None:
             self.logger.debug(f"we have ikev2 for windows configuration. save it")
             self._vpn_server_confs_service.create(user_uuid=user_uuid,
                                                   configuration=ikev2_win_config,
-                                                  vpn_device_platform_id=VPNConfigurationPlatform.WINDOWS.sid,
-                                                  vpn_type_id=VPNType.IKEV2.sid)
+                                                  vpn_device_platform_id=VPNConfigurationPlatform.WINDOWS.text,
+                                                  vpn_type_id=VPNType.IKEV2.text)
 
         response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK)
         resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
