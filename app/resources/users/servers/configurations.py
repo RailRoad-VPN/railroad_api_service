@@ -7,7 +7,7 @@ from typing import List
 from flask import Response, request
 
 from app.exception import RailRoadAPIError
-from app.service import VPNServerConfigurationsAPIService, VPNServersAPIService
+from app.service import UsersVPNServersConfigurationsAPIService, VPNServersAPIService
 from rest import APIException, APIResourceURL
 from utils import check_uuid
 
@@ -39,7 +39,7 @@ class UsersServersConfigurationsAPI(ResourceAPI):
         ]
         return api_urls
 
-    def __init__(self, vpnserversconfigurations_service: VPNServerConfigurationsAPIService,
+    def __init__(self, vpnserversconfigurations_service: UsersVPNServersConfigurationsAPIService,
                  vpnservers_api_service: VPNServersAPIService, config: dict) -> None:
         super().__init__()
         self._confs_api_service = vpnserversconfigurations_service

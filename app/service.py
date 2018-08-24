@@ -186,6 +186,44 @@ class UserSubscriptionAPIService(RESTService):
         return api_response
 
 
+class UsersVPNServersConfigurationsAPIService(RESTService):
+    __version__ = 1
+
+    logger = logging.getLogger(__name__)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def find(self, server_uuid: str, user_uuid: str, platform_id: int, vpn_type_id: int) -> APIResponse:
+        self.logger.debug(f"find method with parameters: server_uuid: {server_uuid}, user_uuid: {user_uuid}, "
+                          f"platform_id: {platform_id}, vpn_type_id: {vpn_type_id}")
+        url = self._url.replace('<string:user_uuid>', user_uuid)
+        url = f"{url}?platform_id={platform_id}&vpn_type_id={vpn_type_id}"
+        api_response = self._get(url=url)
+        return api_response
+
+    def get_by_suuid(self, user_uuid: str, suuid: str) -> APIResponse:
+        self.logger.debug(f"get_by_suuid method with parameters: user_uuid: {user_uuid}, suuid: {suuid}")
+        url = self._url.replace('<string:user_uuid>', user_uuid)
+        url = f"{url}/{suuid}"
+        api_response = self._get(url=url)
+        return api_response
+
+    def create(self, user_uuid: str, configuration: str, vpn_device_platform_id: int, vpn_type_id: int) -> APIResponse:
+        self.logger.debug(f"create method with parameters: user_uuid: {user_uuid},"
+                          f"configuration: {configuration}, vpn_device_platform_id: {vpn_device_platform_id}, "
+                          f"vpn_type_id: {vpn_type_id}")
+        data = {
+            'user_uuid': user_uuid,
+            'configuration': configuration,
+            'vpn_device_platform_id': vpn_device_platform_id,
+            'vpn_type_id': vpn_type_id,
+        }
+        url = self._url.replace('<string:user_uuid>', user_uuid)
+        api_response = self._post(data=data, url=url)
+        return api_response
+
+
 class SubscriptionAPIService(RESTService):
     __version__ = 1
 
@@ -338,45 +376,6 @@ class VPNTypeAPIService(RESTService):
         self.logger.debug(f"get_vpntype_by_id method with parameters sid: {sid}")
         url = f"{self._url}/{sid}"
         api_response = self._get(url=url)
-        return api_response
-
-
-class VPNServerConfigurationsAPIService(RESTService):
-    __version__ = 1
-
-    logger = logging.getLogger(__name__)
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    def find(self, server_uuid: str, user_uuid: str, platform_id: int, vpn_type_id: int) -> APIResponse:
-        self.logger.debug(f"find method with parameters: server_uuid: {server_uuid}, user_uuid: {user_uuid}, "
-                          f"platform_id: {platform_id}, vpn_type_id: {vpn_type_id}")
-        url = self._url.replace("<string:server_uuid>", server_uuid)
-        url = f"{url}?user_uuid={user_uuid}&platform_id={platform_id}&vpn_type_id={vpn_type_id}"
-        api_response = self._get(url=url)
-        return api_response
-
-    def get_by_suuid(self, server_uuid: str, suuid: str) -> APIResponse:
-        self.logger.debug(f"get_by_suuid method with parameters: server_uuid: {server_uuid}, suuid: {suuid}")
-        url = self._url.replace("<string:server_uuid>", server_uuid)
-        url = f"{url}/{suuid}"
-        api_response = self._get(url=url)
-        return api_response
-
-    def create(self, user_uuid: str, configuration: str, vpn_device_platform_id: int,
-               vpn_type_id: int) -> APIResponse:
-        self.logger.debug(f"create method with parameters: user_uuid: {user_uuid},"
-                          f"configuration: {configuration}, vpn_device_platform_id: {vpn_device_platform_id}, "
-                          f"vpn_type_id: {vpn_type_id}")
-        data = {
-            'user_uuid': user_uuid,
-            'configuration': configuration,
-            'vpn_device_platform_id': vpn_device_platform_id,
-            'vpn_type_id': vpn_type_id,
-        }
-        url = self._url.replace("<string:server_uuid>", server_uuid)
-        api_response = self._post(data=data, url=url)
         return api_response
 
 

@@ -17,7 +17,7 @@ from app.model.user_subscription_status import UserSubscriptionStatus
 from app.model.vpn_conf_platform import VPNConfigurationPlatform
 from app.model.vpn_type import VPNType
 from app.service import OrderAPIService, UserSubscriptionAPIService, VPNMGMTUsersAPIService, \
-    VPNServerConfigurationsAPIService
+    UsersVPNServersConfigurationsAPIService
 
 sys.path.insert(0, '../rest_api_library')
 from response import make_api_response, make_error_request_response
@@ -51,7 +51,7 @@ class PaymentsAPI(ResourceAPI):
 
     def __init__(self, order_api_service: OrderAPIService, user_sub_api_service: UserSubscriptionAPIService,
                  vpn_mgmt_users_api_service: VPNMGMTUsersAPIService, user_policy: UserPolicy,
-                 vpn_server_confs_service: VPNServerConfigurationsAPIService, config: dict):
+                 vpn_server_confs_service: UsersVPNServersConfigurationsAPIService, config: dict):
         super().__init__()
         self._config = config
         self._order_api_service = order_api_service

@@ -154,7 +154,7 @@ class VPNServerPolicy(object):
     geostate_api_service = None
 
     def __init__(self, vpnserver_service: VPNServersAPIService, vpntype_service: VPNTypeAPIService,
-                 vpnserverconfiguration_service: VPNServerConfigurationsAPIService,
+                 vpnserverconfiguration_service: UsersVPNServersConfigurationsAPIService,
                  vpnserverstatus_service: VPNServerStatusAPIService, geoposition_service: GeoPositionAPIService,
                  geocity_service: GeoCityAPIService, geocountry_service: GeoCountryAPIService,
                  geostate_service: GeoStateAPIService):

@@ -55,9 +55,6 @@ vpnserversmeta_api_service = VPNServersMetaAPIService(api_url=app_config['VPNC_S
 vpntype_api_service = VPNTypeAPIService(api_url=app_config['VPNC_SERVICE_URL'],
                                         resource_name=app_config['VPNC_SERVICE_VPNTYPE_RESOURCE_NAME'])
 
-vpnserverconf_api_service = VPNServerConfigurationsAPIService(api_url=app_config['VPNC_SERVICE_URL'],
-                                                              resource_name=app_config[
-                                                                  'VPNC_SERVICE_VPNSERVERCONFIGURATIONS_RESOURCE_NAME'])
 vpnserverconn_api_service = VPNServerConnectionsAPIService(api_url=app_config['VPNC_SERVICE_URL'],
                                                            resource_name=app_config[
                                                                'VPNC_SERVICE_VPNSERVERCONNECTIONS_RESOURCE_NAME'])
@@ -99,6 +96,10 @@ user_sub_api_service = UserSubscriptionAPIService(api_url=app_config['BILLING_SE
 
 user_device_api_service = UserDeviceAPIService(api_url=app_config['AUTH_SERVICE_URL'],
                                                resource_name=app_config['AUTH_SERVICE_USER_DEVICES_RESOURCE_NAME'])
+
+vpnserverconf_api_service = UsersVPNServersConfigurationsAPIService(api_url=app_config['AUTH_SERVICE_URL'],
+                                                                    resource_name=app_config[
+                                                                        'AUTH_SERVICE_USER_VPN_SERVER_CONFIGURATIONS_RESOURCE_NAME'])
 
 subscription_api_service = SubscriptionAPIService(api_url=app_config['BILLING_SERVICE_URL'],
                                                   resource_name=app_config[

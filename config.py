@@ -12,6 +12,7 @@ class Config(object):
 
     AUTH_SERVICE_USERS_RESOURCE_NAME = 'users'
     AUTH_SERVICE_USER_DEVICES_RESOURCE_NAME = 'users/<string:user_uuid>/devices'
+    AUTH_SERVICE_USER_VPN_SERVER_CONFIGURATIONS_RESOURCE_NAME = 'users/<string:user_uuid>/vpnservers_configurations'
 
     BILLING_SERVICE_SUBSCRIPTIONS_RESOURCE_NAME = 'subscriptions'
     BILLING_SERVICE_USER_SUBSCRIPTION_RESOURCE_NAME = 'users/<string:user_uuid>/subscriptions'
@@ -22,7 +23,6 @@ class Config(object):
     VPNC_SERVICE_VPNSERVER_RESOURCE_NAME = 'vpns/servers'
     VPNC_SERVICE_VPNSERVERSTATUS_RESOURCE_NAME = 'vpns/servers/statuses'
     VPNC_SERVICE_VPNSERVERSMETA_RESOURCE_NAME = 'vpns/servers/meta'
-    VPNC_SERVICE_VPNSERVERCONFIGURATIONS_RESOURCE_NAME = 'vpns/servers/<string:server_uuid>/configurations'
     VPNC_SERVICE_VPNSERVERCONNECTIONS_RESOURCE_NAME = 'vpns/servers/<string:server_uuid>/connections'
 
     VPNMGMT_BASIC_AUTH = ('dfnadm', 'jdn@94nfju%HFn1m3')
