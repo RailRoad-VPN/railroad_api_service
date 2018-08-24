@@ -226,12 +226,27 @@ class PaymentsAPI(ResourceAPI):
 
         self.logger.debug(f"call vpn mgmt users api service")
         api_response = self._vpn_mgmt_users_api_service.create_vpn_user(email=user.get('email'))
+        self.logger.debug(f"got user configurations")
         user_configurations = api_response.data
 
-        openvpn_win_config = user_configurations.get(VPNType.OPENVPN.sid).get(VPNConfigurationPlatform.WINDOWS.sid)
-        openvpn_android_config = user_configurations.get(VPNType.OPENVPN.sid).get(VPNConfigurationPlatform.ANDROID.sid)
-        ikev2_win_config = user_configurations.get(VPNType.IKEV2.sid).get(VPNConfigurationPlatform.WINDOWS.sid)
-        ikev2_ios_config = user_configurations.get(VPNType.IKEV2.sid).get(VPNConfigurationPlatform.IOS.sid)
+        self.logger.debug(f"get openvpn user configs")
+        openvpn = user_configurations.get(VPNType.OPENVPN.sid, None)
+
+        self.logger.debug(f"get ikev2 user configs")
+        ikev2 = user_configurations.get(VPNType.IKEV2.sid, None)
+
+        openvpn_win_config = None
+        openvpn_android_config = None
+        ikev2_ios_config = None
+        ikev2_win_config = None
+
+        if openvpn is not None:
+            openvpn_win_config = openvpn.get(VPNConfigurationPlatform.WINDOWS.sid)
+            openvpn_android_config = openvpn.get(VPNConfigurationPlatform.ANDROID.sid)
+
+        if ikev2 is not None:
+            ikev2_win_config = ikev2.get(VPNConfigurationPlatform.WINDOWS.sid)
+            ikev2_ios_config = ikev2.get(VPNConfigurationPlatform.IOS.sid)
 
         if openvpn_win_config is not None:
             self._vpn_server_confs_service.create(user_uuid=user_uuid,

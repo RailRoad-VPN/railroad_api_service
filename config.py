@@ -67,7 +67,7 @@ class TestingConfig(Config):
 
     AUTH_SERVICE_URL = 'http://127.0.0.1:6000/api/v1'
     VPNC_SERVICE_URL = 'http://127.0.0.1:9000/api/v1'
-    VPNMGMT_SERVICE_URL = 'http://77.37.138.16:45270/api/v1'
+    VPNMGMT_SERVICE_URL = 'http://10.200.78.25:45270/api/v1'
     BILLING_SERVICE_URL = 'http://127.0.0.1:7000/api/v1'
 
     APN_PATH = '/opt/apps/dfn/apn/%s.apn'
