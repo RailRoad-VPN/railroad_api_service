@@ -14,7 +14,7 @@ class VPNConfigurationPlatform(Enum):
         self.sid = sid
         self.text = text
 
-    IOS = (1, 'iOS', 'Apple iPhone and iPad mobile OS')
-    ANDROID = (2, 'Android', 'All Android devices OS')
-    WINDOWS = (3, 'Windows', 'Windows OS')
-    MACOS = (4, 'macOS', 'Apple Mac OS')
+    IOS = (1, 'iOS')
+    ANDROID = (2, 'Android')
+    WINDOWS = (3, 'Windows')
+    MACOS = (4, 'macOS')
