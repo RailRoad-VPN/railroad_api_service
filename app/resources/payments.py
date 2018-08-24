@@ -230,10 +230,10 @@ class PaymentsAPI(ResourceAPI):
         user_configurations = api_response.data
 
         self.logger.debug(f"get openvpn user configs")
-        openvpn = user_configurations.get(VPNType.OPENVPN.tname, None)
+        openvpn = user_configurations.get(VPNType.OPENVPN.text, None)
 
         self.logger.debug(f"get ikev2 user configs")
-        ikev2 = user_configurations.get(VPNType.IKEV2.tname, None)
+        ikev2 = user_configurations.get(VPNType.IKEV2.text, None)
 
         openvpn_win_config = None
         openvpn_android_config = None
