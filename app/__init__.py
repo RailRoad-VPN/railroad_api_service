@@ -130,7 +130,7 @@ apis = [
     {'cls': VPNSServersMetaAPI, 'args': [vpnserversmeta_api_service, app_config]},
     {'cls': UsersServersConditionsAPI, 'args': [vpn_policy, app_config]},
     {'cls': UsersServersAPI, 'args': [vpn_policy, app_config]},
-    {'cls': UsersServersConfigurationsAPI, 'args': [vpnserverconf_api_service, app_config]},
+    {'cls': UsersServersConfigurationsAPI, 'args': [vpnserverconf_api_service, vpnserver_api_service, app_config]},
     {'cls': UsersServersConnectionsAPI, 'args': [vpnserverconn_api_service, app_config]},
     {'cls': VPNSDevicePlatformsAPI, 'args': [vpn_device_platforms_api_service, app_config]},
     {'cls': VPNSServersConnectionsAPI, 'args': [vpnserverconn_api_service, user_policy, app_config]},
