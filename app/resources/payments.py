@@ -226,7 +226,7 @@ class PaymentsAPI(ResourceAPI):
 
         self.logger.debug(f"call vpn mgmt users api service")
         api_response = self._vpn_mgmt_users_api_service.create_vpn_user(email=user.get('email'))
-        self.logger.debug(f"got user configurations")
+        self.logger.debug(f"got user configurations response: {api_response}")
         user_configurations = api_response.data
 
         self.logger.debug(f"get openvpn user configs")
