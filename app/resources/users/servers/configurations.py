@@ -55,27 +55,38 @@ class UsersServersConfigurationsAPI(ResourceAPI):
         return resp
 
     def get(self, server_uuid: str, user_uuid: str, suuid: str = None) -> Response:
-
         platform_id = request.args.get('platform_id', None)
         vpn_type_id = request.args.get('vpn_type_id', None)
 
         if suuid is None:
             try:
-                api_response = self._confs_api_service.find(server_uuid=server_uuid, user_uuid=user_uuid,
-                                                            platform_id=platform_id, vpn_type_id=vpn_type_id)
-
-                config_b64_str = api_response.data.configuration
-
                 api_response = self._vpnservers_api_service.get_vpnserver_by_uuid(suuid=server_uuid)
                 server = api_response.data
 
-                config_str = base64.b64decode(config_b64_str)
-                config_str.replace("server_ip", server.get('ip'))
-                config_str.replace("server_port", server.get('port'))
-                config_b64_str = base64.b64encode(config_str)
+                if platform_id is not None and vpn_type_id is not None:
+                    api_response = self._confs_api_service.find_by_platform_and_type(user_uuid=user_uuid,
+                                                                                     platform_id=platform_id,
+                                                                                     vpn_type_id=vpn_type_id)
+                    config_b64_str = api_response.data.get('configuration')
+
+                    config_str = base64.b64decode(config_b64_str).decode("utf-8")
+                    config_str = config_str.replace("server_ip", server.get('ip'))
+                    config_str = config_str.replace("server_port", server.get('port'))
+                    config_b64_str = base64.b64encode(config_str.encode('utf-8'))
+                    api_response.data['configuration'] = config_b64_str.decode("utf-8")
+                else:
+                    api_response = self._confs_api_service.find(user_uuid=user_uuid)
+
+                    for user_config in api_response.data:
+                        config_b64_str = user_config.get('configuration')
+                        config_str = base64.b64decode(config_b64_str).decode("utf-8")
+                        config_str = config_str.replace("server_ip", server.get('ip'))
+                        config_str = config_str.replace("server_port", server.get('port'))
+                        config_b64_str = base64.b64encode(config_str.encode('utf-8'))
+                        user_config['configuration'] = config_b64_str.decode("utf-8")
 
                 response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK,
-                                            data=config_b64_str)
+                                            data=api_response.data)
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
                 return resp
             except APIException as e:
@@ -94,7 +105,7 @@ class UsersServersConfigurationsAPI(ResourceAPI):
                 resp = make_api_response(data=response_data, http_code=code)
                 return resp
             try:
-                api_response = self._confs_api_service.get_by_suuid(suuid=suuid)
+                api_response = self._confs_api_service.get_by_suuid(suuid=suuid, user_uuid=user_uuid)
                 response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK,
                                             data=api_response.data)
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)

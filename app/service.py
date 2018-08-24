@@ -194,9 +194,15 @@ class UsersVPNServersConfigurationsAPIService(RESTService):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def find(self, server_uuid: str, user_uuid: str, platform_id: int, vpn_type_id: int) -> APIResponse:
-        self.logger.debug(f"find method with parameters: server_uuid: {server_uuid}, user_uuid: {user_uuid}, "
-                          f"platform_id: {platform_id}, vpn_type_id: {vpn_type_id}")
+    def find(self, user_uuid: str) -> APIResponse:
+        self.logger.debug(f"find method with parameters: user_uuid: {user_uuid}")
+        url = self._url.replace('<string:user_uuid>', user_uuid)
+        api_response = self._get(url=url)
+        return api_response
+
+    def find_by_platform_and_type(self, user_uuid: str, platform_id: int, vpn_type_id: int) -> APIResponse:
+        self.logger.debug(f"find method with parameters: user_uuid: {user_uuid}, platform_id: {platform_id}, "
+                          f"vpn_type_id: {vpn_type_id}")
         url = self._url.replace('<string:user_uuid>', user_uuid)
         url = f"{url}?platform_id={platform_id}&vpn_type_id={vpn_type_id}"
         api_response = self._get(url=url)
