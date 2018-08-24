@@ -124,7 +124,7 @@ apis = [
     {'cls': UsersSubscriptionsAPI, 'args': [user_policy, app_config]},
     {'cls': UsersDevicesAPI, 'args': [user_policy, app_config]},
     {'cls': PaymentsAPI, 'args': [order_api_service, user_sub_api_service, vpn_mgmt_users_api_service, user_policy,
-                                  app_config]},
+                                  vpnserverconf_api_service, app_config]},
     {'cls': SubscriptionsAPI, 'args': [subscription_api_service, app_config]},
     {'cls': VPNSServersMetaAPI, 'args': [vpnserversmeta_api_service, app_config]},
     {'cls': UsersServersConditionsAPI, 'args': [vpn_policy, app_config]},
