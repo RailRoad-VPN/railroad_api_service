@@ -364,14 +364,13 @@ class VPNServerConfigurationsAPIService(RESTService):
         api_response = self._get(url=url)
         return api_response
 
-    def create(self, user_uuid: str, server_uuid: str, configuration: str, vpn_device_platform_id: int,
+    def create(self, user_uuid: str, configuration: str, vpn_device_platform_id: int,
                vpn_type_id: int) -> APIResponse:
-        self.logger.debug(f"create method with parameters: user_uuid: {user_uuid}, server_uuid: {server_uuid},"
+        self.logger.debug(f"create method with parameters: user_uuid: {user_uuid},"
                           f"configuration: {configuration}, vpn_device_platform_id: {vpn_device_platform_id}, "
                           f"vpn_type_id: {vpn_type_id}")
         data = {
             'user_uuid': user_uuid,
-            'server_uuid': server_uuid,
             'configuration': configuration,
             'vpn_device_platform_id': vpn_device_platform_id,
             'vpn_type_id': vpn_type_id,

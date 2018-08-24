@@ -14,7 +14,10 @@ from app.model.order_status import OrderStatus
 from app.model.payment_status import PaymentStatus, PPGPaymentStatus
 from app.model.payment_type import PaymentType
 from app.model.user_subscription_status import UserSubscriptionStatus
-from app.service import OrderAPIService, UserSubscriptionAPIService, VPNMGMTUsersAPIService
+from app.model.vpn_conf_platform import VPNConfigurationPlatform
+from app.model.vpn_type import VPNType
+from app.service import OrderAPIService, UserSubscriptionAPIService, VPNMGMTUsersAPIService, \
+    VPNServerConfigurationsAPIService
 
 sys.path.insert(0, '../rest_api_library')
 from response import make_api_response, make_error_request_response
@@ -35,6 +38,7 @@ class PaymentsAPI(ResourceAPI):
     _order_api_service = None
     _user_sub_api_service = None
     _vpn_mgmt_users_api_service = None
+    _vpn_server_confs_service = None
     _user_policy = None
 
     @staticmethod
@@ -47,12 +51,13 @@ class PaymentsAPI(ResourceAPI):
 
     def __init__(self, order_api_service: OrderAPIService, user_sub_api_service: UserSubscriptionAPIService,
                  vpn_mgmt_users_api_service: VPNMGMTUsersAPIService, user_policy: UserPolicy,
-                 config: dict):
+                 vpn_server_confs_service: VPNServerConfigurationsAPIService, config: dict):
         super().__init__()
         self._config = config
         self._order_api_service = order_api_service
         self._user_sub_api_service = user_sub_api_service
         self._vpn_mgmt_users_api_service = vpn_mgmt_users_api_service
+        self._vpn_server_confs_service = vpn_server_confs_service
         self._user_policy = user_policy
 
     def post(self) -> Response:
@@ -221,10 +226,35 @@ class PaymentsAPI(ResourceAPI):
 
         self.logger.debug(f"call vpn mgmt users api service")
         api_response = self._vpn_mgmt_users_api_service.create_vpn_user(email=user.get('email'))
-        config_base64_str = api_response.data
-        self.logger.debug(f"got config base64 {config_base64_str}")
+        user_configurations = api_response.data
 
-        # TODO save use configuration
+        openvpn_win_config = user_configurations.get(VPNType.OPENVPN.sid).get(VPNConfigurationPlatform.WINDOWS.sid)
+        openvpn_android_config = user_configurations.get(VPNType.OPENVPN.sid).get(VPNConfigurationPlatform.ANDROID.sid)
+        ikev2_win_config = user_configurations.get(VPNType.IKEV2.sid).get(VPNConfigurationPlatform.WINDOWS.sid)
+        ikev2_ios_config = user_configurations.get(VPNType.IKEV2.sid).get(VPNConfigurationPlatform.IOS.sid)
+
+        if openvpn_win_config is not None:
+            self._vpn_server_confs_service.create(user_uuid=user_uuid,
+                                                  configuration=openvpn_win_config,
+                                                  vpn_device_platform_id=VPNConfigurationPlatform.WINDOWS.sid,
+                                                  vpn_type_id=VPNType.OPENVPN.sid)
+        if openvpn_android_config is not None:
+            self._vpn_server_confs_service.create(user_uuid=user_uuid,
+                                                  configuration=openvpn_win_config,
+                                                  vpn_device_platform_id=VPNConfigurationPlatform.ANDROID.sid,
+                                                  vpn_type_id=VPNType.OPENVPN.sid)
+
+        if ikev2_ios_config is not None:
+            self._vpn_server_confs_service.create(user_uuid=user_uuid,
+                                                  configuration=ikev2_ios_config,
+                                                  vpn_device_platform_id=VPNConfigurationPlatform.IOS.sid,
+                                                  vpn_type_id=VPNType.IKEV2.sid)
+
+        if ikev2_win_config is not None:
+            self._vpn_server_confs_service.create(user_uuid=user_uuid,
+                                                  configuration=ikev2_win_config,
+                                                  vpn_device_platform_id=VPNConfigurationPlatform.WINDOWS.sid,
+                                                  vpn_type_id=VPNType.IKEV2.sid)
 
         response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK)
         resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
