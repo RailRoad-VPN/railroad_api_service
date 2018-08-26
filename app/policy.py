@@ -144,6 +144,8 @@ class UserPolicy(object):
 class VPNServerPolicy(object):
     __version__ = 1
 
+    logger = logging.getLogger(__name__)
+
     vpnserver_api_service = None
     vpntype_api_service = None
     vpnserverconf_api_service = None
