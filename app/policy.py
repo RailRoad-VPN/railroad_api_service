@@ -126,11 +126,16 @@ class UserPolicy(object):
         try:
             self.logger.debug(f"{self.__class__}: try to retrieve connections for "
                               f"user device with uuid: {api_response.data.get('uuid')}")
-            api_response.data['connections'] = self._get_user_device_connections(user_device=api_response.data)
+            user_device_connections_api_response = self._get_user_device_connections(user_device=api_response.data)
+            self.logger.debug(f"{self.__class__}: got user_device_connections_api_response: "
+                              f"{user_device_connections_api_response.serialize()}")
+            self.logger.debug(f"{self.__class__}: set user device connections to user device api response")
+            api_response.data['connections'] = user_device_connections_api_response.data
         except APIException as e:
             self.logger.error(f"failed to retrieve connections for user device "
                               f"with uuid: {api_response.data.get('uuid')}")
-            return api_response
+
+        return api_response
 
     def get_user_devices(self, user_uuid: str) -> APIResponse:
         self.logger.debug(f"{self.__class__}: get_user_devices method with parameters user_uuid: {user_uuid}")
