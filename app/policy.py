@@ -130,7 +130,10 @@ class UserPolicy(object):
             self.logger.debug(f"{self.__class__}: got user_device_connections_api_response: "
                               f"{user_device_connections_api_response}")
             self.logger.debug(f"{self.__class__}: set user device connections to user device api response")
-            api_response.data['connections'] = user_device_connections_api_response.data
+            conns_list = []
+            for udc in user_device_connections_api_response.data:
+                conns_list.append(udc)
+            api_response.data['connections'] = conns_list
         except APIException as e:
             self.logger.error(f"failed to retrieve connections for user device "
                               f"with uuid: {api_response.data.get('uuid')}")
