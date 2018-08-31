@@ -128,7 +128,7 @@ class UserPolicy(object):
                               f"user device with uuid: {api_response.data.get('uuid')}")
             user_device_connections_api_response = self._get_user_device_connections(user_device=api_response.data)
             self.logger.debug(f"{self.__class__}: got user_device_connections_api_response: "
-                              f"{user_device_connections_api_response.serialize()}")
+                              f"{user_device_connections_api_response}")
             self.logger.debug(f"{self.__class__}: set user device connections to user device api response")
             api_response.data['connections'] = user_device_connections_api_response.data
         except APIException as e:
