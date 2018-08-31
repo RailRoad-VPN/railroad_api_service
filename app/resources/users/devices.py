@@ -202,17 +202,24 @@ class UsersDevicesAPI(ResourceAPI):
     def get(self, user_uuid: str, user_device_uuid: str = None) -> Response:
         super(UsersDevicesAPI, self).get(req=request)
 
+        self.logger.debug(f"UsersDevicesAPI get method with parameters user_uuid: {user_uuid}, "
+                          f"user_device_uuid: {user_device_uuid}")
+
         is_valid = check_uuid(suuid=user_uuid)
         if not is_valid:
             return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
         if user_device_uuid is not None:
+            self.logger.debug("user device uuid is not None, get all user devices")
+
             is_valid = check_uuid(suuid=user_device_uuid)
             if not is_valid:
                 return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
-            # get all user device by uuid
+
+            # get all user devices
             try:
                 api_response = self._user_policy.get_user_device_by_uuid(user_uuid=user_uuid, suuid=user_device_uuid)
+                self.logger.debug("user device uuid is not None, get all user devices")
                 response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK,
                                             data=api_response.data)
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
