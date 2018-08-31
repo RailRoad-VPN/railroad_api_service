@@ -141,7 +141,7 @@ class VPNSServersConnectionsAPI(ResourceAPI):
                 if NEW_CONNECTION:
                     raise APINotFoundException
                 else:
-                    self.logger.debug("Update existed connection")
+                    self.logger.debug(f"{self.__class__}: Update existed connection")
                 self.logger.debug(f"{self.__class__}: Got VPN server connection: {server_connection}")
 
                 server_connection['user_device_uuid'] = user_device_uuid

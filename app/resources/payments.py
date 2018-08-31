@@ -63,19 +63,19 @@ class PaymentsAPI(ResourceAPI):
     def post(self) -> Response:
         self.logger.debug(f"{self.__class__}: PaymentAPI -> POST method with parameters")
 
-        self.logger.debug("check request has json")
+        self.logger.debug(f"{self.__class__}: check request has json")
         request_json = request.json
 
         if request_json is None:
             return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.REQUEST_NO_JSON)
 
-        self.logger.debug("get apn base64 string from request_json")
+        self.logger.debug(f"{self.__class__}: get apn base64 string from request_json")
         apn = request_json.get('apn', None)
 
         if apn is None:
             return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.PAYMENT_BAD_DATA_ERROR)
 
-        self.logger.debug("create apn file name")
+        self.logger.debug(f"{self.__class__}: create apn file name")
         t = '{0:%Y_%m_%d_%H%M%S}'.format(datetime.datetime.now())
         tt = f"{t}_{uuid.uuid4()}"
 
@@ -216,8 +216,8 @@ class PaymentsAPI(ResourceAPI):
         self.logger.debug(f"{self.__class__}: update user subscription")
         self._user_sub_api_service.update(user_subscription=payment_user_sub)
 
-        self.logger.debug("Launch MANAGEMENT API")
-        self.logger.debug("create VPN user")
+        self.logger.debug(f"{self.__class__}: Launch MANAGEMENT API")
+        self.logger.debug(f"{self.__class__}: create VPN user")
 
         self.logger.debug(f"{self.__class__}: get user by user_uuid: {user_uuid}")
         api_response = self._user_policy.get_user(suuid=user_uuid)

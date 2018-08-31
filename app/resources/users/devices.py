@@ -88,7 +88,7 @@ class UsersDevicesAPI(ResourceAPI):
                                                                 vpn_type_id=vpn_type_id)
             user_device = api_response.data
 
-            self.logger.debug("Get X-Device-Token from headers")
+            self.logger.debug(f"{self.__class__}: Get X-Device-Token from headers")
             x_device_token = api_response.headers['X-Device-Token']
 
             self.logger.debug(f'Get user by uuid: {user_uuid}')
@@ -111,11 +111,11 @@ class UsersDevicesAPI(ResourceAPI):
 
             self._user_policy.update_user(user_dict=user_dict)
 
-            self.logger.debug("Get user device uuid from response of creating user device")
+            self.logger.debug(f"{self.__class__}: Get user device uuid from response of creating user device")
             ud_uuid = user_device['uuid']
             self.logger.debug(f"{self.__class__}: User Device uuid: {ud_uuid}")
 
-            self.logger.debug("Prepare API URL")
+            self.logger.debug(f"{self.__class__}: Prepare API URL")
             api_url = self.__api_url__.replace('<string:user_uuid>', user_uuid)
             self.logger.debug(f"{self.__class__}: API URL: {api_url}")
 
@@ -129,7 +129,7 @@ class UsersDevicesAPI(ResourceAPI):
             self.logger.debug(f"{self.__class__}: Set X-Device-Token: {x_device_token}")
             resp.headers['X-Device-Token'] = x_device_token
 
-            self.logger.debug("Return response")
+            self.logger.debug(f"{self.__class__}: Return response")
             return resp
         except APIException as e:
             self.logger.debug(e.serialize())
