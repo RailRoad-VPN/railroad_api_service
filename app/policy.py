@@ -121,6 +121,8 @@ class UserPolicy(object):
         try:
             api_response.data['connections'] = self._get_user_device_connections(user_device=api_response.data)
         except APIException as e:
+            self.logger.error(
+                f"failed to retrieve connections for user device with uuid: {api_response.data.get('uuid')}")
             return api_response
 
     def get_user_devices(self, user_uuid: str) -> APIResponse:
