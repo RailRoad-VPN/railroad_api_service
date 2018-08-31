@@ -17,6 +17,7 @@ from app.resources.users.servers.configurations import UsersServersConfiguration
 from app.resources.users.servers.connections import UsersServersConnectionsAPI
 from app.resources.users.subscriptions import UsersSubscriptionsAPI
 from app.resources.vpns.device_platforms import VPNSDevicePlatformsAPI
+from app.resources.vpns.servers import VPNServersAPI
 from app.resources.vpns.servers.connections import VPNSServersConnectionsAPI
 from app.resources.vpns.servers.meta import VPNSServersMetaAPI
 from app.service import *
@@ -127,6 +128,7 @@ apis = [
     {'cls': PaymentsAPI, 'args': [order_api_service, user_sub_api_service, vpn_mgmt_users_api_service, user_policy,
                                   vpnserverconf_api_service, app_config]},
     {'cls': SubscriptionsAPI, 'args': [subscription_api_service, app_config]},
+    {'cls': VPNServersAPI, 'args': [vpn_policy, app_config]},
     {'cls': VPNSServersMetaAPI, 'args': [vpnserversmeta_api_service, app_config]},
     {'cls': UsersServersConditionsAPI, 'args': [vpn_policy, app_config]},
     {'cls': UsersServersAPI, 'args': [vpn_policy, app_config]},

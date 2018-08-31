@@ -343,7 +343,8 @@ class VPNServersAPIService(RESTService):
     def update_vpnserver(self, vpnserver: dict):
         self.logger.debug(f"update_vpnserver method with parameters vpnserver: {vpnserver}")
         url = f"{self._url}/{vpnserver['uuid']}"
-        self._put(url=url, data=vpnserver)
+        api_response = self._put(url=url, data=vpnserver)
+        return api_response
 
     def create_vpnserver(self, vpnserver: dict) -> APIResponse:
         self.logger.debug(f"create_vpnserver method with parameters vpnserver: {vpnserver}")

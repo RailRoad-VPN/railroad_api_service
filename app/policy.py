@@ -199,9 +199,10 @@ class VPNServerPolicy(object):
         api_response = self.vpnserver_api_service.get_vpnserver_by_uuid(suuid=suuid)
         return api_response.data
 
-    def update_vpn_server(self, vpnserver: dict):
+    def update_vpn_server(self, vpnserver: dict) -> APIResponse:
         self.logger.debug(f"update_vpn_server method with parameter vpnserver: {vpnserver}")
-        self.vpnserver_api_service.update_vpnserver(vpnserver=vpnserver)
+        api_response = self.vpnserver_api_service.update_vpnserver(vpnserver=vpnserver)
+        return api_response
 
     def get_random_vpn_server(self, type_id: int = None, status_id: int = None) -> APIResponse:
         self.logger.debug(f"get_random_vpn_server method with parameters type_id: {type_id}, status_id: {status_id}")
@@ -312,7 +313,7 @@ class VPNServerPolicy(object):
 
     def _get_vpn_server(self, server: dict) -> dict:
         self.logger.debug(f"_get_vpn_server method with parameters server: {server}")
-        geo_position_id = server.pop("geo_position_id")
+        geo_position_id = server.get("geo_position_id")
 
         try:
             self.logger.info(f"get geopos by id: {geo_position_id}")
@@ -323,7 +324,6 @@ class VPNServerPolicy(object):
             return server
 
         geopos = api_response.data
-        geopos.pop("id", None)
 
         server['geo'] = geopos
 
