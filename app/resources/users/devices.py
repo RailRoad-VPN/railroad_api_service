@@ -210,7 +210,8 @@ class UsersDevicesAPI(ResourceAPI):
             return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
         if user_device_uuid is not None:
-            self.logger.debug(f"{self.__class__}: user device uuid is not None, get user device by uuid: {user_device_uuid}")
+            self.logger.debug(f"{self.__class__}: user device uuid is not None, get user device "
+                              f"by uuid: {user_device_uuid}")
 
             is_valid = check_uuid(suuid=user_device_uuid)
             if not is_valid:
