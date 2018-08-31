@@ -69,7 +69,7 @@ class VPNSServersConnectionsAPI(ResourceAPI):
             'users': user_list,
         }
 
-        self.logger.debug(f"Check required fields: {req_fields}")
+        self.logger.debug(f"{self.__class__}: Check required fields: {req_fields}")
 
         error_fields = check_required_api_fields(req_fields)
         if len(error_fields) > 0:
@@ -79,7 +79,7 @@ class VPNSServersConnectionsAPI(ResourceAPI):
             return resp
 
         if len(user_list) == 0:
-            self.logger.debug(f"No connections for server.")
+            self.logger.debug(f"{self.__class__}: No connections for server.")
 
             self._vpnserverconn_api_service.disconnect_by_server(server_uuid=server_uuid)
 
@@ -120,7 +120,7 @@ class VPNSServersConnectionsAPI(ResourceAPI):
             try:
                 if user_device is None:
                     user_device_uuid = None
-                    self.logger.debug(f"We did not found user device for received connection information. "
+                    self.logger.debug(f"{self.__class__}: We did not found user device for received connection information. "
                                       f"This means it is OpenVPN configuration or something else.")
                     api_response = self._vpnserverconn_api_service.get_current_by_server_and_user_and_vip(
                         server_uuid=server_uuid,
@@ -142,7 +142,7 @@ class VPNSServersConnectionsAPI(ResourceAPI):
                     raise APINotFoundException
                 else:
                     self.logger.debug("Update existed connection")
-                self.logger.debug(f"Got VPN server connection: {server_connection}")
+                self.logger.debug(f"{self.__class__}: Got VPN server connection: {server_connection}")
 
                 server_connection['user_device_uuid'] = user_device_uuid
                 server_connection['device_ip'] = device_ip

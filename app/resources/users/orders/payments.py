@@ -52,7 +52,7 @@ class UsersOrdersPaymentsAPI(ResourceAPI):
         super(UsersOrdersPaymentsAPI, self).get(req=request)
 
         if suuid is not None:
-            self.logger.debug(f"check order_payment uuid")
+            self.logger.debug(f"{self.__class__}: check order_payment uuid")
             is_valid = check_uuid(suuid)
             if not is_valid:
                 return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.ORDERPAYMENT_IDENTIFIER)
