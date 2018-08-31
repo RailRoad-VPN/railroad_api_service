@@ -87,11 +87,10 @@ class UserPolicy(object):
     def create_user_device(self, user_uuid: str, device_token: str, virtual_ip: str, device_id: str, platform_id: int,
                            vpn_type_id: int, location: str, is_active: bool, connected_since: datetime = None,
                            device_ip: str = None) -> APIResponse:
-        self.logger.debug(
-            f"{self.__class__}: create_user_device method with parameters user_uuid: {user_uuid}, device_id: {device_id}, "
-            f"device_token: {device_token}, location: {location}, is_active: {is_active}, "
-            f"platform_id: {platform_id}, vpn_type_id: {vpn_type_id}, virtual_ip: {virtual_ip}, "
-            f"device_ip: {device_ip}, connected_since: {connected_since}")
+        self.logger.debug(f"{self.__class__}: create_user_device method with parameters user_uuid: {user_uuid}, "
+                          f"device_id: {device_id}, device_token: {device_token}, location: {location}, "
+                          f"is_active: {is_active}, platform_id: {platform_id}, vpn_type_id: {vpn_type_id}, "
+                          f"virtual_ip: {virtual_ip}, device_ip: {device_ip}, connected_since: {connected_since}")
         api_response = self._user_device_api_service.create(user_uuid=user_uuid, device_token=device_token,
                                                             vpn_type_id=vpn_type_id, device_id=device_id,
                                                             virtual_ip=virtual_ip, device_ip=device_ip,
@@ -120,7 +119,7 @@ class UserPolicy(object):
         self._user_device_api_service.delete(user_uuid=user_uuid, suuid=suuid)
 
     def get_user_device_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
-        self.logger.debug(f"{self.__class__}: {self.__class__}: get_user_device_by_uuid method with parameters " 
+        self.logger.debug(f"{self.__class__}: get_user_device_by_uuid method with parameters "
                           f"user_uuid: {user_uuid}, suuid: {suuid}")
         api_response = self._user_device_api_service.get_user_device_by_uuid(user_uuid=user_uuid, suuid=suuid)
         self.logger.debug(f"got api response: {api_response.serialize()}")
@@ -179,9 +178,8 @@ class VPNServerPolicy(object):
         self.geostate_api_service = geostate_service
 
     def create_vpn_server_user_configuration(self, server_uuid: str, user_uuid: str, cert: str):
-        self.logger.debug(
-            f"{self.__class__}: create_vpn_server_user_configuration method with parameters server_uuid: {server_uuid}, "
-            f"user_uuid: {user_uuid}, cert: {cert}")
+        self.logger.debug(f"{self.__class__}: create_vpn_server_user_configuration method with parameters "
+                          f"server_uuid: {server_uuid}, user_uuid: {user_uuid}, cert: {cert}")
 
         self.logger.debug(f"{self.__class__}: get vpn server by uuid: {server_uuid}")
         api_response = self.vpnserver_api_service.get_vpnserver_by_uuid(suuid=server_uuid)
