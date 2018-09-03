@@ -117,7 +117,6 @@ class UserPolicy(object):
         self.logger.debug(f"{self.__class__}: update_user_device method with parameters user_uuid: {user_uuid}, "
                           f"suuid: {suuid}")
         self._user_device_api_service.delete(user_uuid=user_uuid, suuid=suuid)
-
     def get_user_device_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
         self.logger.debug(f"{self.__class__}: get_user_device_by_uuid method with parameters "
                           f"user_uuid: {user_uuid}, suuid: {suuid}")
