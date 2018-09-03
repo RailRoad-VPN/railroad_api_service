@@ -68,7 +68,6 @@ class UsersDevicesAPI(ResourceAPI):
             'platform_id': platform_id,
             'vpn_type_id': vpn_type_id,
             'is_active': is_active,
-            'virtual_ip': virtual_ip,
         }
 
         error_fields = check_required_api_fields(req_fields)
@@ -80,12 +79,10 @@ class UsersDevicesAPI(ResourceAPI):
 
         try:
             api_response = self._user_policy.create_user_device(user_uuid=user_uuid, device_id=device_id,
-                                                                virtual_ip=virtual_ip,
-                                                                device_ip=device_ip, device_token=device_token,
-                                                                location=location, is_active=is_active,
-                                                                connected_since=connected_since,
-                                                                platform_id=platform_id,
-                                                                vpn_type_id=vpn_type_id)
+                                                                virtual_ip=virtual_ip, device_ip=device_ip,
+                                                                device_token=device_token, location=location,
+                                                                is_active=is_active, connected_since=connected_since,
+                                                                platform_id=platform_id, vpn_type_id=vpn_type_id)
             user_device = api_response.data
 
             self.logger.debug(f"{self.__class__}: Get X-Device-Token from headers")
@@ -239,7 +236,8 @@ class UsersDevicesAPI(ResourceAPI):
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.BAD_REQUEST)
                 return resp
         else:
-            self.logger.debug(f"{self.__class__}: user device uuid is None, get all user devices by user uuid: {user_uuid}")
+            self.logger.debug(
+                f"{self.__class__}: user device uuid is None, get all user devices by user uuid: {user_uuid}")
             # get all user devices
             try:
                 self.logger.debug(f"{self.__class__}: call user policy")
