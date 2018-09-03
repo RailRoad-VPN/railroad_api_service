@@ -57,10 +57,10 @@ class UsersDevicesAPI(ResourceAPI):
         platform_id = request_json.get('platform_id', None)
         vpn_type_id = request_json.get('vpn_type_id', None)
         location = request_json.get('location', None)
-        is_active = request_json.get('is_active', True)
-        virtual_ip = request_json.get('virtual_ip', True)
-        device_ip = request_json.get('device_ip', True)
-        connected_since = request_json.get('connected_since', True)
+        is_active = request_json.get('is_active', None)
+        virtual_ip = request_json.get('virtual_ip', None)
+        device_ip = request_json.get('device_ip', None)
+        connected_since = request_json.get('connected_since', None)
 
         req_fields = {
             'user_uuid': user_uuid,
