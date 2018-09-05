@@ -49,4 +49,7 @@ class RailRoadAPIError(APIErrorEnum):
 
     PAYMENT_APN_DOES_NOT_CONTAIN_ORDER_CODE_CUSTOM_FIELD = (name + str(count()), 'APN does not contain ordercode custom field', 'We received APN but without x-ordercode custom field for some reason. Need manual work')
     PAYMENT_APN_DOES_NOT_CONTAIN_USER_UUID_CUSTOM_FIELD = (name + str(count()), 'APN does not contain useruuid custom field', 'We received APN but without x-useruuid custom field for some reason. Need manual work')
-    PAYMENT_APN_DID_NOT_FIND_USER_SUB =  (name + str(count()), 'APN is okay, but ', 'We received APN, get all user subscriptions by user uuid from x-useruuid custom field, but did not find user subscription for what this payment come. Need manual work')
+    PAYMENT_APN_DID_NOT_FIND_USER_SUB = (name + str(count()), 'APN is okay, but ', 'We received APN, get all user subscriptions by user uuid from x-useruuid custom field, but did not find user subscription for what this payment come. Need manual work')
+
+    VPNTYPES_IDENTIFIER_ERROR = (name + str(count()), 'VPNTYPES_IDENTIFIER_ERROR phrase', 'VPNTYPES_IDENTIFIER_ERROR description')
+    DEVICEPLATFORMS_IDENTITY_ERROR = (name + str(count()), 'DEVICEPLATFORMS_IDENTITY_ERROR phrase', 'DEVICEPLATFORMS_IDENTITY_ERROR description')

@@ -17,6 +17,7 @@ from app.resources.users.servers.configurations import UsersServersConfiguration
 from app.resources.users.servers.connections import UsersServersConnectionsAPI
 from app.resources.users.subscriptions import UsersSubscriptionsAPI
 from app.resources.vpns.device_platforms import VPNSDevicePlatformsAPI
+from app.resources.vpns.types import VPNSTypesAPI
 from app.resources.vpns.servers import VPNServersAPI
 from app.resources.vpns.servers.connections import VPNSServersConnectionsAPI
 from app.resources.vpns.servers.meta import VPNSServersMetaAPI
@@ -135,6 +136,7 @@ apis = [
     {'cls': UsersServersConfigurationsAPI, 'args': [vpnserverconf_api_service, vpnserver_api_service, app_config]},
     {'cls': UsersServersConnectionsAPI, 'args': [vpnserverconn_api_service, app_config]},
     {'cls': VPNSDevicePlatformsAPI, 'args': [vpn_device_platforms_api_service, app_config]},
+    {'cls': VPNSTypesAPI, 'args': [vpntype_api_service, app_config]},
     {'cls': VPNSServersConnectionsAPI, 'args': [vpnserverconn_api_service, user_policy, app_config]},
 ]
 

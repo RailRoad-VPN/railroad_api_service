@@ -6,7 +6,7 @@ from typing import List
 from flask import Response
 
 from app.exception import RailRoadAPIError
-from app.service import VPNDevicePlatformsAPIService
+from app.service import VPNTypeAPIService
 from rest import APIResourceURL, APINotFoundException, APIException
 
 sys.path.insert(0, '../rest_api_library')
@@ -15,7 +15,7 @@ from response import APIResponseStatus, APIResponse, make_error_request_response
 from response import make_api_response
 
 
-class VPNSDevicePlatformsAPI(ResourceAPI):
+class VPNSTypesAPI(ResourceAPI):
     __version__ = 1
 
     logger = logging.getLogger(__name__)
@@ -25,20 +25,20 @@ class VPNSDevicePlatformsAPI(ResourceAPI):
 
     _config = None
 
-    _vpndeviceplatforms_api_service = None
+    _vpn_types_api_service = None
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
-        url = f"{base_url}/{VPNSDevicePlatformsAPI.__api_url__}"
+        url = f"{base_url}/{VPNSTypesAPI.__api_url__}"
         api_urls = [
             APIResourceURL(base_url=url, resource_name='', methods=['GET']),
             APIResourceURL(base_url=url, resource_name='<int:sid>', methods=['GET']),
         ]
         return api_urls
 
-    def __init__(self, vpndeviceplatforms_api_service: VPNDevicePlatformsAPIService, config: dict) -> None:
+    def __init__(self, vpn_types_api_service: VPNTypeAPIService, config: dict) -> None:
         super().__init__()
-        self._vpndeviceplatforms_api_service = vpndeviceplatforms_api_service
+        self._vpn_types_api_service = vpn_types_api_service
 
         self._config = config
 
@@ -56,9 +56,9 @@ class VPNSDevicePlatformsAPI(ResourceAPI):
                 sid = int(sid)
             except ValueError:
                 return make_error_request_response(HTTPStatus.BAD_REQUEST,
-                                                   err=RailRoadAPIError.DEVICEPLATFORMS_IDENTITY_ERROR)
+                                                   err=RailRoadAPIError.VPNTYPES_IDENTIFIER_ERROR)
             try:
-                api_response = self._vpndeviceplatforms_api_service.find_by_id(sid=sid)
+                api_response = self._vpn_types_api_service.get_vpntype_by_id(sid=sid)
                 response_data = APIResponse(status=APIResponseStatus.success.status, code=api_response.code,
                                             data=api_response.data, headers=api_response.headers)
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
@@ -75,7 +75,7 @@ class VPNSDevicePlatformsAPI(ResourceAPI):
                 return make_api_response(data=response_data, http_code=http_code)
         else:
             try:
-                api_response = self._vpndeviceplatforms_api_service.find()
+                api_response = self._vpn_types_api_service.get_vpntypes()
                 response_data = APIResponse(status=APIResponseStatus.success.status, code=api_response.code,
                                             data=api_response.data, headers=api_response.headers)
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
