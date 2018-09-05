@@ -21,7 +21,7 @@ class VPNSTypesAPI(ResourceAPI):
     logger = logging.getLogger(__name__)
 
     __endpoint_name__ = __qualname__
-    __api_url__ = 'vpns/device_platforms'
+    __api_url__ = 'vpns/types'
 
     _config = None
 
