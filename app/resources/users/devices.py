@@ -24,7 +24,6 @@ class UsersDevicesAPI(ResourceAPI):
     __endpoint_name__ = __qualname__
     __api_url__ = 'users/<string:user_uuid>/devices'
 
-    _config = None
     _user_policy = None
 
     @staticmethod
@@ -36,12 +35,13 @@ class UsersDevicesAPI(ResourceAPI):
         ]
         return api_urls
 
-    def __init__(self, user_policy: UserPolicy, config: dict) -> None:
-        super().__init__()
-        self._config = config
+    def __init__(self, user_policy: UserPolicy, *args) -> None:
+        super().__init__(*args)
         self._user_policy = user_policy
 
     def post(self, user_uuid: str) -> Response:
+        super(UsersDevicesAPI, self).post(req=request)
+
         request_json = request.json
 
         if request_json is None:
@@ -135,6 +135,8 @@ class UsersDevicesAPI(ResourceAPI):
             return resp
 
     def put(self, user_uuid: str, user_device_uuid: str) -> Response:
+        super(UsersDevicesAPI, self).put(req=request)
+
         request_json = request.json
 
         if request_json is None:
@@ -254,6 +256,8 @@ class UsersDevicesAPI(ResourceAPI):
                 return resp
 
     def delete(self, user_uuid: str, user_device_uuid: str) -> Response:
+        super(UsersDevicesAPI, self).delete(req=request)
+
         self.logger.debug(f"{self.__class__}: UsersDevicesAPI delete method with parameters user_uuid: {user_uuid}, "
                           f"user_device_uuid: {user_device_uuid}")
 

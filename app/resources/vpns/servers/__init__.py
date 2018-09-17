@@ -25,7 +25,6 @@ class VPNServersAPI(ResourceAPI):
     __api_url__ = 'vpns/servers'
 
     _vpn_policy = None
-    _config = None
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
@@ -35,17 +34,18 @@ class VPNServersAPI(ResourceAPI):
         ]
         return api_urls
 
-    def __init__(self, vpn_service: VPNServerPolicy, config: dict) -> None:
+    def __init__(self, vpn_service: VPNServerPolicy, *args) -> None:
+        super().__init__(*args)
         self._vpn_policy = vpn_service
-        self._config = config
 
-        super().__init__()
 
     def post(self) -> Response:
         resp = make_error_request_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
         return resp
 
     def put(self, suuid: str) -> Response:
+        super(VPNServersAPI, self).put(req=request)
+
         logger.debug('put method')
         request_json = request.json
 

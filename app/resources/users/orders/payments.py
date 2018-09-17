@@ -23,7 +23,6 @@ class UsersOrdersPaymentsAPI(ResourceAPI):
     __endpoint_name__ = __qualname__
     __api_url__ = 'orders/<string:order_uuid>/payments'
 
-    _config = None
     _order_service = None
 
     @staticmethod
@@ -35,9 +34,8 @@ class UsersOrdersPaymentsAPI(ResourceAPI):
         ]
         return api_urls
 
-    def __init__(self, order_service: OrderAPIService, config: dict) -> None:
-        super().__init__()
-        self._config = config
+    def __init__(self, order_service: OrderAPIService, *args) -> None:
+        super().__init__(*args)
         self._order_service = order_service
 
     def post(self) -> Response:

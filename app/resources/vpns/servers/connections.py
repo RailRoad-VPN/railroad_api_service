@@ -25,8 +25,6 @@ class VPNSServersConnectionsAPI(ResourceAPI):
     __endpoint_name__ = __qualname__
     __api_url__ = 'vpns/servers/<string:server_uuid>/connections'
 
-    _config = None
-
     _vpnserverconn_api_service = None
     _user_policy = None
 
@@ -40,14 +38,14 @@ class VPNSServersConnectionsAPI(ResourceAPI):
         return api_urls
 
     def __init__(self, vpnserverconn_api_service: VPNServerConnectionsAPIService, user_policy: UserPolicy,
-                 config: dict) -> None:
-        super().__init__()
+                 *args) -> None:
+        super().__init__(*args)
         self._vpnserverconn_api_service = vpnserverconn_api_service
         self._user_policy = user_policy
 
-        self._config = config
-
     def post(self, server_uuid: str) -> Response:
+        super(VPNSServersConnectionsAPI, self).post(req=request)
+
         request_json = request.json
 
         if request_json is None:
@@ -120,8 +118,9 @@ class VPNSServersConnectionsAPI(ResourceAPI):
             try:
                 if user_device is None:
                     user_device_uuid = None
-                    self.logger.debug(f"{self.__class__}: We did not found user device for received connection information. "
-                                      f"This means it is OpenVPN configuration or something else.")
+                    self.logger.debug(
+                        f"{self.__class__}: We did not found user device for received connection information. "
+                        f"This means it is OpenVPN configuration or something else.")
                     api_response = self._vpnserverconn_api_service.get_current_by_server_and_user_and_vip(
                         server_uuid=server_uuid,
                         virtual_ip=virtual_ip)

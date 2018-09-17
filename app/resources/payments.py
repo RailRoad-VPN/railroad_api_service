@@ -34,7 +34,6 @@ class PaymentsAPI(ResourceAPI):
     __endpoint_name__ = __qualname__
     __api_url__ = 'payments'
 
-    _config = None
     _order_api_service = None
     _user_sub_api_service = None
     _vpn_mgmt_users_api_service = None
@@ -51,9 +50,8 @@ class PaymentsAPI(ResourceAPI):
 
     def __init__(self, order_api_service: OrderAPIService, user_sub_api_service: UserSubscriptionAPIService,
                  vpn_mgmt_users_api_service: VPNMGMTUsersAPIService, user_policy: UserPolicy,
-                 vpn_server_confs_service: UsersVPNServersConfigurationsAPIService, config: dict):
-        super().__init__()
-        self._config = config
+                 vpn_server_confs_service: UsersVPNServersConfigurationsAPIService, *args):
+        super().__init__(*args)
         self._order_api_service = order_api_service
         self._user_sub_api_service = user_sub_api_service
         self._vpn_mgmt_users_api_service = vpn_mgmt_users_api_service
@@ -61,6 +59,8 @@ class PaymentsAPI(ResourceAPI):
         self._user_policy = user_policy
 
     def post(self) -> Response:
+        super(PaymentsAPI, self).post(req=request)
+
         self.logger.debug(f"{self.__class__}: PaymentAPI -> POST method with parameters")
 
         self.logger.debug(f"{self.__class__}: check request has json")

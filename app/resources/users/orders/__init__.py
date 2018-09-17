@@ -24,7 +24,6 @@ class UsersOrdersAPI(ResourceAPI):
     __endpoint_name__ = __qualname__
     __api_url__ = 'orders'
 
-    _config = None
     _order_api_service = None
 
     @staticmethod
@@ -38,12 +37,13 @@ class UsersOrdersAPI(ResourceAPI):
         ]
         return api_urls
 
-    def __init__(self, order_service: OrderAPIService, config: dict) -> None:
-        super().__init__()
-        self._config = config
+    def __init__(self, order_service: OrderAPIService, *args) -> None:
+        super().__init__(*args)
         self._order_api_service = order_service
 
     def post(self) -> Response:
+        super(UsersOrdersAPI, self).post(req=request)
+
         request_json = request.json
 
         if request_json is None:
@@ -74,6 +74,8 @@ class UsersOrdersAPI(ResourceAPI):
         return resp
 
     def put(self, suuid: str) -> Response:
+        super(UsersOrdersAPI, self).put(req=request)
+
         request_json = request.json
 
         if request_json is None:

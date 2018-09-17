@@ -2,7 +2,6 @@ import sys
 from http import HTTPStatus
 from typing import List
 
-import logging
 from flask import Response, request
 
 from app.exception import RailRoadAPIError
@@ -23,7 +22,6 @@ class UsersServersConditionsAPI(ResourceAPI):
     __api_url__ = 'users/<string:user_uuid>/servers/conditions'
 
     _vpn_policy = None
-    _config = None
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
@@ -34,11 +32,9 @@ class UsersServersConditionsAPI(ResourceAPI):
         ]
         return api_urls
 
-    def __init__(self, vpn_service: VPNServerPolicy, config: dict) -> None:
+    def __init__(self, vpn_service: VPNServerPolicy, *args) -> None:
+        super().__init__(*args)
         self._vpn_policy = vpn_service
-        self._config = config
-
-        super().__init__()
 
     def post(self) -> Response:
         resp = make_error_request_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)

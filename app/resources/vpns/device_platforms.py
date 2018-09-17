@@ -3,7 +3,7 @@ import sys
 from http import HTTPStatus
 from typing import List
 
-from flask import Response
+from flask import Response, request
 
 from app.exception import RailRoadAPIError
 from app.service import VPNDevicePlatformsAPIService
@@ -23,8 +23,6 @@ class VPNSDevicePlatformsAPI(ResourceAPI):
     __endpoint_name__ = __qualname__
     __api_url__ = 'vpns/device_platforms'
 
-    _config = None
-
     _vpndeviceplatforms_api_service = None
 
     @staticmethod
@@ -36,11 +34,9 @@ class VPNSDevicePlatformsAPI(ResourceAPI):
         ]
         return api_urls
 
-    def __init__(self, vpndeviceplatforms_api_service: VPNDevicePlatformsAPIService, config: dict) -> None:
-        super().__init__()
+    def __init__(self, vpndeviceplatforms_api_service: VPNDevicePlatformsAPIService, *args) -> None:
+        super().__init__(*args)
         self._vpndeviceplatforms_api_service = vpndeviceplatforms_api_service
-
-        self._config = config
 
     def post(self) -> Response:
         resp = make_error_request_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -51,6 +47,8 @@ class VPNSDevicePlatformsAPI(ResourceAPI):
         return resp
 
     def get(self, sid: int = None) -> Response:
+        super(VPNSDevicePlatformsAPI, self).get(req=request)
+
         if sid is not None:
             try:
                 sid = int(sid)

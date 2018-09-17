@@ -25,7 +25,6 @@ class UsersAPI(ResourceAPI):
     __endpoint_name__ = __qualname__
     __api_url__ = 'users'
 
-    _config = None
     _user_policy = None
 
     @staticmethod
@@ -40,12 +39,13 @@ class UsersAPI(ResourceAPI):
         ]
         return api_urls
 
-    def __init__(self, user_policy: UserPolicy, config: dict) -> None:
-        super().__init__()
-        self._config = config
+    def __init__(self, user_policy: UserPolicy, *args) -> None:
+        super().__init__(*args)
         self._user_policy = user_policy
 
     def post(self) -> Response:
+        super(UsersAPI, self).post(req=request)
+
         request_json = request.json
 
         if request_json is None:
@@ -100,6 +100,8 @@ class UsersAPI(ResourceAPI):
             return resp
 
     def put(self, suuid: str = None) -> Response:
+        super(UsersAPI, self).put(req=request)
+
         request_json = request.json
 
         if request_json is None:
@@ -168,6 +170,7 @@ class UsersAPI(ResourceAPI):
 
     def get(self, suuid: str = None, email: str = None, pin_code: str = None) -> Response:
         super(UsersAPI, self).get(req=request)
+
         if suuid is not None:
             is_valid = check_uuid(suuid=suuid)
             if not is_valid:

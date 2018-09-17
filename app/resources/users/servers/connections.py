@@ -3,7 +3,7 @@ import sys
 from http import HTTPStatus
 from typing import List
 
-from flask import Response
+from flask import Response, request
 
 from app.exception import RailRoadAPIError
 from app.service import VPNServerConnectionsAPIService
@@ -24,8 +24,6 @@ class UsersServersConnectionsAPI(ResourceAPI):
     __endpoint_name__ = __qualname__
     __api_url__ = 'users/<string:user_uuid>/servers/<string:server_uuid>/connections'
 
-    _config = None
-
     _connections_api_service = None
 
     @staticmethod
@@ -37,20 +35,25 @@ class UsersServersConnectionsAPI(ResourceAPI):
         ]
         return api_urls
 
-    def __init__(self, vpnserversconnections_service: VPNServerConnectionsAPIService, config: dict) -> None:
-        super().__init__()
+    def __init__(self, vpnserversconnections_service: VPNServerConnectionsAPIService, *args) -> None:
+        super().__init__(*args)
         self._connections_api_service = vpnserversconnections_service
-        self._config = config
 
     def post(self) -> Response:
+        super(UsersServersConnectionsAPI, self).post(req=request)
+
         resp = make_error_request_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
         return resp
 
     def put(self) -> Response:
+        super(UsersServersConnectionsAPI, self).put(req=request)
+
         resp = make_error_request_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
         return resp
 
     def get(self, server_uuid: str, user_uuid: str, suuid: str = None) -> Response:
+        super(UsersServersConnectionsAPI, self).get(req=request)
+
         if suuid is None:
             try:
                 api_response = self._connections_api_service.get_by_server_and_user(server_uuid=server_uuid,

@@ -23,7 +23,6 @@ class SubscriptionsAPI(ResourceAPI):
     __endpoint_name__ = __qualname__
     __api_url__ = 'subscriptions'
 
-    _config = None
     _subscription_api_service = None
 
     @staticmethod
@@ -34,9 +33,8 @@ class SubscriptionsAPI(ResourceAPI):
         ]
         return api_urls
 
-    def __init__(self, subscription_service: SubscriptionAPIService, config: dict) -> None:
-        super().__init__()
-        self._config = config
+    def __init__(self, subscription_service: SubscriptionAPIService, *args) -> None:
+        super().__init__(*args)
         self._subscription_api_service = subscription_service
 
     def post(self) -> Response:

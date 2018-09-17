@@ -2,7 +2,7 @@ import sys
 from http import HTTPStatus
 from typing import List
 
-from flask import Response
+from flask import Response, request
 
 from app.service import VPNServersMetaAPIService
 from rest import APIResourceURL
@@ -19,8 +19,6 @@ class VPNSServersMetaAPI(ResourceAPI):
     __endpoint_name__ = __qualname__
     __api_url__ = 'vpns/servers/meta'
 
-    _config = None
-
     vpnserversmeta_api_service = None
 
     @staticmethod
@@ -31,11 +29,9 @@ class VPNSServersMetaAPI(ResourceAPI):
         ]
         return api_urls
 
-    def __init__(self, vpnserversmeta_service: VPNServersMetaAPIService, config: dict) -> None:
-        super().__init__()
+    def __init__(self, vpnserversmeta_service: VPNServersMetaAPIService, *args) -> None:
+        super().__init__(*args)
         self.vpnserversmeta_api_service = vpnserversmeta_service
-
-        self._config = config
 
     def post(self) -> Response:
         resp = make_error_request_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -46,6 +42,8 @@ class VPNSServersMetaAPI(ResourceAPI):
         return resp
 
     def get(self) -> Response:
+        super(VPNSServersMetaAPI, self).get(req=request)
+
         api_response = self.vpnserversmeta_api_service.get_meta()
 
         response_data = APIResponse(status=APIResponseStatus.success.status, code=api_response.code,

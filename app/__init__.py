@@ -17,10 +17,10 @@ from app.resources.users.servers.configurations import UsersServersConfiguration
 from app.resources.users.servers.connections import UsersServersConnectionsAPI
 from app.resources.users.subscriptions import UsersSubscriptionsAPI
 from app.resources.vpns.device_platforms import VPNSDevicePlatformsAPI
-from app.resources.vpns.types import VPNSTypesAPI
 from app.resources.vpns.servers import VPNServersAPI
 from app.resources.vpns.servers.connections import VPNSServersConnectionsAPI
 from app.resources.vpns.servers.meta import VPNSServersMetaAPI
+from app.resources.vpns.types import VPNSTypesAPI
 from app.service import *
 
 sys.path.insert(1, '../rest_api_library')
@@ -121,23 +121,23 @@ vpn_policy = VPNServerPolicy(vpnserver_service=vpnserver_api_service, vpntype_se
                              geocountry_service=geocountry_api_service, geostate_service=geostate_api_service)
 
 apis = [
-    {'cls': UsersAPI, 'args': [user_policy, app_config]},
-    {'cls': UsersOrdersAPI, 'args': [order_api_service, app_config]},
-    {'cls': UsersOrdersPaymentsAPI, 'args': [order_api_service, app_config]},
-    {'cls': UsersSubscriptionsAPI, 'args': [user_policy, app_config]},
-    {'cls': UsersDevicesAPI, 'args': [user_policy, app_config]},
+    {'cls': UsersAPI, 'args': [user_policy, app_config, True]},
+    {'cls': UsersOrdersAPI, 'args': [order_api_service, app_config, True]},
+    {'cls': UsersOrdersPaymentsAPI, 'args': [order_api_service, app_config, True]},
+    {'cls': UsersSubscriptionsAPI, 'args': [user_policy, app_config, True]},
+    {'cls': UsersDevicesAPI, 'args': [user_policy, app_config, True]},
     {'cls': PaymentsAPI, 'args': [order_api_service, user_sub_api_service, vpn_mgmt_users_api_service, user_policy,
                                   vpnserverconf_api_service, app_config]},
-    {'cls': SubscriptionsAPI, 'args': [subscription_api_service, app_config]},
-    {'cls': VPNServersAPI, 'args': [vpn_policy, app_config]},
+    {'cls': SubscriptionsAPI, 'args': [subscription_api_service, app_config, True]},
+    {'cls': VPNServersAPI, 'args': [vpn_policy, app_config, True]},
     {'cls': VPNSServersMetaAPI, 'args': [vpnserversmeta_api_service, app_config]},
-    {'cls': UsersServersConditionsAPI, 'args': [vpn_policy, app_config]},
-    {'cls': UsersServersAPI, 'args': [vpn_policy, app_config]},
-    {'cls': UsersServersConfigurationsAPI, 'args': [vpnserverconf_api_service, vpnserver_api_service, app_config]},
-    {'cls': UsersServersConnectionsAPI, 'args': [vpnserverconn_api_service, app_config]},
-    {'cls': VPNSDevicePlatformsAPI, 'args': [vpn_device_platforms_api_service, app_config]},
-    {'cls': VPNSTypesAPI, 'args': [vpntype_api_service, app_config]},
-    {'cls': VPNSServersConnectionsAPI, 'args': [vpnserverconn_api_service, user_policy, app_config]},
+    {'cls': UsersServersConditionsAPI, 'args': [vpn_policy, app_config, True]},
+    {'cls': UsersServersAPI, 'args': [vpn_policy, app_config, True]},
+    {'cls': UsersServersConfigurationsAPI, 'args': [vpnserverconf_api_service, vpnserver_api_service, app_config, True]},
+    {'cls': UsersServersConnectionsAPI, 'args': [vpnserverconn_api_service, app_config, True]},
+    {'cls': VPNSDevicePlatformsAPI, 'args': [vpn_device_platforms_api_service, app_config, True]},
+    {'cls': VPNSTypesAPI, 'args': [vpntype_api_service, app_config, True]},
+    {'cls': VPNSServersConnectionsAPI, 'args': [vpnserverconn_api_service, user_policy, app_config, True]},
 ]
 
 register_api(app, api_base_uri, apis)
@@ -155,10 +155,15 @@ def not_found_error(error):
 
 @app.errorhandler(404)
 def not_found_error(error):
-    return make_error_request_response(http_code=HTTPStatus.NOT_FOUND, err=RailRoadAPIError.API_DOES_NOT_EXIST)
+    return make_error_request_response(http_code=HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
 
 @app.errorhandler(500)
 def internal_error(error):
     return make_error_request_response(http_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-                                       err=RailRoadAPIError.API_DOES_NOT_EXIST)
+                                       err=RailRoadAPIError.UNKNOWN_ERROR_CODE)
+
+
+@app.errorhandler(APIException)
+def api_exception_error(error):
+    return make_error_request_response(http_code=error.http_code)

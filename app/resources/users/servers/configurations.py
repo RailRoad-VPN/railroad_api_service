@@ -25,8 +25,6 @@ class UsersServersConfigurationsAPI(ResourceAPI):
     __endpoint_name__ = __qualname__
     __api_url__ = 'users/<string:user_uuid>/servers/<string:server_uuid>/configurations'
 
-    _config = None
-
     _confs_api_service = None
     _vpnservers_api_service = None
 
@@ -40,11 +38,10 @@ class UsersServersConfigurationsAPI(ResourceAPI):
         return api_urls
 
     def __init__(self, vpnserversconfigurations_service: UsersVPNServersConfigurationsAPIService,
-                 vpnservers_api_service: VPNServersAPIService, config: dict) -> None:
-        super().__init__()
+                 vpnservers_api_service: VPNServersAPIService, *args) -> None:
+        super().__init__(*args)
         self._confs_api_service = vpnserversconfigurations_service
         self._vpnservers_api_service = vpnservers_api_service
-        self._config = config
 
     def post(self) -> Response:
         resp = make_error_request_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -55,6 +52,8 @@ class UsersServersConfigurationsAPI(ResourceAPI):
         return resp
 
     def get(self, server_uuid: str, user_uuid: str, suuid: str = None) -> Response:
+        super(UsersServersConfigurationsAPI, self).get(req=request)
+
         platform_id = request.args.get('platform_id', None)
         vpn_type_id = request.args.get('vpn_type_id', None)
 

@@ -22,7 +22,6 @@ class UsersSubscriptionsAPI(ResourceAPI):
     __endpoint_name__ = __qualname__
     __api_url__ = 'users/<string:user_uuid>/subscriptions'
 
-    _config = None
     _user_policy = None
 
     @staticmethod
@@ -34,12 +33,13 @@ class UsersSubscriptionsAPI(ResourceAPI):
         ]
         return api_urls
 
-    def __init__(self, user_policy: UserPolicy, config: dict) -> None:
-        super().__init__()
-        self._config = config
+    def __init__(self, user_policy: UserPolicy, *args) -> None:
+        super().__init__(*args)
         self._user_policy = user_policy
 
     def post(self, user_uuid: str) -> Response:
+        super(UsersSubscriptionsAPI, self).post(req=request)
+        
         request_json = request.json
 
         if request_json is None:
@@ -85,6 +85,8 @@ class UsersSubscriptionsAPI(ResourceAPI):
             return resp
 
     def put(self, user_uuid: str, user_subscription_uuid: str) -> Response:
+        super(UsersSubscriptionsAPI, self).put(req=request)
+        
         request_json = request.json
 
         if request_json is None:
