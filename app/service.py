@@ -397,7 +397,7 @@ class VPNMGMTUsersAPIService(RESTService):
     def create_vpn_user(self, email: str):
         self.logger.debug(f"{self.__class__}: create_vpn_user with parameters email: {email}")
         url = self._url.replace("<string:user_email>", email)
-        api_response = self._post(data={}, url=url)
+        api_response = self._post(data={}, url=url, timeout=600)
         return api_response
 
     def withdraw_vpn_user(self, email: str):
