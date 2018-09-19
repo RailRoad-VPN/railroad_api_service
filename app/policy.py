@@ -220,18 +220,15 @@ class VPNServerPolicy(object):
         api_response = self.vpnserver_api_service.update_vpnserver(vpnserver=vpnserver)
         return api_response
 
-    def get_random_vpn_server(self, type_id: int = None, status_id: int = None) -> APIResponse:
+    def get_random_vpn_server(self, type_id: int = None) -> APIResponse:
         self.logger.debug(
-            f"{self.__class__}: get_random_vpn_server method with parameters type_id: {type_id}, status_id: {status_id}")
+            f"{self.__class__}: get_random_vpn_server method with parameters type_id: {type_id}")
         # TODO some logic to get random VPN server
 
         pagination = ResourcePagination(limit=1, offset=0)
 
         if type_id is not None:
             api_response = self.vpnserver_api_service.get_vpnservers_by_type(type_id=type_id, pagination=pagination)
-        elif status_id is not None:
-            api_response = self.vpnserver_api_service.get_vpnservers_by_status(status_id=status_id,
-                                                                               pagination=pagination)
         else:
             api_response = self.vpnserver_api_service.get_vpnservers(pagination=pagination)
 

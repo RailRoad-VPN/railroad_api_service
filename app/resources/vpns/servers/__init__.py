@@ -38,7 +38,6 @@ class VPNServersAPI(ResourceAPI):
         super().__init__(*args)
         self._vpn_policy = vpn_service
 
-
     def post(self) -> Response:
         resp = make_error_request_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
         return resp
