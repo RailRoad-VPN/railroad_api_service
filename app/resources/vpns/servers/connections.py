@@ -103,12 +103,12 @@ class VPNSServersConnectionsAPI(ResourceAPI):
 
             user_device = None
             user_device_uuid = None
-            NEW_CONNECTION = False
+            new_connection = False
             for ud in user_devices:
                 if ud.get('virtual_ip') == virtual_ip:
                     user_device = ud
                     if not user_device.get('is_connected'):
-                        NEW_CONNECTION = True
+                        new_connection = True
                     user_device['connected_since'] = connected_since
                     user_device['device_ip'] = device_ip
                     user_device['is_connected'] = True
@@ -120,7 +120,7 @@ class VPNSServersConnectionsAPI(ResourceAPI):
                     user_device_uuid = None
                     self.logger.debug(
                         f"{self.__class__}: We did not found user device for received connection information. "
-                        f"This means it is OpenVPN configuration or something else.")
+                        f"This means it is OpenVPN configuration OR something else.")
                     api_response = self._vpnserverconn_api_service.get_current_by_server_and_user_and_vip(
                         server_uuid=server_uuid,
                         virtual_ip=virtual_ip)
@@ -137,7 +137,7 @@ class VPNSServersConnectionsAPI(ResourceAPI):
                         user_device_uuid=user_device_uuid)
                     server_connection = api_response.data
 
-                if NEW_CONNECTION:
+                if new_connection:
                     raise APINotFoundException
                 else:
                     self.logger.debug(f"{self.__class__}: Update existed connection")

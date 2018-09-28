@@ -117,6 +117,7 @@ class UserPolicy(object):
         self.logger.debug(f"{self.__class__}: update_user_device method with parameters user_uuid: {user_uuid}, "
                           f"suuid: {suuid}")
         self._user_device_api_service.delete(user_uuid=user_uuid, suuid=suuid)
+
     def get_user_device_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
         self.logger.debug(f"{self.__class__}: get_user_device_by_uuid method with parameters "
                           f"user_uuid: {user_uuid}, suuid: {suuid}")
@@ -184,24 +185,6 @@ class VPNServerPolicy(object):
         self.geocity_api_service = geocity_service
         self.geocountry_api_service = geocountry_service
         self.geostate_api_service = geostate_service
-
-    def create_vpn_server_user_configuration(self, server_uuid: str, user_uuid: str, cert: str):
-        self.logger.debug(f"{self.__class__}: create_vpn_server_user_configuration method with parameters "
-                          f"server_uuid: {server_uuid}, user_uuid: {user_uuid}, cert: {cert}")
-
-        self.logger.debug(f"{self.__class__}: get vpn server by uuid: {server_uuid}")
-        api_response = self.vpnserver_api_service.get_vpnserver_by_uuid(suuid=server_uuid)
-        server = api_response.data
-        self.logger.debug(f"{self.__class__}: vpn server: {server}")
-
-        self.logger.debug(f"{self.__class__}: create vpn Configuration")
-        configuration = ''
-        platform_id = 0
-
-        self.vpnserverconf_api_service.create(user_uuid=user_uuid, server_uuid=server_uuid,
-                                              configuration=configuration, platform_id=platform_id)
-
-        # TODO
 
     def create_vpn_server(self, vpnserver: dict) -> APIResponse:
         self.logger.debug(f"{self.__class__}: create_vpn_server method with parameters vpnserver: {vpnserver}")
