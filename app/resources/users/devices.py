@@ -51,8 +51,6 @@ class UsersDevicesAPI(ResourceAPI):
         if not is_valid:
             return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
-        user_uuid = request_json.get('user_uuid', None)
-        device_token = request_json.get('device_token', None)
         device_id = request_json.get('device_id', None)
         platform_id = request_json.get('platform_id', None)
         vpn_type_id = request_json.get('vpn_type_id', None)
@@ -80,8 +78,8 @@ class UsersDevicesAPI(ResourceAPI):
         try:
             api_response = self._user_policy.create_user_device(user_uuid=user_uuid, device_id=device_id,
                                                                 virtual_ip=virtual_ip, device_ip=device_ip,
-                                                                device_token=device_token, location=location,
-                                                                is_active=is_active, connected_since=connected_since,
+                                                                location=location, is_active=is_active,
+                                                                connected_since=connected_since,
                                                                 platform_id=platform_id, vpn_type_id=vpn_type_id)
             user_device = api_response.data
 
@@ -149,28 +147,19 @@ class UsersDevicesAPI(ResourceAPI):
         if not is_valid_a or not is_valid_b or (user_device_uuid != device_uuid):
             return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
-        suuid = request_json.get('uuid', None)
-        user_uuid = request_json.get('user_uuid', None)
-        device_token = request_json.get('device_token', None)
         device_id = request_json.get('device_id', None)
-        platform_id = request_json.get('platform_id', None)
-        vpn_type_id = request_json.get('vpn_type_id', None)
+        device_ip = request_json.get('device_ip', None)
+        virtual_ip = request_json.get('virtual_ip', None)
         location = request_json.get('location', None)
         is_active = request_json.get('is_active', None)
-        virtual_ip = request_json.get('virtual_ip', None)
-        device_ip = request_json.get('device_ip', None)
         connected_since = request_json.get('connected_since', None)
         modify_reason = request_json.get('modify_reason', None)
 
         req_fields = {
-            'uuid': suuid,
-            'user_uuid': user_uuid,
-            'device_token': device_token,
             'device_id': device_id,
-            'platform_id': platform_id,
-            'vpn_type_id': vpn_type_id,
-            'is_active': is_active,
             'virtual_ip': virtual_ip,
+            'location': location,
+            'is_active': is_active,
             'modify_reason': modify_reason,
         }
 
@@ -185,7 +174,6 @@ class UsersDevicesAPI(ResourceAPI):
             # check does user device exists
             self._user_policy.get_user_device_by_uuid(user_uuid=user_uuid, suuid=user_device_uuid)
             # reuse variable
-            req_fields['location'] = location
             req_fields['device_ip'] = device_ip
             req_fields['connected_since'] = connected_since
             self._user_policy.update_user_device(req_fields)
