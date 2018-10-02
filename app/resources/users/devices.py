@@ -174,6 +174,8 @@ class UsersDevicesAPI(ResourceAPI):
             # check does user device exists
             self._user_policy.get_user_device_by_uuid(user_uuid=user_uuid, suuid=user_device_uuid)
             # reuse variable
+            req_fields['uuid'] = user_device_uuid
+            req_fields['user_uuid'] = user_uuid
             req_fields['device_ip'] = device_ip
             req_fields['connected_since'] = connected_since
             self._user_policy.update_user_device(req_fields)
