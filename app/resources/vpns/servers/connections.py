@@ -62,7 +62,6 @@ class VPNSServersConnectionsAPI(ResourceAPI):
         req_fields = {
             'server': server,
             'type': server_type,
-            'users_count': users_count,
             'uuid': server_uuid,
             'users': user_list,
         }
