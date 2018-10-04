@@ -96,7 +96,7 @@ class VPNSServersConnectionsAPI(ResourceAPI):
             device_ip = connection_user.get('device_ip')
             virtual_ip = connection_user.get('virtual_ip')
 
-            self.logger.debug(f"{self.__class__}: get user}")
+            self.logger.debug(f"{self.__class__}: get user by email")
             api_response = self._user_policy.get_user(email=email)
             user = api_response.data
             user_uuid = user.get('uuid')
@@ -127,7 +127,7 @@ class VPNSServersConnectionsAPI(ResourceAPI):
             else:
                 self.logger.debug(f"{self.__class__}: find user device by device_id: {device_id}")
                 api_response = self._user_policy.get_user_device_by_uuid(user_uuid=user_uuid, suuid=device_id)
-                user_devices = api_response.data
+                user_device = api_response.data
 
             try:
                 if user_device is None:
@@ -142,6 +142,7 @@ class VPNSServersConnectionsAPI(ResourceAPI):
                 else:
                     user_device_uuid = user_device.get('uuid')
                     try:
+                        self.logger.debug(f"{self.__class__}: get user devices")
                         self._user_policy.update_user_device(user_device=user_device)
                     except APIException as e:
                         self.logger.error(e)
