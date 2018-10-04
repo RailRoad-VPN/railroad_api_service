@@ -118,11 +118,11 @@ class UserPolicy(object):
                           f"suuid: {suuid}")
         self._user_device_api_service.delete(user_uuid=user_uuid, suuid=suuid)
 
-    def get_user_device_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
+    def get_user_devices_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
         """
             suuid is uuid or device_id
         """
-        self.logger.debug(f"{self.__class__}: get_user_device_by_uuid method with parameters "
+        self.logger.debug(f"{self.__class__}: get_user_devices_by_uuid method with parameters "
                           f"user_uuid: {user_uuid}, suuid: {suuid}")
         api_response = self._user_device_api_service.get_user_device_by_uuid(user_uuid=user_uuid, suuid=suuid)
         self.logger.debug(f"{self.__class__}: got api response: {api_response.serialize()}")

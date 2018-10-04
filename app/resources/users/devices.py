@@ -172,7 +172,7 @@ class UsersDevicesAPI(ResourceAPI):
 
         try:
             # check does user device exists
-            self._user_policy.get_user_device_by_uuid(user_uuid=user_uuid, suuid=user_device_uuid)
+            self._user_policy.get_user_devices_by_uuid(user_uuid=user_uuid, suuid=user_device_uuid)
             # reuse variable
             req_fields['uuid'] = user_device_uuid
             req_fields['user_uuid'] = user_uuid
@@ -209,7 +209,7 @@ class UsersDevicesAPI(ResourceAPI):
             # get specific user device by uuid
             try:
                 self.logger.debug(f"{self.__class__}: call user policy")
-                api_response = self._user_policy.get_user_device_by_uuid(user_uuid=user_uuid, suuid=user_device_uuid)
+                api_response = self._user_policy.get_user_devices_by_uuid(user_uuid=user_uuid, suuid=user_device_uuid)
                 self.logger.debug(f"{self.__class__}: api_response: {api_response.serialize()}")
                 response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK,
                                             data=api_response.data)

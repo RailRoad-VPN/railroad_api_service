@@ -130,7 +130,7 @@ class UserDeviceAPIService(RESTService):
         self._delete(url=url)
 
     def get_user_device_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
-        self.logger.debug(f"{self.__class__}: get_user_device_by_uuid method with parameters user_uuid: {user_uuid}, suuid: {suuid}")
+        self.logger.debug(f"{self.__class__}: get_user_devices_by_uuid method with parameters user_uuid: {user_uuid}, suuid: {suuid}")
         url = self._url.replace('<string:user_uuid>', user_uuid)
         url = f"{url}/{suuid}"
         api_response = self._get(url=url)
