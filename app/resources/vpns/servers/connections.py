@@ -85,7 +85,9 @@ class VPNSServersConnectionsAPI(ResourceAPI):
             resp = make_api_response(data=response_data, http_code=response_data.code)
             return resp
 
+        self.logger.debug(f"{self.__class__}: iterate users")
         for k, connection_user in user_list.items():
+            self.logger.debug(f"{self.__class__}: iterate user json: {connection_user}")
             email = connection_user.get('email')
             bytes_i = connection_user.get('bytes_i')
             bytes_o = connection_user.get('bytes_o')
@@ -94,6 +96,7 @@ class VPNSServersConnectionsAPI(ResourceAPI):
             device_ip = connection_user.get('device_ip')
             virtual_ip = connection_user.get('virtual_ip')
 
+            self.logger.debug(f"{self.__class__}: get user}")
             api_response = self._user_policy.get_user(email=email)
             user = api_response.data
             user_uuid = user.get('uuid')
@@ -103,12 +106,16 @@ class VPNSServersConnectionsAPI(ResourceAPI):
             user_device_uuid = None
             new_connection = False
             if device_id is None:
+                self.logger.debug(f"{self.__class__}: device id is None")
 
+                self.logger.debug(f"{self.__class__}: get user devices")
                 api_response = self._user_policy.get_user_devices(user_uuid=user_uuid)
                 user_devices = api_response.data
 
+                self.logger.debug(f"{self.__class__}: search user device by virtual_ip: {virtual_ip}")
                 for ud in user_devices:
                     if ud.get('virtual_ip') == virtual_ip:
+                        self.logger.debug(f"{self.__class__}: found user device")
                         user_device = ud
                         if not user_device.get('is_connected'):
                             new_connection = True
@@ -118,7 +125,9 @@ class VPNSServersConnectionsAPI(ResourceAPI):
                         user_device['modify_reason'] = 'update connection information'
                         break
             else:
-                self._user_policy.get_user_device_by_uuid(user_uuid=user_uuid, suuid=device_id)
+                self.logger.debug(f"{self.__class__}: find user device by device_id: {device_id}")
+                api_response = self._user_policy.get_user_device_by_uuid(user_uuid=user_uuid, suuid=device_id)
+                user_devices = api_response.data
 
             try:
                 if user_device is None:
