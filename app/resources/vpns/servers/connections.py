@@ -98,22 +98,27 @@ class VPNSServersConnectionsAPI(ResourceAPI):
             user = api_response.data
             user_uuid = user.get('uuid')
 
-            api_response = self._user_policy.get_user_devices(user_uuid=user_uuid)
-            user_devices = api_response.data
-
+            device_id = connection_user.get('device_id', None)
             user_device = None
             user_device_uuid = None
             new_connection = False
-            for ud in user_devices:
-                if ud.get('virtual_ip') == virtual_ip:
-                    user_device = ud
-                    if not user_device.get('is_connected'):
-                        new_connection = True
-                    user_device['connected_since'] = connected_since
-                    user_device['device_ip'] = device_ip
-                    user_device['is_connected'] = True
-                    user_device['modify_reason'] = 'update connection information'
-                    break
+            if device_id is None:
+
+                api_response = self._user_policy.get_user_devices(user_uuid=user_uuid)
+                user_devices = api_response.data
+
+                for ud in user_devices:
+                    if ud.get('virtual_ip') == virtual_ip:
+                        user_device = ud
+                        if not user_device.get('is_connected'):
+                            new_connection = True
+                        user_device['connected_since'] = connected_since
+                        user_device['device_ip'] = device_ip
+                        user_device['is_connected'] = True
+                        user_device['modify_reason'] = 'update connection information'
+                        break
+            else:
+                self._user_policy.get_user_device_by_uuid(user_uuid=user_uuid, suuid=device_id)
 
             try:
                 if user_device is None:
