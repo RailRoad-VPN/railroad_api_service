@@ -188,7 +188,7 @@ class PaymentsAPI(ResourceAPI):
         self.logger.debug(f"{self.__class__}: update order")
         self._order_api_service.update_order(order_json=order)
 
-        self.logger.debug(f"{self.__class__}: get all user subscriptions")
+        self.logger.debug(f"{self.__class__}: get all user services")
         api_response = self._user_sub_api_service.get_user_subs_by_user_uuid(user_uuid=user_uuid)
         user_subs = api_response.data
         self.logger.debug(f"{self.__class__}: got user subs: {user_subs}")

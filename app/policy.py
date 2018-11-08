@@ -45,13 +45,13 @@ class UserPolicy(object):
             f"{self.__class__}: update_user_sub method with parameter user_subscription: {user_subscription}")
         self._user_sub_api_service.update(user_subscription=user_subscription)
 
-    def get_user_sub_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
+    def get_user_service_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
         api_response = self._user_sub_api_service.get_user_sub_by_uuid(user_uuid=user_uuid, suuid=suuid)
         return api_response
 
-    def get_user_subs(self, user_uuid: str) -> APIResponse:
+    def get_user_services(self, user_uuid: str) -> APIResponse:
         self.logger.debug(f"{self.__class__}: get_user_subs method with parameter user_uuid: {user_uuid}")
-        self.logger.debug(f"{self.__class__}: Get user subscriptions by user uuid")
+        self.logger.debug(f"{self.__class__}: Get user services by user uuid")
         api_response = self._user_sub_api_service.get_user_subs_by_user_uuid(user_uuid=user_uuid)
         return api_response
 

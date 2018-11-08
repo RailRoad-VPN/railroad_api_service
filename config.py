@@ -14,8 +14,8 @@ class Config(object):
     AUTH_SERVICE_USER_DEVICES_RESOURCE_NAME = 'users/<string:user_uuid>/devices'
     AUTH_SERVICE_USER_VPN_SERVER_CONFIGURATIONS_RESOURCE_NAME = 'users/<string:user_uuid>/vpnservers_configurations'
 
-    BILLING_SERVICE_SUBSCRIPTIONS_RESOURCE_NAME = 'subscriptions'
-    BILLING_SERVICE_USER_SUBSCRIPTION_RESOURCE_NAME = 'users/<string:user_uuid>/subscriptions'
+    BILLING_SERVICE_SUBSCRIPTIONS_RESOURCE_NAME = 'services'
+    BILLING_SERVICE_USER_SUBSCRIPTION_RESOURCE_NAME = 'users/<string:user_uuid>/services'
     BILLING_SERVICE_ORDERS_RESOURCE_NAME = 'orders'
     BILLING_SERVICE_PAYMENTS_RESOURCE_NAME = 'orders/<string:order_uuid>/payments'
 

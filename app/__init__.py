@@ -6,7 +6,7 @@ from flask import Flask, request
 from app.exception import RailRoadAPIError
 from app.policy import *
 from app.resources.payments import PaymentsAPI
-from app.resources.subscriptions import SubscriptionsAPI
+from app.resources.services import RRNServicesAPI
 from app.resources.users import UsersAPI
 from app.resources.users.devices import UsersDevicesAPI
 from app.resources.users.orders import UsersOrdersAPI
@@ -15,7 +15,7 @@ from app.resources.users.servers import UsersServersAPI
 from app.resources.users.servers.conditions import UsersServersConditionsAPI
 from app.resources.users.servers.configurations import UsersServersConfigurationsAPI
 from app.resources.users.servers.connections import UsersServersConnectionsAPI
-from app.resources.users.subscriptions import UsersSubscriptionsAPI
+from app.resources.users.subscriptions import UsersServicesAPI
 from app.resources.vpns.device_platforms import VPNSDevicePlatformsAPI
 from app.resources.vpns.servers import VPNServersAPI
 from app.resources.vpns.servers.connections import VPNSServersConnectionsAPI
@@ -103,8 +103,8 @@ vpnserverconf_api_service = UsersVPNServersConfigurationsAPIService(api_url=app_
                                                                     resource_name=app_config[
                                                                         'AUTH_SERVICE_USER_VPN_SERVER_CONFIGURATIONS_RESOURCE_NAME'])
 
-subscription_api_service = SubscriptionAPIService(api_url=app_config['BILLING_SERVICE_URL'],
-                                                  resource_name=app_config[
+rrnservices_api_service = RRNServiceAPIService(api_url=app_config['BILLING_SERVICE_URL'],
+                                               resource_name=app_config[
                                                       'BILLING_SERVICE_SUBSCRIPTIONS_RESOURCE_NAME'])
 
 order_api_service = OrderAPIService(api_url=app_config['BILLING_SERVICE_URL'],
@@ -124,11 +124,11 @@ apis = [
     {'cls': UsersAPI, 'args': [user_policy, app_config, True]},
     {'cls': UsersOrdersAPI, 'args': [order_api_service, app_config, True]},
     {'cls': UsersOrdersPaymentsAPI, 'args': [order_api_service, app_config, True]},
-    {'cls': UsersSubscriptionsAPI, 'args': [user_policy, app_config, True]},
+    {'cls': UsersServicesAPI, 'args': [user_policy, app_config, True]},
     {'cls': UsersDevicesAPI, 'args': [user_policy, app_config, True]},
     {'cls': PaymentsAPI, 'args': [order_api_service, user_sub_api_service, vpn_mgmt_users_api_service, user_policy,
                                   vpnserverconf_api_service, app_config]},
-    {'cls': SubscriptionsAPI, 'args': [subscription_api_service, app_config, True]},
+    {'cls': RRNServicesAPI, 'args': [rrnservices_api_service, app_config, True]},
     {'cls': VPNServersAPI, 'args': [vpn_policy, app_config, True]},
     {'cls': VPNSServersMetaAPI, 'args': [vpnserversmeta_api_service, app_config]},
     {'cls': UsersServersConditionsAPI, 'args': [vpn_policy, app_config, True]},

@@ -16,20 +16,20 @@ from response import APIResponseStatus, APIResponse
 from rest import APIException, APIResourceURL
 
 
-class UsersSubscriptionsAPI(ResourceAPI):
+class UsersServicesAPI(ResourceAPI):
     __version__ = 1
 
     __endpoint_name__ = __qualname__
-    __api_url__ = 'users/<string:user_uuid>/subscriptions'
+    __api_url__ = 'users/<string:user_uuid>/services'
 
     _user_policy = None
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
-        url = "%s/%s" % (base_url, UsersSubscriptionsAPI.__api_url__)
+        url = "%s/%s" % (base_url, UsersServicesAPI.__api_url__)
         api_urls = [
             APIResourceURL(base_url=url, resource_name='', methods=['GET', 'POST', ]),
-            APIResourceURL(base_url=url, resource_name='<string:user_subscription_uuid>', methods=['GET', 'PUT', ]),
+            APIResourceURL(base_url=url, resource_name='<string:user_service_uuid>', methods=['GET', 'PUT', ]),
         ]
         return api_urls
 
@@ -38,7 +38,7 @@ class UsersSubscriptionsAPI(ResourceAPI):
         self._user_policy = user_policy
 
     def post(self, user_uuid: str) -> Response:
-        super(UsersSubscriptionsAPI, self).post(req=request)
+        super(UsersServicesAPI, self).post(req=request)
         
         request_json = request.json
 
@@ -50,14 +50,14 @@ class UsersSubscriptionsAPI(ResourceAPI):
             return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
         user_uuid = request_json.get('user_uuid', None)
-        subscription_id = request_json.get('subscription_id', None)
+        service_id = request_json.get('service_id', None)
         status_id = request_json.get('status_id', None)
         order_uuid = request_json.get('order_uuid', None)
 
         req_fields = {
             'user_uuid': user_uuid,
             'status_id': status_id,
-            'subscription_id': subscription_id,
+            'service_id': service_id,
             'order_uuid': order_uuid,
         }
 
@@ -69,7 +69,7 @@ class UsersSubscriptionsAPI(ResourceAPI):
             return resp
 
         try:
-            api_response = self._user_policy.create_user_sub(user_uuid=user_uuid, subscription_id=subscription_id,
+            api_response = self._user_policy.create_user_sub(user_uuid=user_uuid, subscription_id=service_id,
                                                              order_uuid=order_uuid, status_id=status_id)
 
             api_url = self.__api_url__.replace('<string:user_uuid>', user_uuid)
@@ -84,8 +84,8 @@ class UsersSubscriptionsAPI(ResourceAPI):
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
 
-    def put(self, user_uuid: str, user_subscription_uuid: str) -> Response:
-        super(UsersSubscriptionsAPI, self).put(req=request)
+    def put(self, user_uuid: str, user_service_uuid: str) -> Response:
+        super(UsersServicesAPI, self).put(req=request)
         
         request_json = request.json
 
@@ -94,13 +94,13 @@ class UsersSubscriptionsAPI(ResourceAPI):
 
         us_uuid = request_json.get('uuid', None)
 
-        is_valid_a = check_uuid(suuid=user_subscription_uuid)
+        is_valid_a = check_uuid(suuid=user_service_uuid)
         is_valid_b = check_uuid(suuid=us_uuid)
-        if not is_valid_a or not is_valid_b or (user_subscription_uuid != us_uuid):
+        if not is_valid_a or not is_valid_b or (user_service_uuid != us_uuid):
             return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
         user_uuid = request_json.get('user_uuid', None)
-        subscription_id = request_json.get('subscription_id', None)
+        service_id = request_json.get('service_id', None)
         status_id = request_json.get('status_id', None)
         expire_date = request_json.get('expire_date', None)
         order_uuid = request_json.get('order_uuid', None)
@@ -110,7 +110,7 @@ class UsersSubscriptionsAPI(ResourceAPI):
         us_json = {
             'uuid': us_uuid,
             'user_uuid': user_uuid,
-            'subscription_id': subscription_id,
+            'service_id': service_id,
             'status_id': status_id,
             'expire_date': expire_date,
             'order_uuid': order_uuid,
@@ -126,7 +126,7 @@ class UsersSubscriptionsAPI(ResourceAPI):
             return resp
 
         try:
-            self._user_policy.get_user_sub_by_uuid(user_uuid=user_uuid, suuid=user_subscription_uuid)
+            self._user_policy.get_user_service_by_uuid(user_uuid=user_uuid, suuid=user_service_uuid)
         except APIException:
             return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.USER_SUBSCRIPTION_NOT_EXIST)
 
@@ -141,20 +141,20 @@ class UsersSubscriptionsAPI(ResourceAPI):
             resp = make_api_response(data=response_data, http_code=e.http_code)
             return resp
 
-    def get(self, user_uuid: str, user_subscription_uuid: str = None) -> Response:
-        super(UsersSubscriptionsAPI, self).get(req=request)
+    def get(self, user_uuid: str, user_service_uuid: str = None) -> Response:
+        super(UsersServicesAPI, self).get(req=request)
 
         is_valid = check_uuid(suuid=user_uuid)
         if not is_valid:
             return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
-        if user_subscription_uuid is not None:
-            is_valid = check_uuid(suuid=user_subscription_uuid)
+        if user_service_uuid is not None:
+            is_valid = check_uuid(suuid=user_service_uuid)
             if not is_valid:
                 return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
-            # get user subscription by subscription uuid
+            # get user service by service uuid
             try:
-                api_response = self._user_policy.get_user_sub_by_uuid(user_uuid=user_uuid, suuid=user_subscription_uuid)
+                api_response = self._user_policy.get_user_service_by_uuid(user_uuid=user_uuid, suuid=user_service_uuid)
             except APIException as e:
                 return make_error_request_response(http_code=e.http_code, err=e.errors)
             response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK,
@@ -162,9 +162,9 @@ class UsersSubscriptionsAPI(ResourceAPI):
             resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
             return resp
         else:
-            # get all user subscriptions
+            # get all user services
             try:
-                api_response = self._user_policy.get_user_subs(user_uuid=user_uuid)
+                api_response = self._user_policy.get_user_services(user_uuid=user_uuid)
                 subs = api_response.data
                 response_data = APIResponse(status=api_response.status, code=api_response.code, data=subs)
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)

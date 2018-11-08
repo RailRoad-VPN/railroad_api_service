@@ -20,7 +20,8 @@ class OrderAPIService(RESTService):
         super().__init__(**kwargs)
 
     def create_order(self, status_id: int, payment_uuid: str = None) -> APIResponse:
-        self.logger.debug(f"{self.__class__}: create_order method with parameters status_id: {status_id}, payment_uuid: {payment_uuid}")
+        self.logger.debug(
+            f"{self.__class__}: create_order method with parameters status_id: {status_id}, payment_uuid: {payment_uuid}")
         data = {
             'status_id': status_id,
             'payment_uuid': payment_uuid,
@@ -51,8 +52,9 @@ class OrderAPIService(RESTService):
         return api_response
 
     def create_payment(self, order_uuid: str, type_id: int, status_id: int, json_data: dict):
-        self.logger.debug(f"{self.__class__}: create_payment method with parameters order_uuid: {order_uuid}, type_id: {type_id}, "
-                          f"status_id: {status_id}, json_data: {json_data}")
+        self.logger.debug(
+            f"{self.__class__}: create_payment method with parameters order_uuid: {order_uuid}, type_id: {type_id}, "
+            f"status_id: {status_id}, json_data: {json_data}")
 
         url = f"{self._url}/{order_uuid}/payments"
 
@@ -74,7 +76,8 @@ class OrderAPIService(RESTService):
             raise APIException(http_code=api_response.code, errors=api_response.errors)
 
     def get_payment(self, order_uuid: str, suuid: str) -> APIResponse:
-        self.logger.debug(f"{self.__class__}: get_payment method with parameters order_uuid: {order_uuid}, suuid: {suuid}")
+        self.logger.debug(
+            f"{self.__class__}: get_payment method with parameters order_uuid: {order_uuid}, suuid: {suuid}")
         url = f"{self._url}/{order_uuid}/payments/{suuid}"
         api_response = self._get(url=url)
         return api_response
@@ -97,10 +100,11 @@ class UserDeviceAPIService(RESTService):
     def create(self, user_uuid: str, virtual_ip: str, device_id: str, platform_id: int,
                vpn_type_id: int, location: str, is_active: bool, device_ip: str = None,
                connected_since: datetime = None) -> APIResponse:
-        self.logger.debug(f"{self.__class__}: create method with parameters user_uuid: {user_uuid}, device_id: {device_id}, "
-                          f"location: {location}, is_active: {is_active}, "
-                          f"platform_id: {platform_id}, vpn_type_id: {vpn_type_id}, virtual_ip: {virtual_ip}, "
-                          f"device_ip: {device_ip}, connected_since: {connected_since}")
+        self.logger.debug(
+            f"{self.__class__}: create method with parameters user_uuid: {user_uuid}, device_id: {device_id}, "
+            f"location: {location}, is_active: {is_active}, "
+            f"platform_id: {platform_id}, vpn_type_id: {vpn_type_id}, virtual_ip: {virtual_ip}, "
+            f"device_ip: {device_ip}, connected_since: {connected_since}")
         us_json = {
             'device_id': device_id,
             'platform_id': platform_id,
@@ -130,7 +134,8 @@ class UserDeviceAPIService(RESTService):
         self._delete(url=url)
 
     def get_user_device_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
-        self.logger.debug(f"{self.__class__}: get_user_devices_by_uuid method with parameters user_uuid: {user_uuid}, suuid: {suuid}")
+        self.logger.debug(
+            f"{self.__class__}: get_user_devices_by_uuid method with parameters user_uuid: {user_uuid}, suuid: {suuid}")
         url = self._url.replace('<string:user_uuid>', user_uuid)
         url = f"{url}/{suuid}"
         api_response = self._get(url=url)
@@ -152,8 +157,9 @@ class UserSubscriptionAPIService(RESTService):
         super().__init__(**kwargs)
 
     def create(self, user_uuid: str, subscription_id: str, order_uuid: str, status_id: int) -> APIResponse:
-        self.logger.debug(f"{self.__class__}: create method with parameters user_uuid: {user_uuid}, subscription_id: {subscription_id}, "
-                          f"order_uuid: {order_uuid}, status_id: {status_id}")
+        self.logger.debug(
+            f"{self.__class__}: create method with parameters user_uuid: {user_uuid}, subscription_id: {subscription_id}, "
+            f"order_uuid: {order_uuid}, status_id: {status_id}")
         us_json = {
             'user_uuid': user_uuid,
             'subscription_id': subscription_id,
@@ -171,7 +177,8 @@ class UserSubscriptionAPIService(RESTService):
         self._put(data=user_subscription, url=url)
 
     def get_user_sub_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
-        self.logger.debug(f"{self.__class__}: get_user_sub_by_uuid method with parameters user_uuid: {user_uuid}, suuid: {suuid}")
+        self.logger.debug(
+            f"{self.__class__}: get_user_sub_by_uuid method with parameters user_uuid: {user_uuid}, suuid: {suuid}")
         url = self._url.replace('<string:user_uuid>', user_uuid)
         url = f"{url}/{suuid}"
         api_response = self._get(url=url)
@@ -199,15 +206,17 @@ class UsersVPNServersConfigurationsAPIService(RESTService):
         return api_response
 
     def find_by_platform_and_type(self, user_uuid: str, platform_id: int, vpn_type_id: int) -> APIResponse:
-        self.logger.debug(f"{self.__class__}: find method with parameters: user_uuid: {user_uuid}, platform_id: {platform_id}, "
-                          f"vpn_type_id: {vpn_type_id}")
+        self.logger.debug(
+            f"{self.__class__}: find method with parameters: user_uuid: {user_uuid}, platform_id: {platform_id}, "
+            f"vpn_type_id: {vpn_type_id}")
         url = self._url.replace('<string:user_uuid>', user_uuid)
         url = f"{url}?platform_id={platform_id}&vpn_type_id={vpn_type_id}"
         api_response = self._get(url=url)
         return api_response
 
     def get_by_suuid(self, user_uuid: str, suuid: str) -> APIResponse:
-        self.logger.debug(f"{self.__class__}: get_by_suuid method with parameters: user_uuid: {user_uuid}, suuid: {suuid}")
+        self.logger.debug(
+            f"{self.__class__}: get_by_suuid method with parameters: user_uuid: {user_uuid}, suuid: {suuid}")
         url = self._url.replace('<string:user_uuid>', user_uuid)
         url = f"{url}/{suuid}"
         api_response = self._get(url=url)
@@ -228,7 +237,7 @@ class UsersVPNServersConfigurationsAPIService(RESTService):
         return api_response
 
 
-class SubscriptionAPIService(RESTService):
+class RRNServiceAPIService(RESTService):
     __version__ = 1
 
     logger = logging.getLogger(__name__)
@@ -236,13 +245,10 @@ class SubscriptionAPIService(RESTService):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def get_subscriptions(self, lang_code: str) -> APIResponse:
-        self.logger.debug(f"{self.__class__}: get_subscriptions method with parameters lang_code: {lang_code}")
-        headers = {
-            'Accept-Language': lang_code
-        }
-        api_response = self._get(headers=headers)
+    def get_services(self) -> APIResponse:
+        self.logger.debug(f"{self.__class__}: get_services method")
 
+        api_response = self._get()
         return api_response
 
 
@@ -282,7 +288,8 @@ class UserAPIService(RESTService):
         self._put(url=url, data=user_dict, headers=self._headers)
 
     def get_user(self, suuid: str = None, email: str = None, pin_code: int = None) -> APIResponse:
-        self.logger.debug(f"{self.__class__}: get_user method with parameters suuid: {suuid}, email: {email}, pin_code: {pin_code}")
+        self.logger.debug(f"{self.__class__}: get_user method with parameters suuid: {suuid}, email: {email}, "
+                          f"pin_code: {pin_code}")
         if suuid:
             url = f"{self._url}/uuid/{suuid}"
         elif email:
@@ -313,7 +320,8 @@ class VPNServersAPIService(RESTService):
         return api_response
 
     def get_vpnservers_by_type(self, type_id: int, pagination: ResourcePagination) -> APIResponse:
-        self.logger.debug(f"{self.__class__}: get_vpnservers_by_type method with parameters type_id: {type_id}, pagination: {pagination}")
+        self.logger.debug(
+            f"{self.__class__}: get_vpnservers_by_type method with parameters type_id: {type_id}, pagination: {pagination}")
         url = f"{self._url}/type/{type_id}"
 
         if pagination is not None and pagination.is_paginated:
@@ -414,7 +422,8 @@ class VPNMGMTServerConnectionsAPIService(RESTService):
         super().__init__(**kwargs)
 
     def update_server_connections(self, ip_address: str, vpn_type: VPNTypeEnum):
-        self.logger.debug(f"{self.__class__}: update_server_connections with parameters ip_address: {ip_address}, vpn_type: {vpn_type}")
+        self.logger.debug(
+            f"{self.__class__}: update_server_connections with parameters ip_address: {ip_address}, vpn_type: {vpn_type}")
         data = {
             'ip_list': [ip_address, ],
             'vpn_type_name': vpn_type.text
@@ -433,10 +442,11 @@ class VPNServerConnectionsAPIService(RESTService):
 
     def create(self, server_uuid: str, user_uuid: str, user_device_uuid: str, device_ip: str, virtual_ip: str,
                bytes_i: str, bytes_o: str, is_connected: bool, connected_since: str) -> APIResponse:
-        self.logger.debug(f"{self.__class__}: create method with parameters server_uuid: {server_uuid}, user_uuid: {user_uuid},"
-                          f"user_device_uuid: {user_device_uuid}, ip_device: {device_ip}, virtual_ip: {virtual_ip},"
-                          f"bytes_i: {bytes_i}, bytes_o: {bytes_o}, is_connected: {is_connected}, "
-                          f"connected_since: {connected_since}")
+        self.logger.debug(
+            f"{self.__class__}: create method with parameters server_uuid: {server_uuid}, user_uuid: {user_uuid},"
+            f"user_device_uuid: {user_device_uuid}, ip_device: {device_ip}, virtual_ip: {virtual_ip},"
+            f"bytes_i: {bytes_i}, bytes_o: {bytes_o}, is_connected: {is_connected}, "
+            f"connected_since: {connected_since}")
         data = {
             'server_uuid': server_uuid,
             'user_uuid': user_uuid,
@@ -459,7 +469,8 @@ class VPNServerConnectionsAPIService(RESTService):
         self._delete(url=url)
 
     def update(self, server_connection_dict: dict):
-        self.logger.debug(f"{self.__class__}: update method with parameters server_connection_dict: {server_connection_dict}")
+        self.logger.debug(
+            f"{self.__class__}: update method with parameters server_connection_dict: {server_connection_dict}")
         url = self._url.replace("<string:server_uuid>", server_connection_dict.get('server_uuid'))
         url = f"{url}/{server_connection_dict.get('uuid')}"
         api_response = self._put(url=url, data=server_connection_dict)
@@ -474,30 +485,34 @@ class VPNServerConnectionsAPIService(RESTService):
         return api_response
 
     def get_by_server_and_suuid(self, server_uuid: str, suuid: str) -> APIResponse:
-        self.logger.debug(f"{self.__class__}: get_by_server_and_suuid method with parameters server_uuid: {server_uuid}, suuid: {suuid}")
+        self.logger.debug(
+            f"{self.__class__}: get_by_server_and_suuid method with parameters server_uuid: {server_uuid}, suuid: {suuid}")
         url = self._url.replace("<string:server_uuid>", server_uuid)
         url = f"{url}/{suuid}"
         api_response = self._get(url=url)
         return api_response
 
     def get_current_by_server_and_user_device(self, server_uuid: str, user_device_uuid: str):
-        self.logger.debug(f"{self.__class__}: get_current_by_server_and_user_device method with parameters server_uuid: {server_uuid}, "
-                          f"user_device_uuid: {user_device_uuid}")
+        self.logger.debug(
+            f"{self.__class__}: get_current_by_server_and_user_device method with parameters server_uuid: {server_uuid}, "
+            f"user_device_uuid: {user_device_uuid}")
         url = self._url.replace("<string:server_uuid>", server_uuid)
         url = f"{url}?user_device_uuid={user_device_uuid}&is_connected=True"
         api_response = self._get(url=url)
         return api_response
 
     def get_current_by_server_and_user_and_vip(self, server_uuid: str, virtual_ip: str):
-        self.logger.debug(f"{self.__class__}: get_current_by_user_device method with parameters server_uuid: {server_uuid}, "
-                          f"virtual_ip: {virtual_ip}")
+        self.logger.debug(
+            f"{self.__class__}: get_current_by_user_device method with parameters server_uuid: {server_uuid}, "
+            f"virtual_ip: {virtual_ip}")
         url = self._url.replace("<string:server_uuid>", server_uuid)
         url = f"{url}?virtual_ip={virtual_ip}&is_connected=True"
         api_response = self._get(url=url)
         return api_response
 
     def get_all_by_user_device_uuid(self, user_device_uuid: str) -> APIResponse:
-        self.logger.debug(f"{self.__class__}: get_all_by_user_device_uuid method with parameters user_device_uuid: {user_device_uuid}")
+        self.logger.debug(
+            f"{self.__class__}: get_all_by_user_device_uuid method with parameters user_device_uuid: {user_device_uuid}")
         url = self._url.replace("/<string:server_uuid>/", "/")
         url = f"{url}?user_device_uuid={user_device_uuid}"
         api_response = self._get(url=url)
