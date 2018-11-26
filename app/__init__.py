@@ -15,7 +15,7 @@ from app.resources.users.servers import UsersServersAPI
 from app.resources.users.servers.conditions import UsersServersConditionsAPI
 from app.resources.users.servers.configurations import UsersServersConfigurationsAPI
 from app.resources.users.servers.connections import UsersServersConnectionsAPI
-from app.resources.users.subscriptions import UsersServicesAPI
+from app.resources.users.rrnservices import UsersServicesAPI
 from app.resources.vpns.device_platforms import VPNSDevicePlatformsAPI
 from app.resources.vpns.servers import VPNServersAPI
 from app.resources.vpns.servers.connections import VPNSServersConnectionsAPI
@@ -92,9 +92,9 @@ geostate_api_service = GeoStateAPIService(api_url=app_config['VPNC_SERVICE_URL']
 user_api_service = UserAPIService(api_url=app_config['AUTH_SERVICE_URL'],
                                   resource_name=app_config['AUTH_SERVICE_USERS_RESOURCE_NAME'])
 
-user_sub_api_service = UserSubscriptionAPIService(api_url=app_config['BILLING_SERVICE_URL'],
-                                                  resource_name=app_config[
-                                                      'BILLING_SERVICE_USER_SUBSCRIPTION_RESOURCE_NAME'])
+user_rrnservice_api_service = UserRRNServiceAPIService(api_url=app_config['BILLING_SERVICE_URL'],
+                                                       resource_name=app_config[
+                                                           'BILLING_SERVICE_USER_SUBSCRIPTION_RESOURCE_NAME'])
 
 user_device_api_service = UserDeviceAPIService(api_url=app_config['AUTH_SERVICE_URL'],
                                                resource_name=app_config['AUTH_SERVICE_USER_DEVICES_RESOURCE_NAME'])
@@ -105,12 +105,12 @@ vpnserverconf_api_service = UsersVPNServersConfigurationsAPIService(api_url=app_
 
 rrnservices_api_service = RRNServiceAPIService(api_url=app_config['BILLING_SERVICE_URL'],
                                                resource_name=app_config[
-                                                      'BILLING_SERVICE_SUBSCRIPTIONS_RESOURCE_NAME'])
+                                                   'BILLING_SERVICE_SUBSCRIPTIONS_RESOURCE_NAME'])
 
 order_api_service = OrderAPIService(api_url=app_config['BILLING_SERVICE_URL'],
                                     resource_name=app_config['BILLING_SERVICE_ORDERS_RESOURCE_NAME'])
 
-user_policy = UserPolicy(user_sub_api_service=user_sub_api_service, order_api_service=order_api_service,
+user_policy = UserPolicy(user_rrnservice_api_service=user_rrnservice_api_service, order_api_service=order_api_service,
                          user_api_service=user_api_service, user_device_api_service=user_device_api_service,
                          vpnserversconnections_service=vpnserverconn_api_service)
 
@@ -126,14 +126,16 @@ apis = [
     {'cls': UsersOrdersPaymentsAPI, 'args': [order_api_service, app_config, True]},
     {'cls': UsersServicesAPI, 'args': [user_policy, app_config, True]},
     {'cls': UsersDevicesAPI, 'args': [user_policy, app_config, True]},
-    {'cls': PaymentsAPI, 'args': [order_api_service, user_sub_api_service, vpn_mgmt_users_api_service, user_policy,
-                                  vpnserverconf_api_service, app_config]},
+    {'cls': PaymentsAPI,
+     'args': [order_api_service, user_rrnservice_api_service, vpn_mgmt_users_api_service, user_policy,
+              vpnserverconf_api_service, app_config]},
     {'cls': RRNServicesAPI, 'args': [rrnservices_api_service, app_config, True]},
     {'cls': VPNServersAPI, 'args': [vpn_policy, app_config, True]},
     {'cls': VPNSServersMetaAPI, 'args': [vpnserversmeta_api_service, app_config]},
     {'cls': UsersServersConditionsAPI, 'args': [vpn_policy, app_config, True]},
     {'cls': UsersServersAPI, 'args': [vpn_policy, app_config, True]},
-    {'cls': UsersServersConfigurationsAPI, 'args': [vpnserverconf_api_service, vpnserver_api_service, app_config, True]},
+    {'cls': UsersServersConfigurationsAPI,
+     'args': [vpnserverconf_api_service, vpnserver_api_service, app_config, True]},
     {'cls': UsersServersConnectionsAPI, 'args': [vpnserverconn_api_service, app_config, True]},
     {'cls': VPNSDevicePlatformsAPI, 'args': [vpn_device_platforms_api_service, app_config, True]},
     {'cls': VPNSTypesAPI, 'args': [vpntype_api_service, app_config, True]},

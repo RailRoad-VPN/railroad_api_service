@@ -148,7 +148,7 @@ class UserDeviceAPIService(RESTService):
         return api_response
 
 
-class UserSubscriptionAPIService(RESTService):
+class UserRRNServiceAPIService(RESTService):
     __version__ = 1
 
     logger = logging.getLogger(__name__)
@@ -156,27 +156,30 @@ class UserSubscriptionAPIService(RESTService):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def create(self, user_uuid: str, subscription_id: str, order_uuid: str, status_id: int) -> APIResponse:
+    def create(self, user_uuid: str, service_id: str, order_uuid: str, status_id: int,
+               expire_date: datetime, is_trial: bool) -> APIResponse:
         self.logger.debug(
-            f"{self.__class__}: create method with parameters user_uuid: {user_uuid}, subscription_id: {subscription_id}, "
-            f"order_uuid: {order_uuid}, status_id: {status_id}")
+            f"{self.__class__}: create method with parameters user_uuid: {user_uuid}, service_id: {service_id}, "
+            f"order_uuid: {order_uuid}, status_id: {status_id}, expire_date: {expire_date}, is_trial: {is_trial}")
         us_json = {
             'user_uuid': user_uuid,
-            'subscription_id': subscription_id,
             'status_id': status_id,
+            'service_id': service_id,
             'order_uuid': order_uuid,
+            'expire_date': str(expire_date),
+            'is_trial': is_trial,
         }
         url = self._url.replace('<string:user_uuid>', user_uuid)
         api_response = self._post(data=us_json, url=url)
         return api_response
 
-    def update(self, user_subscription: dict):
-        self.logger.debug(f"{self.__class__}: update method with parameters user_subscription: {user_subscription}")
-        url = self._url.replace('<string:user_uuid>', user_subscription['user_uuid'])
-        url = f"{url}/{user_subscription['uuid']}"
-        self._put(data=user_subscription, url=url)
+    def update(self, user_service: dict):
+        self.logger.debug(f"{self.__class__}: update method with parameters user_service: {user_service}")
+        url = self._url.replace('<string:user_uuid>', user_service['user_uuid'])
+        url = f"{url}/{user_service['uuid']}"
+        self._put(data=user_service, url=url)
 
-    def get_user_sub_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
+    def get_user_service_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
         self.logger.debug(
             f"{self.__class__}: get_user_sub_by_uuid method with parameters user_uuid: {user_uuid}, suuid: {suuid}")
         url = self._url.replace('<string:user_uuid>', user_uuid)
@@ -184,7 +187,7 @@ class UserSubscriptionAPIService(RESTService):
         api_response = self._get(url=url)
         return api_response
 
-    def get_user_subs_by_user_uuid(self, user_uuid: str) -> APIResponse:
+    def get_user_services_by_user_uuid(self, user_uuid: str) -> APIResponse:
         self.logger.debug(f"{self.__class__}: get_user_subs_by_user_uuid method with parameters user_uuid: {user_uuid}")
         url = self._url.replace('<string:user_uuid>', user_uuid)
         api_response = self._get(url=url)
@@ -440,8 +443,8 @@ class VPNServerConnectionsAPIService(RESTService):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def create(self, server_uuid: str, user_uuid: str, user_device_uuid: str, device_ip: str, virtual_ip: str,
-               bytes_i: str, bytes_o: str, is_connected: bool, connected_since: str) -> APIResponse:
+    def create(self, server_uuid: str, user_uuid: str, device_ip: str, virtual_ip: str,
+               bytes_i: str, bytes_o: str, is_connected: bool, connected_since: str, user_device_uuid: str = None) -> APIResponse:
         self.logger.debug(
             f"{self.__class__}: create method with parameters server_uuid: {server_uuid}, user_uuid: {user_uuid},"
             f"user_device_uuid: {user_device_uuid}, ip_device: {device_ip}, virtual_ip: {virtual_ip},"

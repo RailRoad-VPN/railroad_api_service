@@ -17,42 +17,44 @@ class UserPolicy(object):
     order_api_service = None
     payment_api_service = None
 
-    def __init__(self, user_sub_api_service: UserSubscriptionAPIService, user_api_service: UserAPIService,
+    def __init__(self, user_rrnservice_api_service: UserRRNServiceAPIService, user_api_service: UserAPIService,
                  order_api_service: OrderAPIService, user_device_api_service: UserDeviceAPIService,
                  vpnserversconnections_service: VPNServerConnectionsAPIService):
         self._user_api_service = user_api_service
         self._user_device_api_service = user_device_api_service
-        self._user_sub_api_service = user_sub_api_service
+        self._user_rrnservice_api_service = user_rrnservice_api_service
         self._order_api_service = order_api_service
         self._vpnserversconnections_service = vpnserversconnections_service
 
-    def create_user_sub(self, user_uuid: str, subscription_id: str, order_uuid: str, status_id: int) -> APIResponse:
+    def create_user_service(self, user_uuid: str, subscription_id: str, order_uuid: str, status_id: int,
+                            expire_date: datetime, is_trial: bool) -> APIResponse:
         self.logger.debug(f"{self.__class__}: create_user_sub method with parameter user_uuid: {user_uuid}, "
-                          f"subscription_id: {subscription_id}, "
+                          f"subscription_id: {subscription_id}, is_trial: {is_trial}, expire_date: {expire_date},"
                           f"order_uuid: {order_uuid}, status_id: {status_id}")
-        api_response = self._user_sub_api_service.create(user_uuid=user_uuid, subscription_id=subscription_id,
-                                                         order_uuid=order_uuid, status_id=status_id)
+        api_response = self._user_rrnservice_api_service.create(user_uuid=user_uuid, service_id=subscription_id,
+                                                                order_uuid=order_uuid, status_id=status_id,
+                                                                expire_date=expire_date, is_trial=is_trial)
         location = api_response.headers.get('Location', None)
         if location is None:
             raise APIException(http_code=api_response.code, errors=api_response.errors)
 
         suuid = location.split('/')[-1]
-        api_response = self._user_sub_api_service.get_user_sub_by_uuid(user_uuid=user_uuid, suuid=suuid)
+        api_response = self._user_rrnservice_api_service.get_user_service_by_uuid(user_uuid=user_uuid, suuid=suuid)
         return api_response
 
     def update_user_sub(self, user_subscription: dict):
         self.logger.debug(
             f"{self.__class__}: update_user_sub method with parameter user_subscription: {user_subscription}")
-        self._user_sub_api_service.update(user_subscription=user_subscription)
+        self._user_rrnservice_api_service.update(user_service=user_subscription)
 
     def get_user_service_by_uuid(self, user_uuid: str, suuid: str) -> APIResponse:
-        api_response = self._user_sub_api_service.get_user_sub_by_uuid(user_uuid=user_uuid, suuid=suuid)
+        api_response = self._user_rrnservice_api_service.get_user_service_by_uuid(user_uuid=user_uuid, suuid=suuid)
         return api_response
 
     def get_user_services(self, user_uuid: str) -> APIResponse:
         self.logger.debug(f"{self.__class__}: get_user_subs method with parameter user_uuid: {user_uuid}")
         self.logger.debug(f"{self.__class__}: Get user services by user uuid")
-        api_response = self._user_sub_api_service.get_user_subs_by_user_uuid(user_uuid=user_uuid)
+        api_response = self._user_rrnservice_api_service.get_user_services_by_user_uuid(user_uuid=user_uuid)
         return api_response
 
     def get_user(self, suuid: str = None, email: str = None, pin_code: str = None) -> APIResponse:
@@ -96,15 +98,21 @@ class UserPolicy(object):
                                                             device_ip=device_ip, platform_id=platform_id,
                                                             location=location, is_active=is_active,
                                                             connected_since=connected_since)
+        self.logger.debug("Check X-Device-Token")
         x_device_token = api_response.headers.get('X-Device-Token', None)
         if x_device_token is None:
+            self.logger.debug("Bad X-Device-Token")
             raise APIException(http_code=api_response.code, errors=api_response.errors)
 
+        self.logger.debug("Get Location HTTP Header from response")
         location = api_response.headers.get('Location', None)
         if location is None:
+            self.logger.debug("Bad Location HTTP Header")
             raise APIException(http_code=api_response.code, errors=api_response.errors)
 
+        self.logger.debug("Get uuid of created user device from location HTTP header value")
         suuid = location.split('/')[-1]
+        self.logger.debug(f"uuid: {suuid}")
         api_response = self._user_device_api_service.get_user_device_by_uuid(user_uuid=user_uuid, suuid=suuid)
         api_response.headers['X-Device-Token'] = x_device_token
         return api_response

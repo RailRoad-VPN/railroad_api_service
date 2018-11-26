@@ -16,7 +16,7 @@ from app.model.payment_type import PaymentType
 from app.model.user_subscription_status import UserSubscriptionStatus
 from app.model.vpn_conf_platform import VPNConfigurationPlatform
 from app.model.vpn_type import VPNType
-from app.service import OrderAPIService, UserSubscriptionAPIService, VPNMGMTUsersAPIService, \
+from app.service import OrderAPIService, UserRRNServiceAPIService, VPNMGMTUsersAPIService, \
     UsersVPNServersConfigurationsAPIService
 
 sys.path.insert(0, '../rest_api_library')
@@ -35,7 +35,7 @@ class PaymentsAPI(ResourceAPI):
     __api_url__ = 'payments'
 
     _order_api_service = None
-    _user_sub_api_service = None
+    _user_rrnservice_api_service = None
     _vpn_mgmt_users_api_service = None
     _vpn_server_confs_service = None
     _user_policy = None
@@ -48,12 +48,12 @@ class PaymentsAPI(ResourceAPI):
         ]
         return api_urls
 
-    def __init__(self, order_api_service: OrderAPIService, user_sub_api_service: UserSubscriptionAPIService,
+    def __init__(self, order_api_service: OrderAPIService, user_sub_api_service: UserRRNServiceAPIService,
                  vpn_mgmt_users_api_service: VPNMGMTUsersAPIService, user_policy: UserPolicy,
                  vpn_server_confs_service: UsersVPNServersConfigurationsAPIService, *args):
         super().__init__(*args)
         self._order_api_service = order_api_service
-        self._user_sub_api_service = user_sub_api_service
+        self._user_rrnservice_api_service = user_sub_api_service
         self._vpn_mgmt_users_api_service = vpn_mgmt_users_api_service
         self._vpn_server_confs_service = vpn_server_confs_service
         self._user_policy = user_policy
@@ -189,7 +189,7 @@ class PaymentsAPI(ResourceAPI):
         self._order_api_service.update_order(order_json=order)
 
         self.logger.debug(f"{self.__class__}: get all user services")
-        api_response = self._user_sub_api_service.get_user_subs_by_user_uuid(user_uuid=user_uuid)
+        api_response = self._user_rrnservice_api_service.get_user_services_by_user_uuid(user_uuid=user_uuid)
         user_subs = api_response.data
         self.logger.debug(f"{self.__class__}: got user subs: {user_subs}")
 
@@ -214,7 +214,7 @@ class PaymentsAPI(ResourceAPI):
         self.logger.debug(f"{self.__class__}: updated user subscription: {payment_user_sub}")
 
         self.logger.debug(f"{self.__class__}: update user subscription")
-        self._user_sub_api_service.update(user_subscription=payment_user_sub)
+        self._user_rrnservice_api_service.update(user_service=payment_user_sub)
 
         self.logger.debug(f"{self.__class__}: Launch MANAGEMENT API")
         self.logger.debug(f"{self.__class__}: create VPN user")

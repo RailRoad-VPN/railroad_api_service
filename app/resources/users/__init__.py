@@ -183,6 +183,9 @@ class UsersAPI(ResourceAPI):
         # uuid or email or pin_code is not None, let's get user
         try:
             api_response = self._user_policy.get_user(suuid=suuid, email=email, pin_code=pin_code)
+            if pin_code is not None:
+                # delete password if user was requested by pincode
+                api_response.data.pop('password')
         except APIException as e:
             self.logger.debug(e.serialize())
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code, errors=e.errors)

@@ -157,10 +157,9 @@ class VPNSServersConnectionsAPI(ResourceAPI):
 
                 if new_connection and not server_connection:
                     self._vpnserverconn_api_service.create(server_uuid=server_uuid, user_uuid=user_uuid,
-                                                           user_device_uuid=None, is_connected=True,
-                                                           virtual_ip=virtual_ip, device_ip=device_ip,
-                                                           connected_since=connected_since, bytes_i=bytes_i,
-                                                           bytes_o=bytes_o)
+                                                           is_connected=True, virtual_ip=virtual_ip,
+                                                           device_ip=device_ip, connected_since=connected_since,
+                                                           bytes_i=bytes_i, bytes_o=bytes_o)
                 else:
                     self.logger.debug(f"{self.__class__}: Update existed connection")
                     server_connection['user_device_uuid'] = user_device_uuid
@@ -210,8 +209,46 @@ class VPNSServersConnectionsAPI(ResourceAPI):
             return resp
 
     def put(self) -> Response:
-        resp = make_error_request_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
-        return resp
+        super(VPNSServersConnectionsAPI, self).put(req=request)
+
+        bytes_i = request.args.get('bytes_i', None)
+        bytes_o = request.args.get('bytes_o', None)
+        connected_since = request.args.get('connected_since', None)
+        device_ip = request.args.get('device_ip', None)
+        is_connected = request.args.get('is_connected', None)
+        server_uuid = request.args.get('server_uuid', None)
+        user_device_uuid = request.args.get('user_device_uuid', None)
+        user_uuid = request.args.get('user_uuid', None)
+        uuid = request.args.get('uuid', None)
+        virtual_ip = request.args.get('virtual_ip', None)
+
+        req_fields = {
+            'bytes_i': bytes_i,
+            'bytes_o': bytes_o,
+            'connected_since': connected_since,
+            'device_ip': device_ip,
+            'is_connected': is_connected,
+            'server_uuid': server_uuid,
+            'user_device_uuid': user_device_uuid,
+            'user_uuid': user_uuid,
+            'uuid': uuid,
+            'virtual_ip': virtual_ip,
+        }
+
+        error_fields = check_required_api_fields(req_fields)
+        if len(error_fields) > 0:
+            response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST,
+                                        errors=error_fields)
+            resp = make_api_response(data=response_data, http_code=response_data.code)
+            return resp
+
+        try:
+            self._vpnserverconn_api_service.update(server_connection_dict=req_fields)
+        except APIException as e:
+            response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST,
+                                        errors=e.errors)
+            resp = make_api_response(data=response_data, http_code=response_data.code)
+            return resp
 
     def get(self) -> Response:
         super(VPNSServersConnectionsAPI, self).get(req=request)

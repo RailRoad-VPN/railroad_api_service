@@ -1,8 +1,10 @@
+import datetime
 import logging
 import sys
 from http import HTTPStatus
 from typing import List
 
+from dateutil.relativedelta import relativedelta
 from flask import request, Response
 
 from app.exception import RailRoadAPIError
@@ -18,6 +20,8 @@ from rest import APIException, APIResourceURL
 
 class UsersServicesAPI(ResourceAPI):
     __version__ = 1
+
+    logger = logging.getLogger(__name__)
 
     __endpoint_name__ = __qualname__
     __api_url__ = 'users/<string:user_uuid>/services'
@@ -53,12 +57,36 @@ class UsersServicesAPI(ResourceAPI):
         service_id = request_json.get('service_id', None)
         status_id = request_json.get('status_id', None)
         order_uuid = request_json.get('order_uuid', None)
+        is_trial = request_json.get('is_trial', None)
+
+        self.logger.debug(f"{self.__class__}: calculate_expire_date by service_id: {service_id}")
+        now = datetime.datetime.now()
+        sub_id = int(service_id)
+        if sub_id == 1:
+            self.logger.debug(f"service id 1 - it is free pack, no expire date")
+            delta = relativedelta(years=100)
+        elif sub_id == 2:
+            self.logger.debug(f"service id 2 - it is vpn pack, payment per month, expire date +1 month to current date")
+            if is_trial:
+                self.logger.debug("trial is active")
+                delta = relativedelta(days=3)
+            else:
+                delta = relativedelta(months=1)
+        else:
+            self.logger.error(f"service id is UNKNOWN! need manual work")
+            delta = relativedelta(days=1)
+
+        self.logger.debug(f"{self.__class__}: delta: {delta.years} years")
+        expire_date = now + delta
+        self.logger.debug(f"{self.__class__}: calculated expire date: {expire_date}")
 
         req_fields = {
             'user_uuid': user_uuid,
             'status_id': status_id,
             'service_id': service_id,
             'order_uuid': order_uuid,
+            'is_trial': is_trial,
+            'expire_date': expire_date,
         }
 
         error_fields = check_required_api_fields(req_fields)
@@ -69,8 +97,10 @@ class UsersServicesAPI(ResourceAPI):
             return resp
 
         try:
-            api_response = self._user_policy.create_user_sub(user_uuid=user_uuid, subscription_id=service_id,
-                                                             order_uuid=order_uuid, status_id=status_id)
+            api_response = self._user_policy.create_user_service(user_uuid=user_uuid, subscription_id=service_id,
+                                                                 order_uuid=order_uuid, status_id=status_id,
+                                                                 expire_date=expire_date,
+                                                                 is_trial=is_trial)
 
             api_url = self.__api_url__.replace('<string:user_uuid>', user_uuid)
 
@@ -104,7 +134,7 @@ class UsersServicesAPI(ResourceAPI):
         status_id = request_json.get('status_id', None)
         expire_date = request_json.get('expire_date', None)
         order_uuid = request_json.get('order_uuid', None)
-        modify_date = request_json.get('modify_date', None)
+        is_trial = request_json.get('is_trial', None)
         modify_reason = request_json.get('modify_reason', None)
 
         us_json = {
@@ -114,7 +144,7 @@ class UsersServicesAPI(ResourceAPI):
             'status_id': status_id,
             'expire_date': expire_date,
             'order_uuid': order_uuid,
-            'modify_date': modify_date,
+            'is_trial': is_trial,
             'modify_reason': modify_reason,
         }
 
