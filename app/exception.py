@@ -53,3 +53,17 @@ class RailRoadAPIError(APIErrorEnum):
 
     VPNTYPES_IDENTIFIER_ERROR = (name + str(count()), 'VPNTYPES_IDENTIFIER_ERROR phrase', 'VPNTYPES_IDENTIFIER_ERROR description')
     DEVICEPLATFORMS_IDENTITY_ERROR = (name + str(count()), 'DEVICEPLATFORMS_IDENTITY_ERROR phrase', 'DEVICEPLATFORMS_IDENTITY_ERROR description')
+
+
+class UserPolicyException(Exception):
+    __version__ = 1
+
+    error = None
+    error_code = None
+    developer_message = None
+
+    def __init__(self, error: str, error_code: int, developer_message: str = None, *args):
+        super().__init__(*args)
+        self.error = error
+        self.error_code = error_code
+        self.developer_message = developer_message

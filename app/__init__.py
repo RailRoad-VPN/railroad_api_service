@@ -47,99 +47,106 @@ app_config = app.config
 api_base_uri = app_config['API_BASE_URI']
 
 # SERVICES
-vpnserver_api_service = VPNServersAPIService(api_url=app_config['VPNC_SERVICE_URL'],
-                                             resource_name=app_config['VPNC_SERVICE_VPNSERVER_RESOURCE_NAME'])
+rrn_vpn_server_api_service = VPNServersAPIService(api_url=app_config['VPNC_SERVICE_URL'],
+                                                  resource_name=app_config['VPNC_SERVICE_VPNSERVER_RESOURCE_NAME'])
 
-vpnserversmeta_api_service = VPNServersMetaAPIService(api_url=app_config['VPNC_SERVICE_URL'],
-                                                      resource_name=app_config[
-                                                          'VPNC_SERVICE_VPNSERVERSMETA_RESOURCE_NAME'])
+rrn_vpn_servers_meta_api_service = VPNServersMetaAPIService(api_url=app_config['VPNC_SERVICE_URL'],
+                                                            resource_name=app_config[
+                                                                'VPNC_SERVICE_VPNSERVERSMETA_RESOURCE_NAME'])
 
-vpntype_api_service = VPNTypeAPIService(api_url=app_config['VPNC_SERVICE_URL'],
-                                        resource_name=app_config['VPNC_SERVICE_VPNTYPE_RESOURCE_NAME'])
+rrn_vpn_type_api_service = VPNTypeAPIService(api_url=app_config['VPNC_SERVICE_URL'],
+                                             resource_name=app_config['VPNC_SERVICE_VPNTYPE_RESOURCE_NAME'])
 
-vpnserverconn_api_service = VPNServerConnectionsAPIService(api_url=app_config['VPNC_SERVICE_URL'],
-                                                           resource_name=app_config[
-                                                               'VPNC_SERVICE_VPNSERVERCONNECTIONS_RESOURCE_NAME'])
-vpnserverstatus_api_service = VPNServerStatusAPIService(api_url=app_config['VPNC_SERVICE_URL'],
-                                                        resource_name=app_config[
-                                                            'VPNC_SERVICE_VPNSERVERSTATUS_RESOURCE_NAME'])
+rrn_vpn_server_connections_api_service = VPNServerConnectionsAPIService(api_url=app_config['VPNC_SERVICE_URL'],
+                                                                        resource_name=app_config[
+                                                                            'VPNC_SERVICE_VPNSERVERCONNECTIONS_RESOURCE_NAME'])
+rrn_vpn_server_status_api_service = VPNServerStatusAPIService(api_url=app_config['VPNC_SERVICE_URL'],
+                                                              resource_name=app_config[
+                                                                  'VPNC_SERVICE_VPNSERVERSTATUS_RESOURCE_NAME'])
 
-vpn_mgmt_users_api_service = VPNMGMTUsersAPIService(api_url=app_config['VPNMGMT_SERVICE_URL'],
-                                                    auth=app_config['VPNMGMT_BASIC_AUTH'],
-                                                    resource_name=app_config['VPNMGMT_USERS_RESOURCE_NAME'])
+rrn_vpn_mgmt_users_api_service = VPNMGMTUsersAPIService(api_url=app_config['VPNMGMT_SERVICE_URL'],
+                                                        auth=app_config['VPNMGMT_BASIC_AUTH'],
+                                                        resource_name=app_config['VPNMGMT_USERS_RESOURCE_NAME'])
 
-vpn_mgmt_server_conns_api_service = VPNMGMTServerConnectionsAPIService(api_url=app_config['VPNC_SERVICE_URL'],
-                                                                       auth=app_config['VPNMGMT_BASIC_AUTH'],
-                                                                       resource_name=app_config[
-                                                                           'VPNMGMT_SERVER_CONNECTIONS_RESOURCE_NAME'])
+rrn_vpn_mgmt_server_conns_api_service = VPNMGMTServerConnectionsAPIService(api_url=app_config['VPNC_SERVICE_URL'],
+                                                                           auth=app_config['VPNMGMT_BASIC_AUTH'],
+                                                                           resource_name=app_config[
+                                                                               'VPNMGMT_SERVER_CONNECTIONS_RESOURCE_NAME'])
 
-vpn_device_platforms_api_service = VPNDevicePlatformsAPIService(api_url=app_config['VPNC_SERVICE_URL'],
-                                                                resource_name=app_config[
-                                                                    'VPNC_SERVICE_DEVICE_PLATFORMS_RESOURCE_NAME'])
-
-geoposition_api_service = GeoPositionAPIService(api_url=app_config['VPNC_SERVICE_URL'],
-                                                resource_name=app_config['VPNC_SERVICE_GEOPOSITION_RESOURCE_NAME'])
-
-geocity_api_service = GeoCityAPIService(api_url=app_config['VPNC_SERVICE_URL'],
-                                        resource_name=app_config['VPNC_SERVICE_GEOCITY_RESOURCE_NAME'])
-
-geocountry_api_service = GeoCountryAPIService(api_url=app_config['VPNC_SERVICE_URL'],
-                                              resource_name=app_config['VPNC_SERVICE_GEOCOUNTRY_RESOURCE_NAME'])
-
-geostate_api_service = GeoStateAPIService(api_url=app_config['VPNC_SERVICE_URL'],
-                                          resource_name=app_config['VPNC_SERVICE_GEOSTATE_RESOURCE_NAME'])
-
-user_api_service = UserAPIService(api_url=app_config['AUTH_SERVICE_URL'],
-                                  resource_name=app_config['AUTH_SERVICE_USERS_RESOURCE_NAME'])
-
-user_rrnservice_api_service = UserRRNServiceAPIService(api_url=app_config['BILLING_SERVICE_URL'],
-                                                       resource_name=app_config[
-                                                           'BILLING_SERVICE_USER_SUBSCRIPTION_RESOURCE_NAME'])
-
-user_device_api_service = UserDeviceAPIService(api_url=app_config['AUTH_SERVICE_URL'],
-                                               resource_name=app_config['AUTH_SERVICE_USER_DEVICES_RESOURCE_NAME'])
-
-vpnserverconf_api_service = UsersVPNServersConfigurationsAPIService(api_url=app_config['AUTH_SERVICE_URL'],
+rrn_vpn_device_platforms_api_service = VPNDevicePlatformsAPIService(api_url=app_config['VPNC_SERVICE_URL'],
                                                                     resource_name=app_config[
-                                                                        'AUTH_SERVICE_USER_VPN_SERVER_CONFIGURATIONS_RESOURCE_NAME'])
+                                                                        'VPNC_SERVICE_DEVICE_PLATFORMS_RESOURCE_NAME'])
 
-rrnservices_api_service = RRNServiceAPIService(api_url=app_config['BILLING_SERVICE_URL'],
-                                               resource_name=app_config[
-                                                   'BILLING_SERVICE_SUBSCRIPTIONS_RESOURCE_NAME'])
+rrn_geo_position_api_service = GeoPositionAPIService(api_url=app_config['VPNC_SERVICE_URL'],
+                                                     resource_name=app_config['VPNC_SERVICE_GEOPOSITION_RESOURCE_NAME'])
 
-order_api_service = OrderAPIService(api_url=app_config['BILLING_SERVICE_URL'],
-                                    resource_name=app_config['BILLING_SERVICE_ORDERS_RESOURCE_NAME'])
+rrn_geo_city_api_service = GeoCityAPIService(api_url=app_config['VPNC_SERVICE_URL'],
+                                             resource_name=app_config['VPNC_SERVICE_GEOCITY_RESOURCE_NAME'])
 
-user_policy = UserPolicy(user_rrnservice_api_service=user_rrnservice_api_service, order_api_service=order_api_service,
-                         user_api_service=user_api_service, user_device_api_service=user_device_api_service,
-                         vpnserversconnections_service=vpnserverconn_api_service)
+rrn_geo_country_api_service = GeoCountryAPIService(api_url=app_config['VPNC_SERVICE_URL'],
+                                                   resource_name=app_config['VPNC_SERVICE_GEOCOUNTRY_RESOURCE_NAME'])
 
-vpn_policy = VPNServerPolicy(vpnserver_service=vpnserver_api_service, vpntype_service=vpntype_api_service,
-                             vpnserverconfiguration_service=vpnserverconf_api_service,
-                             vpnserverstatus_service=vpnserverstatus_api_service,
-                             geoposition_service=geoposition_api_service, geocity_service=geocity_api_service,
-                             geocountry_service=geocountry_api_service, geostate_service=geostate_api_service)
+rrn_geo_state_api_service = GeoStateAPIService(api_url=app_config['VPNC_SERVICE_URL'],
+                                               resource_name=app_config['VPNC_SERVICE_GEOSTATE_RESOURCE_NAME'])
+
+rrn_user_api_service = UserAPIService(api_url=app_config['AUTH_SERVICE_URL'],
+                                      resource_name=app_config['AUTH_SERVICE_USERS_RESOURCE_NAME'])
+
+rrn_user_rrnservice_api_service = UserRRNServiceAPIService(api_url=app_config['BILLING_SERVICE_URL'],
+                                                           resource_name=app_config[
+                                                               'BILLING_SERVICE_USER_SUBSCRIPTION_RESOURCE_NAME'])
+
+rrn_user_device_api_service = UserDeviceAPIService(api_url=app_config['AUTH_SERVICE_URL'],
+                                                   resource_name=app_config['AUTH_SERVICE_USER_DEVICES_RESOURCE_NAME'])
+
+rrn_vpn_server_configurations_api_service = UsersVPNServersConfigurationsAPIService(
+    api_url=app_config['AUTH_SERVICE_URL'],
+    resource_name=app_config['AUTH_SERVICE_USER_VPN_SERVER_CONFIGURATIONS_RESOURCE_NAME'])
+
+rrn_rrnservices_api_service = RRNServiceAPIService(api_url=app_config['BILLING_SERVICE_URL'],
+                                                   resource_name=app_config[
+                                                       'BILLING_SERVICE_SUBSCRIPTIONS_RESOURCE_NAME'])
+
+rrn_order_api_service = OrderAPIService(api_url=app_config['BILLING_SERVICE_URL'],
+                                        resource_name=app_config['BILLING_SERVICE_ORDERS_RESOURCE_NAME'])
+
+user_policy = UserPolicy(rrn_user_rrnservice_api_service=rrn_user_rrnservice_api_service,
+                         rrn_order_api_service=rrn_order_api_service,
+                         rrn_user_api_service=rrn_user_api_service,
+                         rrn_user_device_api_service=rrn_user_device_api_service,
+                         rrn_vpn_servers_connections_api_service=rrn_vpn_server_connections_api_service,
+                         rrn_vpn_mgmt_users_api_service=rrn_vpn_mgmt_users_api_service,
+                         rrn_vpn_server_configurations_api_service=rrn_vpn_server_configurations_api_service)
+
+vpn_policy = VPNServerPolicy(rrn_vpn_servers_api_service=rrn_vpn_server_api_service,
+                             rrn_vpn_types_api_service=rrn_vpn_type_api_service,
+                             rrn_vpn_server_configurations_api_service=rrn_vpn_server_configurations_api_service,
+                             rrn_vpn_server_statuses_api_service=rrn_vpn_server_status_api_service,
+                             rrn_geo_position_api_service=rrn_geo_position_api_service,
+                             rrn_geo_city_api_service=rrn_geo_city_api_service,
+                             rrn_geo_country_api_service=rrn_geo_country_api_service,
+                             rrn_geo_state_api_service=rrn_geo_state_api_service)
 
 apis = [
     {'cls': UsersAPI, 'args': [user_policy, app_config, True]},
-    {'cls': UsersOrdersAPI, 'args': [order_api_service, app_config, True]},
-    {'cls': UsersOrdersPaymentsAPI, 'args': [order_api_service, app_config, True]},
+    {'cls': UsersOrdersAPI, 'args': [rrn_order_api_service, app_config, True]},
+    {'cls': UsersOrdersPaymentsAPI, 'args': [rrn_order_api_service, app_config, True]},
     {'cls': UsersServicesAPI, 'args': [user_policy, app_config, True]},
     {'cls': UsersDevicesAPI, 'args': [user_policy, app_config, True]},
     {'cls': PaymentsAPI,
-     'args': [order_api_service, user_rrnservice_api_service, vpn_mgmt_users_api_service, user_policy,
-              vpnserverconf_api_service, app_config]},
-    {'cls': RRNServicesAPI, 'args': [rrnservices_api_service, app_config, True]},
+     'args': [rrn_order_api_service, rrn_user_rrnservice_api_service, rrn_vpn_mgmt_users_api_service, user_policy,
+              rrn_vpn_server_configurations_api_service, app_config]},
+    {'cls': RRNServicesAPI, 'args': [rrn_rrnservices_api_service, app_config, True]},
     {'cls': VPNServersAPI, 'args': [vpn_policy, app_config, True]},
-    {'cls': VPNSServersMetaAPI, 'args': [vpnserversmeta_api_service, app_config]},
+    {'cls': VPNSServersMetaAPI, 'args': [rrn_vpn_servers_meta_api_service, app_config]},
     {'cls': UsersServersConditionsAPI, 'args': [vpn_policy, app_config, True]},
     {'cls': UsersServersAPI, 'args': [vpn_policy, app_config, True]},
     {'cls': UsersServersConfigurationsAPI,
-     'args': [vpnserverconf_api_service, vpnserver_api_service, app_config, True]},
-    {'cls': UsersServersConnectionsAPI, 'args': [vpnserverconn_api_service, app_config, True]},
-    {'cls': VPNSDevicePlatformsAPI, 'args': [vpn_device_platforms_api_service, app_config, True]},
-    {'cls': VPNSTypesAPI, 'args': [vpntype_api_service, app_config, True]},
-    {'cls': VPNSServersConnectionsAPI, 'args': [vpnserverconn_api_service, user_policy, app_config, True]},
+     'args': [rrn_vpn_server_configurations_api_service, rrn_vpn_server_api_service, app_config, True]},
+    {'cls': UsersServersConnectionsAPI, 'args': [rrn_vpn_server_connections_api_service, app_config, True]},
+    {'cls': VPNSDevicePlatformsAPI, 'args': [rrn_vpn_device_platforms_api_service, app_config, True]},
+    {'cls': VPNSTypesAPI, 'args': [rrn_vpn_type_api_service, app_config, True]},
+    {'cls': VPNSServersConnectionsAPI, 'args': [rrn_vpn_server_connections_api_service, user_policy, app_config, True]},
 ]
 
 register_api(app, api_base_uri, apis)

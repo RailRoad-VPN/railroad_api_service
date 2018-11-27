@@ -97,7 +97,7 @@ class UsersServicesAPI(ResourceAPI):
             return resp
 
         try:
-            api_response = self._user_policy.create_user_service(user_uuid=user_uuid, subscription_id=service_id,
+            api_response = self._user_policy.create_user_service(user_uuid=user_uuid, service_id=service_id,
                                                                  order_uuid=order_uuid, status_id=status_id,
                                                                  expire_date=expire_date,
                                                                  is_trial=is_trial)

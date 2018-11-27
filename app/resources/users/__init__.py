@@ -7,6 +7,8 @@ from typing import List
 from flask import request, Response
 
 from app.exception import RailRoadAPIError
+from app.model.vpn_conf_platform import VPNConfigurationPlatform
+from app.model.vpn_type import VPNType
 from app.policy import UserPolicy
 
 sys.path.insert(0, '../rest_api_library')
