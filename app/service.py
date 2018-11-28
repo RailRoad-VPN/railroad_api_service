@@ -156,8 +156,8 @@ class UserRRNServiceAPIService(RESTService):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def create(self, user_uuid: str, service_id: str, order_uuid: str, status_id: int,
-               expire_date: datetime, is_trial: bool) -> APIResponse:
+    def create(self, user_uuid: str, service_id: str, order_uuid: str, status_id: int, expire_date: datetime,
+               is_trial: bool) -> APIResponse:
         self.logger.debug(
             f"{self.__class__}: create method with parameters user_uuid: {user_uuid}, service_id: {service_id}, "
             f"order_uuid: {order_uuid}, status_id: {status_id}, expire_date: {expire_date}, is_trial: {is_trial}")

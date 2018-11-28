@@ -14,6 +14,17 @@ class VPNConfigurationPlatform(Enum):
         self.sid = sid
         self.text = text
 
+    @staticmethod
+    def find_by_text(text):
+        if VPNConfigurationPlatform.IOS.text == text:
+            return VPNConfigurationPlatform.IOS
+        elif VPNConfigurationPlatform.ANDROID.text == text:
+            return VPNConfigurationPlatform.ANDROID
+        elif VPNConfigurationPlatform.WINDOWS.text == text:
+            return VPNConfigurationPlatform.WINDOWS
+        elif VPNConfigurationPlatform.MACOS.text == text:
+            return VPNConfigurationPlatform.MACOS
+
     IOS = (1, 'ios')
     ANDROID = (2, 'android')
     WINDOWS = (3, 'windows')

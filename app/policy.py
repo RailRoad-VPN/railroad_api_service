@@ -15,14 +15,16 @@ class UserPolicy(object):
 
     logger = logging.getLogger(__name__)
 
-    user_api_service = None
-    user_sub_api_service = None
-    order_api_service = None
-    payment_api_service = None
-    vpn_mgmt_users_api_service = None
-    vpn_server_confs_service = None
+    _rrn_user_api_service = None
+    _rrn_user_device_api_service = None
+    _rrn_user_rrnservice_api_service = None
+    _rrn_order_api_service = None
+    _rrn_vpn_servers_connections_api_service = None
+    _rrn_vpn_mgmt_users_api_service = None
+    _rrn_vpn_server_configurations_service = None
 
-    def __init__(self, rrn_user_rrnservice_api_service: UserRRNServiceAPIService,
+    def __init__(self,
+                 rrn_user_rrnservice_api_service: UserRRNServiceAPIService,
                  rrn_user_api_service: UserAPIService,
                  rrn_order_api_service: OrderAPIService,
                  rrn_user_device_api_service: UserDeviceAPIService,
