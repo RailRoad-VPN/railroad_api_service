@@ -47,6 +47,9 @@ class RailRoadAPIError(APIErrorEnum):
 
     PAYMENT_DOES_NOT_UPDATE_ORDER = (name + str(count()), 'Order does not update for payment', 'We create payment, but did not link this payment with order')
 
+    BAD_ORDER_IDENTITY = (name + str(count()), 'BAD_ORDER_IDENTITY', 'BAD_ORDER_IDENTITY')
+    ORDER_NOT_EXIST = (name + str(count()), 'ORDER_NOT_EXIST', 'ORDER_NOT_EXIST')
+
     PAYMENT_APN_DOES_NOT_CONTAIN_ORDER_CODE_CUSTOM_FIELD = (name + str(count()), 'APN does not contain ordercode custom field', 'We received APN but without x-ordercode custom field for some reason. Need manual work')
     PAYMENT_APN_DOES_NOT_CONTAIN_USER_UUID_CUSTOM_FIELD = (name + str(count()), 'APN does not contain useruuid custom field', 'We received APN but without x-useruuid custom field for some reason. Need manual work')
     PAYMENT_APN_DID_NOT_FIND_USER_SUB = (name + str(count()), 'APN is okay, but ', 'We received APN, get all user services by user uuid from x-useruuid custom field, but did not find user subscription for what this payment come. Need manual work')

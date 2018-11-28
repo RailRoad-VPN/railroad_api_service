@@ -80,11 +80,11 @@ class UsersServersConfigurationsAPI(ResourceAPI):
                                                                               configuration=config_base64,
                                                                               vpn_device_platform_id=platform_id,
                                                                               vpn_type_id=type_id)
-            conf_uuid = api_response.data['uuid']
+            # conf_uuid = api_response.data['uuid']
             response_data = APIResponse(status=APIResponseStatus.success.status, code=api_response.code)
             resp = make_api_response(data=response_data, http_code=api_response.code)
-            loc_url = self.__api_url__.replace('<string:user_id>', user_uuid).replace('<string:server_uuid>', 'all') + f"/{conf_uuid}"
-            resp.headers['Location'] = loc_url
+            # loc_url = self.__api_url__.replace('<string:user_id>', user_uuid).replace('<string:server_uuid>', 'all') + f"/{conf_uuid}"
+            # resp.headers['Location'] = loc_url
             return resp
         except APIException as e:
             self.logger.debug(e.serialize())
