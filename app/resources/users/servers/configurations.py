@@ -100,13 +100,17 @@ class UsersServersConfigurationsAPI(ResourceAPI):
     def get(self, server_uuid: str, user_id: str, suuid: str = None) -> Response:
         super(UsersServersConfigurationsAPI, self).get(req=request)
 
+        self.logger.debug("check @ in user_id")
         if user_id.find("@"):
+            self.logger.debug("there is @ in user_id. error")
             return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
         else:
+            self.logger.debug("there is NO @ in user_id. checking user_uuid")
             is_valid = check_uuid(suuid=user_id)
             if not is_valid:
                 return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
+        self.logger.debug("get platform_id and vpn_type_id from request args")
         platform_id = request.args.get('platform_id', None)
         vpn_type_id = request.args.get('vpn_type_id', None)
 

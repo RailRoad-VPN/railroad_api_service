@@ -42,7 +42,7 @@ class UserPolicy(object):
     def create_user_service(self, user_uuid: str, service_id: str, order_uuid: str, status_id: int,
                             expire_date: datetime, is_trial: bool) -> APIResponse:
         self.logger.debug(f"{self.__class__}: create_user_service method with parameter user_uuid: {user_uuid}, "
-                          f"subscription_id: {service_id}, is_trial: {is_trial}, expire_date: {expire_date},"
+                          f"service_id: {service_id}, is_trial: {is_trial}, expire_date: {expire_date},"
                           f"order_uuid: {order_uuid}, status_id: {status_id}")
         api_response = self._rrn_user_rrnservice_api_service.create(user_uuid=user_uuid, service_id=service_id,
                                                                     order_uuid=order_uuid, status_id=status_id,
