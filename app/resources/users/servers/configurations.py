@@ -59,7 +59,7 @@ class UsersServersConfigurationsAPI(ResourceAPI):
         if request_json is None:
             return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.REQUEST_NO_JSON)
 
-        if not user_id.find("@"):
+        if user_id.find("@") == -1:
             return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
         email = user_id
@@ -101,7 +101,7 @@ class UsersServersConfigurationsAPI(ResourceAPI):
         super(UsersServersConfigurationsAPI, self).get(req=request)
 
         self.logger.debug("check @ in user_id")
-        if user_id.find("@"):
+        if user_id.find("@") != -1:
             self.logger.debug("there is @ in user_id. error")
             return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
         else:
