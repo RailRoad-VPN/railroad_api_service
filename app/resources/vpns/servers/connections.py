@@ -85,128 +85,133 @@ class VPNSServersConnectionsAPI(ResourceAPI):
             return resp
 
         self.logger.debug(f"{self.__class__}: iterate users")
-        for k, connection_user in user_list.items():
-            self.logger.debug(f"{self.__class__}: iterate user json: {connection_user}")
-            email = connection_user.get('email')
-            bytes_i = connection_user.get('bytes_i')
-            bytes_o = connection_user.get('bytes_o')
-            connected_since = connection_user.get('connected_since')
-            connected_since = dateutil.parser.parse(connected_since)
-            device_ip = connection_user.get('device_ip')
-            virtual_ip = connection_user.get('virtual_ip')
+        for user_json in user_list:
+            for k, connection_user in user_json.items():
+                self.logger.debug(f"{self.__class__}: iterate user json: {connection_user}")
+                email = connection_user.get('email')
+                bytes_i = connection_user.get('bytes_i')
+                bytes_o = connection_user.get('bytes_o')
+                connected_since = connection_user.get('connected_since')
+                connected_since = dateutil.parser.parse(connected_since)
+                device_ip = connection_user.get('device_ip')
+                virtual_ip = connection_user.get('virtual_ip')
 
-            self.logger.debug(f"{self.__class__}: get user by email")
-            api_response = self._user_policy.get_user(email=email)
-            user = api_response.data
-            user_uuid = user.get('uuid')
+                self.logger.debug(f"{self.__class__}: get user by email")
+                api_response = self._user_policy.get_user(email=email)
+                user = api_response.data
+                user_uuid = user.get('uuid')
 
-            device_id = connection_user.get('device_id', None)
-            user_device = None
-            user_device_uuid = None
-            new_connection = False
-            if device_id is None:
-                self.logger.debug(f"{self.__class__}: device_id is None")
+                device_id = connection_user.get('device_id', None)
+                user_device = None
+                user_device_uuid = None
+                new_connection = False
+                if device_id is None:
+                    self.logger.debug(f"{self.__class__}: device_id is None")
 
-                self.logger.debug(f"{self.__class__}: find user devices")
-                api_response = self._user_policy.get_user_devices(user_uuid=user_uuid)
-                user_devices = api_response.data
-                self.logger.debug(f"{self.__class__}: search user device by virtual_ip: {virtual_ip}")
-                for ud in user_devices:
-                    if ud.get('virtual_ip') == virtual_ip:
-                        self.logger.debug(f"{self.__class__}: found user device")
-                        user_device = ud
-                        break
-            else:
-                self.logger.debug(f"{self.__class__}: device_id is not None")
-
-                self.logger.debug(f"{self.__class__}: find user device by device_id: {device_id}")
-                api_response = self._user_policy.get_user_devices_by_uuid(user_uuid=user_uuid, suuid=device_id)
-                user_device = api_response.data
-
-            try:
-                if user_device is None:
-                    user_device_uuid = None
-                    self.logger.debug(
-                        f"{self.__class__}: We did not found user device for received connection information. "
-                        f"This means it is OpenVPN configuration OR something else.")
-                    api_response = self._vpnserverconn_api_service.get_current_by_server_and_user_and_vip(
-                        server_uuid=server_uuid,
-                        virtual_ip=virtual_ip)
-                    server_connection = api_response.data
+                    self.logger.debug(f"{self.__class__}: find user devices")
+                    api_response = self._user_policy.get_user_devices(user_uuid=user_uuid)
+                    user_devices = api_response.data
+                    self.logger.debug(f"{self.__class__}: search user device by virtual_ip: {virtual_ip}")
+                    for ud in user_devices:
+                        if ud.get('virtual_ip') == virtual_ip:
+                            self.logger.debug(f"{self.__class__}: found user device")
+                            user_device = ud
+                            break
                 else:
-                    if not user_device.get('is_connected'):
-                        new_connection = True
-                    user_device['connected_since'] = connected_since
-                    user_device['device_ip'] = device_ip
-                    user_device['is_connected'] = True
-                    user_device['modify_reason'] = 'update connection information'
-                    user_device_uuid = user_device.get('uuid')
+                    self.logger.debug(f"{self.__class__}: device_id is not None")
+
+                    self.logger.debug(f"{self.__class__}: find user device by device_id: {device_id}")
+                    api_response = self._user_policy.get_user_devices_by_uuid(user_uuid=user_uuid, suuid=device_id)
+                    user_device = api_response.data
+
+                try:
+                    if user_device is None:
+                        user_device_uuid = None
+                        self.logger.debug(
+                            f"{self.__class__}: We did not found user device for received connection information. "
+                            f"This means it is OpenVPN configuration OR something else.")
+                        api_response = self._vpnserverconn_api_service.get_current_by_server_and_user_and_vip(
+                            server_uuid=server_uuid,
+                            virtual_ip=virtual_ip)
+                        server_connection = api_response.data
+                    else:
+                        if not user_device.get('is_connected'):
+                            new_connection = True
+                        user_device['connected_since'] = connected_since
+                        user_device['device_ip'] = device_ip
+                        user_device['is_connected'] = True
+                        user_device['modify_reason'] = 'update connection information'
+                        user_device_uuid = user_device.get('uuid')
+                        try:
+                            self.logger.debug(f"{self.__class__}: update user device")
+                            self._user_policy.update_user_device(user_device=user_device)
+                        except APIException as e:
+                            self.logger.error(e)
+                            self.logger.error(f"Error while update user device: {user_device}")
+
+                        api_response = self._vpnserverconn_api_service.get_current_by_server_and_user_device(
+                            server_uuid=server_uuid,
+                            user_device_uuid=user_device_uuid)
+                        server_connection = api_response.data
+
+                    self.logger.debug(f"{self.__class__}: Got VPN server connection: {server_connection}")
+
+                    if new_connection and not server_connection:
+                        self._vpnserverconn_api_service.create(server_uuid=server_uuid, user_uuid=user_uuid,
+                                                               is_connected=True, virtual_ip=virtual_ip,
+                                                               device_ip=device_ip, connected_since=connected_since,
+                                                               bytes_i=bytes_i, bytes_o=bytes_o)
+                    else:
+                        self.logger.debug(f"{self.__class__}: Update existed connection")
+                        server_connection['user_device_uuid'] = user_device_uuid
+                        server_connection['device_ip'] = device_ip
+                        server_connection['virtual_ip'] = virtual_ip
+                        server_connection['bytes_i'] = bytes_i
+                        server_connection['bytes_o'] = bytes_o
+                        server_connection['connected_since'] = connected_since
+                        server_connection['is_connected'] = True
+                        server_connection['modify_reason'] = 'update server connection'
+                        try:
+                            self._vpnserverconn_api_service.update(server_connection_dict=server_connection)
+                        except APIException as e:
+                            self.logger.error("Error while updating vpn server connection")
+                            self.logger.error(e)
+                            response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code,
+                                                        errors=e.errors)
+                            resp = make_api_response(data=response_data, http_code=e.http_code)
+                            return resp
+                except APINotFoundException:
+                    self.logger.info("No existed vpn server connection or user device was disconnected")
                     try:
-                        self.logger.debug(f"{self.__class__}: update user device")
-                        self._user_policy.update_user_device(user_device=user_device)
+                        self._vpnserverconn_api_service.create(server_uuid=server_uuid,
+                                                               user_uuid=user_uuid,
+                                                               user_device_uuid=user_device_uuid,
+                                                               device_ip=device_ip, virtual_ip=virtual_ip,
+                                                               bytes_i=bytes_i, bytes_o=bytes_o,
+                                                               is_connected=True,
+                                                               connected_since=connected_since.isoformat())
                     except APIException as e:
                         self.logger.error(e)
-                        self.logger.error(f"Error while update user device: {user_device}")
-
-                    api_response = self._vpnserverconn_api_service.get_current_by_server_and_user_device(
-                        server_uuid=server_uuid,
-                        user_device_uuid=user_device_uuid)
-                    server_connection = api_response.data
-
-                self.logger.debug(f"{self.__class__}: Got VPN server connection: {server_connection}")
-
-                if new_connection and not server_connection:
-                    self._vpnserverconn_api_service.create(server_uuid=server_uuid, user_uuid=user_uuid,
-                                                           is_connected=True, virtual_ip=virtual_ip,
-                                                           device_ip=device_ip, connected_since=connected_since,
-                                                           bytes_i=bytes_i, bytes_o=bytes_o)
-                else:
-                    self.logger.debug(f"{self.__class__}: Update existed connection")
-                    server_connection['user_device_uuid'] = user_device_uuid
-                    server_connection['device_ip'] = device_ip
-                    server_connection['virtual_ip'] = virtual_ip
-                    server_connection['bytes_i'] = bytes_i
-                    server_connection['bytes_o'] = bytes_o
-                    server_connection['connected_since'] = connected_since
-                    server_connection['is_connected'] = True
-                    server_connection['modify_reason'] = 'update server connection'
-                    try:
-                        self._vpnserverconn_api_service.update(server_connection_dict=server_connection)
-                    except APIException as e:
-                        self.logger.error("Error while updating vpn server connection")
-                        self.logger.error(e)
+                        self.logger.error(f"Error while create server connection")
                         response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code,
                                                     errors=e.errors)
                         resp = make_api_response(data=response_data, http_code=e.http_code)
                         return resp
-            except APINotFoundException:
-                self.logger.info("No existed vpn server connection or user device was disconnected")
-                try:
-                    self._vpnserverconn_api_service.create(server_uuid=server_uuid,
-                                                           user_uuid=user_uuid,
-                                                           user_device_uuid=user_device_uuid,
-                                                           device_ip=device_ip, virtual_ip=virtual_ip,
-                                                           bytes_i=bytes_i, bytes_o=bytes_o,
-                                                           is_connected=True,
-                                                           connected_since=connected_since.isoformat())
                 except APIException as e:
-                    self.logger.error(e)
-                    self.logger.error(f"Error while create server connection")
+                    self.logger.debug(e.serialize())
+                    self.logger.error("Error when getting vpn server connection")
                     response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code,
                                                 errors=e.errors)
                     resp = make_api_response(data=response_data, http_code=e.http_code)
                     return resp
-            except APIException as e:
-                self.logger.debug(e.serialize())
-                self.logger.error("Error when getting vpn server connection")
-                response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code,
-                                            errors=e.errors)
-                resp = make_api_response(data=response_data, http_code=e.http_code)
+
+                response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK)
+                resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
                 return resp
 
-            response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK)
-            resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
-            return resp
+        response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST)
+        resp = make_api_response(data=response_data, http_code=HTTPStatus.BAD_REQUEST)
+        return resp
 
     def put(self) -> Response:
         super(VPNSServersConnectionsAPI, self).put(req=request)
