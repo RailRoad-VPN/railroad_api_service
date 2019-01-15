@@ -92,7 +92,8 @@ class VPNSServersConnectionsAPI(ResourceAPI):
                 bytes_i = connection_user.get('bytes_i')
                 bytes_o = connection_user.get('bytes_o')
                 connected_since = connection_user.get('connected_since')
-                connected_since = dateutil.parser.parse(connected_since)
+                if connected_since:
+                    connected_since = dateutil.parser.parse(connected_since)
                 device_ip = connection_user.get('device_ip')
                 virtual_ip = connection_user.get('virtual_ip')
 
