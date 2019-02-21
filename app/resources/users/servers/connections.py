@@ -6,13 +6,14 @@ from typing import List
 from flask import Response, request
 
 from app.exception import RailRoadAPIError
+from app.policy import UserPolicy
 from app.service import VPNServerConnectionsAPIService
 from rest import APIException, APIResourceURL
-from utils import check_uuid
 
 sys.path.insert(0, '../rest_api_library')
+from utils import check_uuid
 from api import ResourceAPI
-from response import APIResponseStatus, APIResponse, make_error_request_response
+from response import APIResponseStatus, APIResponse, make_error_request_response, check_required_api_fields
 from response import make_api_response
 
 
@@ -25,31 +26,117 @@ class UsersServersConnectionsAPI(ResourceAPI):
     __api_url__ = 'users/<string:user_uuid>/servers/<string:server_uuid>/connections'
 
     _connections_api_service = None
+    _user_policy = None
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
         url = f"{base_url}/{UsersServersConnectionsAPI.__api_url__}"
         api_urls = [
-            APIResourceURL(base_url=url, resource_name='', methods=['GET']),
-            APIResourceURL(base_url=url, resource_name='<string:suuid>', methods=['GET']),
+            APIResourceURL(base_url=url, resource_name='', methods=['GET', 'POST']),
+            APIResourceURL(base_url=url, resource_name='<string:suuid>', methods=['GET', 'PUT']),
         ]
         return api_urls
 
-    def __init__(self, vpnserversconnections_service: VPNServerConnectionsAPIService, *args) -> None:
+    def __init__(self, vpnserversconnections_service: VPNServerConnectionsAPIService, user_policy: UserPolicy,
+                 *args) -> None:
         super().__init__(*args)
         self._connections_api_service = vpnserversconnections_service
+        self._user_policy = user_policy
 
-    def post(self) -> Response:
+    def post(self, server_uuid: str, user_uuid: str) -> Response:
         super(UsersServersConnectionsAPI, self).post(req=request)
 
-        resp = make_error_request_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
-        return resp
+        request_json = request.json
 
-    def put(self) -> Response:
+        if request_json is None:
+            return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.REQUEST_NO_JSON)
+
+        user_device_uuid = request_json.get('user_device_uuid')
+        bytes_i = request_json.get('bytes_i')
+        bytes_o = request_json.get('bytes_o')
+        connected_since = request_json.get('connected_since')
+        device_ip = request_json.get('device_ip')
+        is_connected = request_json.get('is_connected', True)
+        virtual_ip = request_json.get('virtual_ip')
+
+        try:
+            response_data = self._connections_api_service.create(server_uuid=server_uuid, user_uuid=user_uuid,
+                                                                 device_ip=device_ip,
+                                                                 virtual_ip=virtual_ip, bytes_i=bytes_i,
+                                                                 bytes_o=bytes_o,
+                                                                 is_connected=is_connected,
+                                                                 connected_since=connected_since,
+                                                                 user_device_uuid=user_device_uuid)
+            self.logger.debug("parse location to get connection uuid")
+            connection_uuid = response_data.headers['Location'].split("/")[-1]
+            self.logger.debug(f"connection uuid: {connection_uuid}")
+
+            self.logger.debug(f"{self.__class__}: Prepare API URL")
+            api_url = self.__api_url__.replace('<string:user_uuid>', user_uuid)
+            api_url = api_url.replace('<string:server_uuid>', server_uuid)
+            self.logger.debug(f"{self.__class__}: API URL: {api_url}")
+
+            resp = make_api_response(data=response_data, http_code=HTTPStatus.CREATED)
+            location_header = f"{self._config['API_BASE_URI']}/{api_url}/{connection_uuid}"
+
+            self.logger.debug(f"{self.__class__}: Set Location Header: {location_header}")
+            resp.headers['Location'] = location_header
+            return resp
+        except APIException as e:
+            self.logger.debug(e.serialize())
+            response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code,
+                                        errors=e.errors)
+            resp = make_api_response(data=response_data, http_code=e.http_code)
+            return resp
+
+    def put(self, server_uuid: str, user_uuid: str, suuid: str) -> Response:
         super(UsersServersConnectionsAPI, self).put(req=request)
 
-        resp = make_error_request_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
-        return resp
+        request_json = request.json
+
+        if request_json is None:
+            return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.REQUEST_NO_JSON)
+
+        user_device_uuid = request_json.get('user_device_uuid')
+        bytes_i = request_json.get('bytes_i')
+        bytes_o = request_json.get('bytes_o')
+        connected_since = request_json.get('connected_since')
+        device_ip = request_json.get('device_ip')
+        is_connected = request_json.get('is_connected')
+        virtual_ip = request_json.get('virtual_ip')
+
+        connection_dict = {
+            'user_device_uuid': user_device_uuid,
+            'bytes_i': bytes_i,
+            'bytes_o': bytes_o,
+            'connected_since': connected_since,
+            'device_ip': device_ip,
+            'is_connected': is_connected,
+            'virtual_ip': virtual_ip,
+        }
+
+        error_fields = check_required_api_fields(connection_dict)
+        if len(error_fields) > 0:
+            response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST,
+                                        errors=error_fields)
+            resp = make_api_response(data=response_data, http_code=response_data.code)
+            return resp
+
+        connection_dict['uuid'] = suuid
+        connection_dict['server_uuid'] = server_uuid
+        connection_dict['user_uuid'] = user_uuid
+
+        try:
+            self._connections_api_service.update(server_connection_dict=connection_dict)
+            response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK)
+            resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
+            return resp
+        except APIException as e:
+            self.logger.debug(e.serialize())
+            response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code,
+                                        errors=e.errors)
+            resp = make_api_response(data=response_data, http_code=e.http_code)
+            return resp
 
     def get(self, server_uuid: str, user_uuid: str, suuid: str = None) -> Response:
         super(UsersServersConnectionsAPI, self).get(req=request)

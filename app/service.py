@@ -444,7 +444,8 @@ class VPNServerConnectionsAPIService(RESTService):
         super().__init__(**kwargs)
 
     def create(self, server_uuid: str, user_uuid: str, device_ip: str, virtual_ip: str,
-               bytes_i: str, bytes_o: str, is_connected: bool, connected_since: str, user_device_uuid: str = None) -> APIResponse:
+               bytes_i: str, bytes_o: str, is_connected: bool, connected_since: str,
+               user_device_uuid: str = None) -> APIResponse:
         self.logger.debug(
             f"{self.__class__}: create method with parameters server_uuid: {server_uuid}, user_uuid: {user_uuid},"
             f"user_device_uuid: {user_device_uuid}, ip_device: {device_ip}, virtual_ip: {virtual_ip},"

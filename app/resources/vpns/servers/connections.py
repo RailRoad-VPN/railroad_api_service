@@ -259,6 +259,7 @@ class VPNSServersConnectionsAPI(ResourceAPI):
     def get(self) -> Response:
         super(VPNSServersConnectionsAPI, self).get(req=request)
 
+        # TODO тут получать только коннекшены для всего сервера, без привязки к юзеру
         user_device_uuid = request.args.get('user_device_uuid', None)
         is_connected = request.args.get('is_connected', None)
 

@@ -143,7 +143,7 @@ apis = [
     {'cls': UsersServersAPI, 'args': [vpn_policy, app_config, True]},
     {'cls': UsersServersConfigurationsAPI,
      'args': [rrn_vpn_server_configurations_api_service, rrn_vpn_server_api_service, user_policy, app_config, True]},
-    {'cls': UsersServersConnectionsAPI, 'args': [rrn_vpn_server_connections_api_service, app_config, True]},
+    {'cls': UsersServersConnectionsAPI, 'args': [rrn_vpn_server_connections_api_service, user_policy, app_config, True]},
     {'cls': VPNSDevicePlatformsAPI, 'args': [rrn_vpn_device_platforms_api_service, app_config, True]},
     {'cls': VPNSTypesAPI, 'args': [rrn_vpn_type_api_service, app_config, True]},
     {'cls': VPNSServersConnectionsAPI, 'args': [rrn_vpn_server_connections_api_service, user_policy, app_config, True]},
