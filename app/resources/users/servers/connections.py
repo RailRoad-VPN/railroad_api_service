@@ -123,7 +123,11 @@ class UsersServersConnectionsAPI(ResourceAPI):
             return resp
 
         try:
-            self._connections_api_service.update(server_connection_dict=req_fields)
+            api_response = self._connections_api_service.update(server_connection_dict=req_fields)
+            response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK,
+                                        data=api_response.data)
+            resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
+            return resp
         except APIException as e:
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST,
                                         errors=e.errors)
