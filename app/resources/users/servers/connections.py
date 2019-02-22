@@ -97,45 +97,37 @@ class UsersServersConnectionsAPI(ResourceAPI):
         if request_json is None:
             return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.REQUEST_NO_JSON)
 
-        user_device_uuid = request_json.get('user_device_uuid')
-        bytes_i = request_json.get('bytes_i')
-        bytes_o = request_json.get('bytes_o')
-        connected_since = request_json.get('connected_since')
-        device_ip = request_json.get('device_ip')
-        is_connected = request_json.get('is_connected')
-        virtual_ip = request_json.get('virtual_ip')
+        bytes_i = request_json.get('bytes_i', None)
+        bytes_o = request_json.get('bytes_o', None)
+        connected_since = request_json.get('connected_since', None)
+        device_ip = request_json.get('device_ip', None)
+        is_connected = request_json.get('is_connected', None)
+        user_device_uuid = request_json.get('user_device_uuid', None)
+        user_uuid = request_json.get('user_uuid', None)
+        uuid = request_json.get('uuid', None)
+        virtual_ip = request_json.get('virtual_ip', None)
 
-        connection_dict = {
-            'user_device_uuid': user_device_uuid,
+        req_fields = {
             'bytes_i': bytes_i,
             'bytes_o': bytes_o,
-            'connected_since': connected_since,
-            'device_ip': device_ip,
             'is_connected': is_connected,
-            'virtual_ip': virtual_ip,
+            'server_uuid': server_uuid,
+            'uuid': suuid
         }
 
-        error_fields = check_required_api_fields(connection_dict)
+        error_fields = check_required_api_fields(req_fields)
         if len(error_fields) > 0:
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST,
                                         errors=error_fields)
             resp = make_api_response(data=response_data, http_code=response_data.code)
             return resp
 
-        connection_dict['uuid'] = suuid
-        connection_dict['server_uuid'] = server_uuid
-        connection_dict['user_uuid'] = user_uuid
-
         try:
-            self._connections_api_service.update(server_connection_dict=connection_dict)
-            response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK)
-            resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
-            return resp
+            self._vpnserverconn_api_service.update(server_connection_dict=req_fields)
         except APIException as e:
-            self.logger.debug(e.serialize())
-            response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code,
+            response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST,
                                         errors=e.errors)
-            resp = make_api_response(data=response_data, http_code=e.http_code)
+            resp = make_api_response(data=response_data, http_code=response_data.code)
             return resp
 
     def get(self, server_uuid: str, user_uuid: str, suuid: str = None) -> Response:
