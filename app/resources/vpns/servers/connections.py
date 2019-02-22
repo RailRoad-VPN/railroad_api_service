@@ -231,14 +231,9 @@ class VPNSServersConnectionsAPI(ResourceAPI):
         req_fields = {
             'bytes_i': bytes_i,
             'bytes_o': bytes_o,
-            'connected_since': connected_since,
-            'device_ip': device_ip,
             'is_connected': is_connected,
             'server_uuid': server_uuid,
-            'user_device_uuid': user_device_uuid,
-            'user_uuid': user_uuid,
-            'uuid': uuid,
-            'virtual_ip': virtual_ip,
+            'uuid': uuid
         }
 
         error_fields = check_required_api_fields(req_fields)
