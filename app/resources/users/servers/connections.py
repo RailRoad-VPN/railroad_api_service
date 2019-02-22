@@ -123,7 +123,7 @@ class UsersServersConnectionsAPI(ResourceAPI):
             return resp
 
         try:
-            self._vpnserverconn_api_service.update(server_connection_dict=req_fields)
+            self._connections_api_service.update(server_connection_dict=req_fields)
         except APIException as e:
             response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.BAD_REQUEST,
                                         errors=e.errors)
