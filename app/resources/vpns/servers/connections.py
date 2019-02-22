@@ -33,7 +33,7 @@ class VPNSServersConnectionsAPI(ResourceAPI):
         url = f"{base_url}/{VPNSServersConnectionsAPI.__api_url__}"
         api_urls = [
             APIResourceURL(base_url=url.replace('/<string:server_uuid>/', '/'), resource_name='', methods=['GET']),
-            APIResourceURL(base_url=url, resource_name='', methods=['POST']),
+            APIResourceURL(base_url=url, resource_name='<string:server_uuid>', methods=['POST']),
         ]
         return api_urls
 
@@ -214,7 +214,7 @@ class VPNSServersConnectionsAPI(ResourceAPI):
         resp = make_api_response(data=response_data, http_code=HTTPStatus.BAD_REQUEST)
         return resp
 
-    def put(self) -> Response:
+    def put(self, server_uuid: str, suuid: str) -> Response:
         super(VPNSServersConnectionsAPI, self).put(req=request)
 
         bytes_i = request.args.get('bytes_i', None)
@@ -222,7 +222,6 @@ class VPNSServersConnectionsAPI(ResourceAPI):
         connected_since = request.args.get('connected_since', None)
         device_ip = request.args.get('device_ip', None)
         is_connected = request.args.get('is_connected', None)
-        server_uuid = request.args.get('server_uuid', None)
         user_device_uuid = request.args.get('user_device_uuid', None)
         user_uuid = request.args.get('user_uuid', None)
         uuid = request.args.get('uuid', None)
@@ -233,7 +232,7 @@ class VPNSServersConnectionsAPI(ResourceAPI):
             'bytes_o': bytes_o,
             'is_connected': is_connected,
             'server_uuid': server_uuid,
-            'uuid': uuid
+            'uuid': suuid
         }
 
         error_fields = check_required_api_fields(req_fields)
