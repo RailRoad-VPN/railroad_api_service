@@ -112,7 +112,8 @@ class UsersServersConnectionsAPI(ResourceAPI):
             'bytes_o': bytes_o,
             'is_connected': is_connected,
             'server_uuid': server_uuid,
-            'uuid': suuid
+            'uuid': suuid,
+            'user_device_uuid': user_device_uuid
         }
 
         error_fields = check_required_api_fields(req_fields)

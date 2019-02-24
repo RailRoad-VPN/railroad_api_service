@@ -250,10 +250,21 @@ class UserPolicy(object):
         self.logger.debug(f"{self.__class__}: get_user_devices method with parameters user_uuid: {user_uuid}")
         api_response = self._rrn_user_device_api_service.get_user_devices(user_uuid=user_uuid)
         try:
-            for ud in api_response.data:
-                user_device_connection_list = self._get_user_device_connections(user_device=ud)
+            for user_device in api_response.data:
+                bytes_i = 0
+                bytes_o = 0
+                user_device_connection_list = self._get_user_device_connections(user_device=user_device)
                 if user_device_connection_list:
-                    ud['_connections'] = user_device_connection_list
+                    user_device['_connections'] = user_device_connection_list
+                    for user_device_connection in user_device_connection_list:
+                        if user_device_connection['is_connected']:
+                            user_device['is_connected'] = True
+                            user_device['connected_since'] = user_device_connection['connected_since']
+                        bytes_i += int(user_device_connection['bytes_i'])
+                        bytes_o += int(user_device_connection['bytes_o'])
+                    user_device['bytes_i'] = bytes_i;
+                    user_device['bytes_o'] = bytes_o;
+
         except APIException as e:
             pass
         return api_response
