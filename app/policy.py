@@ -16,6 +16,7 @@ class UserPolicy(object):
     logger = logging.getLogger(__name__)
 
     _rrn_user_api_service = None
+    _rrn_user_tickets_api_service = None
     _rrn_user_device_api_service = None
     _rrn_user_rrnservice_api_service = None
     _rrn_order_api_service = None
@@ -26,18 +27,38 @@ class UserPolicy(object):
     def __init__(self,
                  rrn_user_rrnservice_api_service: UserRRNServiceAPIService,
                  rrn_user_api_service: UserAPIService,
+                 rrn_user_tickets_api_service: UserTicketsAPIService,
                  rrn_order_api_service: OrderAPIService,
                  rrn_user_device_api_service: UserDeviceAPIService,
                  rrn_vpn_servers_connections_api_service: VPNServerConnectionsAPIService,
                  rrn_vpn_mgmt_users_api_service: VPNMGMTUsersAPIService,
                  rrn_vpn_server_configurations_api_service: UsersVPNServersConfigurationsAPIService):
         self._rrn_user_api_service = rrn_user_api_service
+        self._rrn_user_tickets_api_service = rrn_user_tickets_api_service
         self._rrn_user_device_api_service = rrn_user_device_api_service
         self._rrn_user_rrnservice_api_service = rrn_user_rrnservice_api_service
         self._rrn_order_api_service = rrn_order_api_service
         self._rrn_vpn_servers_connections_api_service = rrn_vpn_servers_connections_api_service
         self._rrn_vpn_mgmt_users_api_service = rrn_vpn_mgmt_users_api_service
         self._rrn_vpn_server_configurations_service = rrn_vpn_server_configurations_api_service
+
+    def create_user_ticket(self, user_uuid: str, contact_email: str, description: str,
+                           zipfile: bytearray = None) -> APIResponse:
+        api_response = self._rrn_user_tickets_api_service.create(user_uuid=user_uuid, contact_email=contact_email,
+                                                                 description=description, zipfile=zipfile)
+        return api_response
+
+    def get_user_ticket_by_number(self, user_uuid: str, ticket_number: int) -> APIResponse:
+        api_response = self._rrn_user_tickets_api_service.find(user_uuid=user_uuid, ticket_number=ticket_number)
+        return api_response
+
+    def get_user_ticket(self, user_uuid: str, ticket_uuid: str) -> APIResponse:
+        api_response = self._rrn_user_tickets_api_service.find(user_uuid=user_uuid, suuid=ticket_uuid)
+        return api_response
+
+    def get_user_tickets(self, user_uuid: str) -> APIResponse:
+        api_response = self._rrn_user_tickets_api_service.find(user_uuid=user_uuid)
+        return api_response
 
     def create_user_service(self, user_uuid: str, service_id: str, order_uuid: str, status_id: int,
                             expire_date: datetime, is_trial: bool) -> APIResponse:
@@ -259,7 +280,6 @@ class UserPolicy(object):
                     for user_device_connection in user_device_connection_list:
                         if user_device_connection['is_connected']:
                             user_device['is_connected'] = True
-                            user_device['connected_since'] = user_device_connection['connected_since']
                         bytes_i += int(user_device_connection['bytes_i'])
                         bytes_o += int(user_device_connection['bytes_o'])
                     user_device['bytes_i'] = bytes_i;

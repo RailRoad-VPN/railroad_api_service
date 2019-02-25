@@ -11,11 +11,12 @@ from app.resources.users import UsersAPI
 from app.resources.users.devices import UsersDevicesAPI
 from app.resources.users.orders import UsersOrdersAPI
 from app.resources.users.orders.payments import UsersOrdersPaymentsAPI
+from app.resources.users.rrnservices import UsersServicesAPI
 from app.resources.users.servers import UsersServersAPI
 from app.resources.users.servers.conditions import UsersServersConditionsAPI
 from app.resources.users.servers.configurations import UsersServersConfigurationsAPI
 from app.resources.users.servers.connections import UsersServersConnectionsAPI
-from app.resources.users.rrnservices import UsersServicesAPI
+from app.resources.users.tickets import UserTicketsAPI
 from app.resources.vpns.device_platforms import VPNSDevicePlatformsAPI
 from app.resources.vpns.servers import VPNServersAPI
 from app.resources.vpns.servers.connections import VPNSServersConnectionsAPI
@@ -92,6 +93,10 @@ rrn_geo_state_api_service = GeoStateAPIService(api_url=app_config['VPNC_SERVICE_
 rrn_user_api_service = UserAPIService(api_url=app_config['AUTH_SERVICE_URL'],
                                       resource_name=app_config['AUTH_SERVICE_USERS_RESOURCE_NAME'])
 
+rrn_user_tickets_api_service = UserTicketsAPIService(api_url=app_config['AUTH_SERVICE_URL'],
+                                                     resource_name=app_config[
+                                                         'AUTH_SERVICE_USER_TICKETS_RESOURCE_NAME'])
+
 rrn_user_rrnservice_api_service = UserRRNServiceAPIService(api_url=app_config['BILLING_SERVICE_URL'],
                                                            resource_name=app_config[
                                                                'BILLING_SERVICE_USER_SUBSCRIPTION_RESOURCE_NAME'])
@@ -113,6 +118,7 @@ rrn_order_api_service = OrderAPIService(api_url=app_config['BILLING_SERVICE_URL'
 user_policy = UserPolicy(rrn_user_rrnservice_api_service=rrn_user_rrnservice_api_service,
                          rrn_order_api_service=rrn_order_api_service,
                          rrn_user_api_service=rrn_user_api_service,
+                         rrn_user_tickets_api_service=rrn_user_tickets_api_service,
                          rrn_user_device_api_service=rrn_user_device_api_service,
                          rrn_vpn_servers_connections_api_service=rrn_vpn_server_connections_api_service,
                          rrn_vpn_mgmt_users_api_service=rrn_vpn_mgmt_users_api_service,
@@ -133,6 +139,7 @@ apis = [
     {'cls': UsersOrdersPaymentsAPI, 'args': [rrn_order_api_service, app_config, True]},
     {'cls': UsersServicesAPI, 'args': [user_policy, app_config, True]},
     {'cls': UsersDevicesAPI, 'args': [user_policy, app_config, True]},
+    {'cls': UserTicketsAPI, 'args': [user_policy, app_config, True]},
     {'cls': PaymentsAPI,
      'args': [rrn_order_api_service, rrn_user_rrnservice_api_service, rrn_vpn_mgmt_users_api_service, user_policy,
               rrn_vpn_server_configurations_api_service, app_config]},
@@ -143,7 +150,8 @@ apis = [
     {'cls': UsersServersAPI, 'args': [vpn_policy, app_config, True]},
     {'cls': UsersServersConfigurationsAPI,
      'args': [rrn_vpn_server_configurations_api_service, rrn_vpn_server_api_service, user_policy, app_config, True]},
-    {'cls': UsersServersConnectionsAPI, 'args': [rrn_vpn_server_connections_api_service, user_policy, app_config, True]},
+    {'cls': UsersServersConnectionsAPI,
+     'args': [rrn_vpn_server_connections_api_service, user_policy, app_config, True]},
     {'cls': VPNSDevicePlatformsAPI, 'args': [rrn_vpn_device_platforms_api_service, app_config, True]},
     {'cls': VPNSTypesAPI, 'args': [rrn_vpn_type_api_service, app_config, True]},
     {'cls': VPNSServersConnectionsAPI, 'args': [rrn_vpn_server_connections_api_service, user_policy, app_config, True]},

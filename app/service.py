@@ -4,11 +4,55 @@ import logging
 import sys
 
 from app.model import VPNTypeEnum
+from app.model.user_ticket_status import UserTicketStatus
 
 sys.path.insert(0, '../rest_api_library')
 from rest import RESTService, APIException
 from response import APIResponse
 from api import ResourcePagination
+
+
+class UserTicketsAPIService(RESTService):
+    __version__ = 1
+
+    logger = logging.getLogger(__name__)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def create(self, user_uuid: str, contact_email: str, description: str, zipfile: bytearray = None) -> APIResponse:
+        self.logger.debug(
+            f"{self.__class__}: create method with parameters user_uuid: {user_uuid}, "
+            f"contact_email: {contact_email}, description len: {len(description)}, zipfile_exits: {zipfile is not None}")
+
+        data = {
+            'status_id': UserTicketStatus.NEW.sid,
+            'contact_email': contact_email,
+            'description': description,
+            'zipfile': zipfile
+        }
+        url = self._url.replace("<string:user_uuid>", user_uuid)
+        api_response = self._post(url=url, data=data, headers=self._headers)
+        if 'Location' in api_response.headers:
+            api_response = self._get(url=api_response.headers.get('Location'))
+            return api_response
+        else:
+            self.logger.debug(api_response.serialize())
+            raise APIException(http_code=api_response.code, errors=api_response.errors)
+
+    def find(self, user_uuid: str, suuid: str = None, ticket_number: int = None) -> APIResponse:
+        url = self._url.replace("<string:user_uuid>", user_uuid)
+        if suuid:
+            self.logger.debug(f"get user with uuid: {user_uuid} ticket by uuid: {suuid}")
+            url = f"{url}/{suuid}"
+        elif ticket_number:
+            self.logger.debug(f"get user with uuid: {user_uuid} ticket by ticket_number: {ticket_number}")
+            url = f"{url}/{ticket_number}"
+        else:
+            self.logger.debug(f"get ALL user with uuid {user_uuid} tickets")
+            url = f"{url}"
+        api_response = self._get(url=url)
+        return api_response
 
 
 class OrderAPIService(RESTService):
