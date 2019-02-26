@@ -71,9 +71,9 @@ class UserTicketsAPI(ResourceAPI):
 
             api_url = self.__api_url__.replace('<string:user_uuid>', user_uuid)
 
-            response_data = APIResponse(status=APIResponseStatus.success.status, code=api_response.code)
-            resp = make_api_response(data=response_data, http_code=api_response.code)
-            resp.headers['Location'] = f"{self._config['API_BASE_URI']}/{api_url}/{api_response.data['uuid']}"
+            response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.CREATED)
+            resp = make_api_response(data=response_data, http_code=HTTPStatus.CREATED)
+            resp.headers['Location'] = f"{self._config['API_BASE_URI']}/{api_url}/{api_response.data['number']}"
             return resp
         except APIException as e:
             self.logger.debug(e.serialize())
