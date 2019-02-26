@@ -49,6 +49,7 @@ class UserTicketsAPI(ResourceAPI):
 
         contact_email = request_json.get('contact_email', None)
         description = request_json.get('description', None)
+        extra_info = request_json.get('extra_info', None)
         zipfile = request_json.get('zipfile', None)
 
         req_fields = {
@@ -65,7 +66,8 @@ class UserTicketsAPI(ResourceAPI):
 
         try:
             api_response = self._user_policy.create_user_ticket(user_uuid=user_uuid, contact_email=contact_email,
-                                                                description=description, zipfile=zipfile)
+                                                                extra_info=extra_info, description=description,
+                                                                zipfile=zipfile)
 
             api_url = self.__api_url__.replace('<string:user_uuid>', user_uuid)
 

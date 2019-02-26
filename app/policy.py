@@ -42,10 +42,12 @@ class UserPolicy(object):
         self._rrn_vpn_mgmt_users_api_service = rrn_vpn_mgmt_users_api_service
         self._rrn_vpn_server_configurations_service = rrn_vpn_server_configurations_api_service
 
-    def create_user_ticket(self, user_uuid: str, contact_email: str, description: str,
+    def create_user_ticket(self, user_uuid: str, contact_email: str, description: str, extra_info: dict,
                            zipfile: bytearray = None) -> APIResponse:
+        extra_info_s = json.dumps(extra_info)
         api_response = self._rrn_user_tickets_api_service.create(user_uuid=user_uuid, contact_email=contact_email,
-                                                                 description=description, zipfile=zipfile)
+                                                                 extra_info=extra_info_s, description=description,
+                                                                 zipfile=zipfile)
         return api_response
 
     def get_user_ticket_by_number(self, user_uuid: str, ticket_number: int) -> APIResponse:

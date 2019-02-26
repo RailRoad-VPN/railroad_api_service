@@ -20,15 +20,16 @@ class UserTicketsAPIService(RESTService):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def create(self, user_uuid: str, contact_email: str, description: str, zipfile: bytearray = None) -> APIResponse:
+    def create(self, user_uuid: str, contact_email: str, description: str, extra_info: str, zipfile: bytearray = None) -> APIResponse:
         self.logger.debug(
-            f"{self.__class__}: create method with parameters user_uuid: {user_uuid}, "
+            f"{self.__class__}: create method with parameters user_uuid: {user_uuid}, extra_info: {extra_info},"
             f"contact_email: {contact_email}, description len: {len(description)}, zipfile_exits: {zipfile is not None}")
 
         data = {
             'status_id': UserTicketStatus.NEW.sid,
             'contact_email': contact_email,
             'description': description,
+            'extra_info': extra_info,
             'zipfile': zipfile
         }
         url = self._url.replace("<string:user_uuid>", user_uuid)
