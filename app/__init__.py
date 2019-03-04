@@ -17,6 +17,7 @@ from app.resources.users.servers.conditions import UsersServersConditionsAPI
 from app.resources.users.servers.configurations import UsersServersConfigurationsAPI
 from app.resources.users.servers.connections import UsersServersConnectionsAPI
 from app.resources.users.tickets import UserTicketsAPI
+from app.resources.vpns.apps import VPNAppsVersionAPI
 from app.resources.vpns.device_platforms import VPNSDevicePlatformsAPI
 from app.resources.vpns.servers import VPNServersAPI
 from app.resources.vpns.servers.connections import VPNSServersConnectionsAPI
@@ -155,6 +156,7 @@ apis = [
     {'cls': VPNSDevicePlatformsAPI, 'args': [rrn_vpn_device_platforms_api_service, app_config, True]},
     {'cls': VPNSTypesAPI, 'args': [rrn_vpn_type_api_service, app_config, True]},
     {'cls': VPNSServersConnectionsAPI, 'args': [rrn_vpn_server_connections_api_service, user_policy, app_config, True]},
+    {'cls': VPNAppsVersionAPI, 'args': [app_config, True]},
 ]
 
 register_api(app, api_base_uri, apis)
