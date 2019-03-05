@@ -151,6 +151,7 @@ class UsersDevicesAPI(ResourceAPI):
         modify_reason = request_json.get('modify_reason', None)
 
         req_fields = {
+            'user_uuid': user_uuid,
             'device_id': device_id,
             'is_active': is_active,
             'modify_reason': modify_reason,
@@ -169,6 +170,8 @@ class UsersDevicesAPI(ResourceAPI):
             # reuse variable
             req_fields['device_ip'] = device_ip
             req_fields['location'] = location
+            req_fields['uuid'] = user_device_uuid
+            req_fields['user_uuid'] = user_uuid
             self._user_policy.update_user_device(req_fields)
             response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK)
             resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)
