@@ -157,8 +157,6 @@ class UsersDevicesAPI(ResourceAPI):
 
         req_fields = {
             'device_id': device_id,
-            'virtual_ip': virtual_ip,
-            'location': location,
             'is_active': is_active,
             'modify_reason': modify_reason,
         }
@@ -174,9 +172,9 @@ class UsersDevicesAPI(ResourceAPI):
             # check does user device exists
             self._user_policy.get_user_devices_by_uuid(user_uuid=user_uuid, suuid=user_device_uuid)
             # reuse variable
-            req_fields['uuid'] = user_device_uuid
-            req_fields['user_uuid'] = user_uuid
             req_fields['device_ip'] = device_ip
+            req_fields['virtual_ip'] = virtual_ip
+            req_fields['location'] = location
             req_fields['connected_since'] = connected_since
             self._user_policy.update_user_device(req_fields)
             response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK)
