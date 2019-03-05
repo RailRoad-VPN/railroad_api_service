@@ -56,9 +56,7 @@ class UsersDevicesAPI(ResourceAPI):
         vpn_type_id = request_json.get('vpn_type_id', None)
         location = request_json.get('location', None)
         is_active = request_json.get('is_active', None)
-        virtual_ip = request_json.get('virtual_ip', None)
         device_ip = request_json.get('device_ip', None)
-        connected_since = request_json.get('connected_since', None)
 
         req_fields = {
             'user_uuid': user_uuid,
@@ -77,9 +75,8 @@ class UsersDevicesAPI(ResourceAPI):
 
         try:
             api_response = self._user_policy.create_user_device(user_uuid=user_uuid, device_id=device_id,
-                                                                virtual_ip=virtual_ip, device_ip=device_ip,
+                                                                device_ip=device_ip,
                                                                 location=location, is_active=is_active,
-                                                                connected_since=connected_since,
                                                                 platform_id=platform_id, vpn_type_id=vpn_type_id)
             user_device = api_response.data
 

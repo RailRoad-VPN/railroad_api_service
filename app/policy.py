@@ -204,18 +204,16 @@ class UserPolicy(object):
         self.logger.debug(f"{self.__class__}: update_user method with parameter user_dict: {user_dict}")
         self._rrn_user_api_service.update_user(user_dict=user_dict)
 
-    def create_user_device(self, user_uuid: str, virtual_ip: str, device_id: str, platform_id: int,
-                           vpn_type_id: int, location: str, is_active: bool, connected_since: datetime = None,
-                           device_ip: str = None) -> APIResponse:
+    def create_user_device(self, user_uuid: str, device_id: str, platform_id: int,
+                           vpn_type_id: int, location: str, is_active: bool, device_ip: str = None) -> APIResponse:
         self.logger.debug(f"{self.__class__}: create_user_device method with parameters user_uuid: {user_uuid}, "
                           f"device_id: {device_id}, location: {location}, "
                           f"is_active: {is_active}, platform_id: {platform_id}, vpn_type_id: {vpn_type_id}, "
-                          f"virtual_ip: {virtual_ip}, device_ip: {device_ip}, connected_since: {connected_since}")
+                          f"device_ip: {device_ip}")
         api_response = self._rrn_user_device_api_service.create(user_uuid=user_uuid, vpn_type_id=vpn_type_id,
-                                                                device_id=device_id, virtual_ip=virtual_ip,
-                                                                device_ip=device_ip, platform_id=platform_id,
-                                                                location=location, is_active=is_active,
-                                                                connected_since=connected_since)
+                                                                device_id=device_id, device_ip=device_ip,
+                                                                platform_id=platform_id, location=location,
+                                                                is_active=is_active)
         self.logger.debug("Check X-Device-Token")
         x_device_token = api_response.headers.get('X-Device-Token', None)
         if x_device_token is None:
