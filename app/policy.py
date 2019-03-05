@@ -208,10 +208,9 @@ class UserPolicy(object):
                            vpn_type_id: int, location: str, is_active: bool, device_ip: str = None) -> APIResponse:
         self.logger.debug(f"{self.__class__}: create_user_device method with parameters user_uuid: {user_uuid}, "
                           f"device_id: {device_id}, location: {location}, "
-                          f"is_active: {is_active}, platform_id: {platform_id}, vpn_type_id: {vpn_type_id}, "
-                          f"device_ip: {device_ip}")
+                          f"is_active: {is_active}, platform_id: {platform_id}, vpn_type_id: {vpn_type_id}")
         api_response = self._rrn_user_device_api_service.create(user_uuid=user_uuid, vpn_type_id=vpn_type_id,
-                                                                device_id=device_id, device_ip=device_ip,
+                                                                device_id=device_id,
                                                                 platform_id=platform_id, location=location,
                                                                 is_active=is_active)
         self.logger.debug("Check X-Device-Token")

@@ -142,19 +142,17 @@ class UserDeviceAPIService(RESTService):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def create(self, user_uuid: str, device_id: str, platform_id: int, vpn_type_id: int, location: str, is_active: bool,
-               device_ip: str = None) -> APIResponse:
+    def create(self, user_uuid: str, device_id: str, platform_id: int, vpn_type_id: int, location: str, is_active: bool) -> APIResponse:
         self.logger.debug(
             f"{self.__class__}: create method with parameters user_uuid: {user_uuid}, device_id: {device_id}, "
             f"location: {location}, is_active: {is_active}, "
-            f"platform_id: {platform_id}, vpn_type_id: {vpn_type_id}, device_ip: {device_ip}")
+            f"platform_id: {platform_id}, vpn_type_id: {vpn_type_id}")
         us_json = {
             'device_id': device_id,
             'platform_id': platform_id,
             'vpn_type_id': vpn_type_id,
             'location': location,
             'is_active': is_active,
-            'device_ip': device_ip,
         }
         url = self._url.replace('<string:user_uuid>', user_uuid)
         api_response = self._post(data=us_json, url=url)

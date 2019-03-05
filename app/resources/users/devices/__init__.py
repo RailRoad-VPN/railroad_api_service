@@ -56,7 +56,6 @@ class UsersDevicesAPI(ResourceAPI):
         vpn_type_id = request_json.get('vpn_type_id', None)
         location = request_json.get('location', None)
         is_active = request_json.get('is_active', None)
-        device_ip = request_json.get('device_ip', None)
 
         req_fields = {
             'user_uuid': user_uuid,
@@ -75,7 +74,6 @@ class UsersDevicesAPI(ResourceAPI):
 
         try:
             api_response = self._user_policy.create_user_device(user_uuid=user_uuid, device_id=device_id,
-                                                                device_ip=device_ip,
                                                                 location=location, is_active=is_active,
                                                                 platform_id=platform_id, vpn_type_id=vpn_type_id)
             user_device = api_response.data
@@ -145,7 +143,6 @@ class UsersDevicesAPI(ResourceAPI):
             return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
         device_id = request_json.get('device_id', None)
-        device_ip = request_json.get('device_ip', None)
         location = request_json.get('location', None)
         is_active = request_json.get('is_active', None)
         modify_reason = request_json.get('modify_reason', None)
@@ -168,7 +165,6 @@ class UsersDevicesAPI(ResourceAPI):
             # check does user device exists
             self._user_policy.get_user_devices_by_uuid(user_uuid=user_uuid, suuid=user_device_uuid)
             # reuse variable
-            req_fields['device_ip'] = device_ip
             req_fields['location'] = location
             req_fields['uuid'] = user_device_uuid
             req_fields['user_uuid'] = user_uuid
