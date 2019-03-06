@@ -269,11 +269,13 @@ class UserPolicy(object):
     def get_user_devices(self, user_uuid: str) -> APIResponse:
         self.logger.debug(f"{self.__class__}: get_user_devices method with parameters user_uuid: {user_uuid}")
         api_response = self._rrn_user_device_api_service.get_user_devices(user_uuid=user_uuid)
-        try:
-            for user_device in api_response.data:
-                bytes_i = 0
-                bytes_o = 0
+        for user_device in api_response.data:
+            bytes_i = 0
+            bytes_o = 0
+            try:
+                self.logger.debug(f"get connection for user_device with uuid:{user_device['uuid']}")
                 user_device_connection_list = self._get_user_device_connections(user_device=user_device)
+                self.logger.debug(f"got connections. size:{len(user_device_connection_list)}")
                 if user_device_connection_list:
                     user_device['_connections'] = user_device_connection_list
                     for user_device_connection in user_device_connection_list:
@@ -281,11 +283,10 @@ class UserPolicy(object):
                             user_device['is_connected'] = True
                         bytes_i += int(user_device_connection['bytes_i'])
                         bytes_o += int(user_device_connection['bytes_o'])
-                    user_device['bytes_i'] = bytes_i;
-                    user_device['bytes_o'] = bytes_o;
-
-        except APIException as e:
-            pass
+                    user_device['bytes_i'] = bytes_i
+                    user_device['bytes_o'] = bytes_o
+            except APIException as e:
+                self.logger.debug(f"APIException when get connections for user device")
         return api_response
 
     def _get_user_device_connections(self, user_device: dict):
