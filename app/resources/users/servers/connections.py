@@ -104,7 +104,7 @@ class UsersServersConnectionsAPI(ResourceAPI):
         is_connected = request_json.get('is_connected', None)
         user_device_uuid = request_json.get('user_device_uuid', None)
         user_uuid = request_json.get('user_uuid', None)
-        uuid = request_json.get('uuid', None)
+        suuid = request_json.get('uuid', None)
         virtual_ip = request_json.get('virtual_ip', None)
 
         req_fields = {
@@ -123,9 +123,10 @@ class UsersServersConnectionsAPI(ResourceAPI):
         req_fields['connected_since'] = connected_since
         req_fields['device_ip'] = device_ip
         req_fields['user_uuid'] = user_uuid
-        req_fields['uuid'] = uuid
+        req_fields['uuid'] = suuid
         req_fields['virtual_ip'] = virtual_ip
         req_fields['is_connected'] = is_connected
+        req_fields['server_uuid'] = server_uuid
 
         try:
             api_response = self._connections_api_service.update(server_connection_dict=req_fields)
