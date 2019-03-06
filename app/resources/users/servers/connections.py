@@ -108,12 +108,7 @@ class UsersServersConnectionsAPI(ResourceAPI):
         virtual_ip = request_json.get('virtual_ip', None)
 
         req_fields = {
-            'bytes_i': bytes_i,
-            'bytes_o': bytes_o,
-            'is_connected': is_connected,
-            'server_uuid': server_uuid,
-            'uuid': suuid,
-            'user_device_uuid': user_device_uuid
+            'user_device_uuid': user_device_uuid,
         }
 
         error_fields = check_required_api_fields(req_fields)
@@ -122,6 +117,15 @@ class UsersServersConnectionsAPI(ResourceAPI):
                                         errors=error_fields)
             resp = make_api_response(data=response_data, http_code=response_data.code)
             return resp
+
+        req_fields['bytes_i'] = bytes_i
+        req_fields['bytes_o'] = bytes_o
+        req_fields['connected_since'] = connected_since
+        req_fields['device_ip'] = device_ip
+        req_fields['user_uuid'] = user_uuid
+        req_fields['uuid'] = uuid
+        req_fields['virtual_ip'] = virtual_ip
+        req_fields['is_connected'] = is_connected
 
         try:
             api_response = self._connections_api_service.update(server_connection_dict=req_fields)
