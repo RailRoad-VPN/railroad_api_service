@@ -279,10 +279,12 @@ class UserPolicy(object):
                 if user_device_connection_list:
                     user_device['_connections'] = user_device_connection_list
                     for user_device_connection in user_device_connection_list:
-                        if user_device_connection['is_connected']:
+                        if 'is_connected' in user_device_connection and user_device_connection['is_connected']:
                             user_device['is_connected'] = True
-                        bytes_i += int(user_device_connection['bytes_i'])
-                        bytes_o += int(user_device_connection['bytes_o'])
+                        if 'bytes_i' in user_device_connection:
+                            bytes_i += int(user_device_connection['bytes_i'])
+                        if 'bytes_o' in user_device_connection:
+                            bytes_o += int(user_device_connection['bytes_o'])
                     user_device['bytes_i'] = bytes_i
                     user_device['bytes_o'] = bytes_o
             except APIException as e:
