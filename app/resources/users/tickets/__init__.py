@@ -10,8 +10,7 @@ from app.policy import UserPolicy
 from utils import check_uuid
 
 sys.path.insert(0, '../rest_api_library')
-from rest import APIResourceURL, APIException
-from api import ResourceAPI
+from api import ResourceAPI, APIResourceURL, APIException
 from response import make_error_request_response, APIResponse, make_api_response, APIResponseStatus, \
     check_required_api_fields
 

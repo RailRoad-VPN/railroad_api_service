@@ -9,9 +9,8 @@ from app import RailRoadAPIError
 
 sys.path.insert(1, '../rest_api_library')
 from response import make_api_response, make_error_request_response
-from api import ResourceAPI
+from api import ResourceAPI, APIResourceURL
 from response import APIResponseStatus, APIResponse
-from rest import APIResourceURL
 
 
 class VPNAppsVersionAPI(ResourceAPI):

@@ -7,9 +7,9 @@ from app.model import VPNTypeEnum
 from app.model.user_ticket_status import UserTicketStatus
 
 sys.path.insert(0, '../rest_api_library')
-from rest import RESTService, APIException
+from rest import RESTService
 from response import APIResponse
-from api import ResourcePagination
+from api import ResourcePagination, APIException
 
 
 class UserTicketsAPIService(RESTService):
@@ -352,34 +352,21 @@ class VPNServersAPIService(RESTService):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def get_vpnservers(self, pagination: ResourcePagination = None) -> APIResponse:
-        self.logger.debug(f"{self.__class__}: get_vpnservers method with parameters pagination: {pagination}")
-        if pagination is not None and pagination.is_paginated:
-            url = self._build_url_pagination(limit=pagination.limit, offset=pagination.offset)
-            api_response = self._get(url=url)
-        else:
-            api_response = self._get()
-        return api_response
-
-    def get_vpnservers_by_type(self, type_id: int, pagination: ResourcePagination) -> APIResponse:
+    def get_vpnservers(self, status_id: int = None, type_id: int = None, pagination: ResourcePagination = None) -> APIResponse:
         self.logger.debug(
-            f"{self.__class__}: get_vpnservers_by_type method with parameters type_id: {type_id}, pagination: {pagination}")
-        url = f"{self._url}/type/{type_id}"
+            f"get_vpnservers_by_type_and_status method with parameters type_id: {type_id}, status_id: {status_id}, "
+            f"pagination: {pagination}")
+        url = self._url
 
-        if pagination is not None and pagination.is_paginated:
-            url = self._build_url_pagination(limit=pagination.limit, offset=pagination.offset, url=url)
+        query_params = {}
 
-        api_response = self._get(url=url)
-        return api_response
+        if status_id:
+            query_params['status_id'] = status_id
 
-    def get_vpnservers_by_status(self, status_id: int, pagination: ResourcePagination) -> APIResponse:
-        self.logger.debug(
-            f"get_vpnservers_by_status method with parameters status_id: {status_id}, pagination: {pagination}")
-        url = f"{self._url}/status/{status_id}"
-        if pagination is not None and pagination.is_paginated:
-            url = self._build_url_pagination(limit=pagination.limit, offset=pagination.offset, url=url)
+        if type_id:
+            query_params['type_id'] = type_id
 
-        api_response = self._get(url=url)
+        api_response = self._get(url=url, params=query_params, pagination=pagination)
         return api_response
 
     def get_vpnserver_by_uuid(self, suuid: str) -> APIResponse:

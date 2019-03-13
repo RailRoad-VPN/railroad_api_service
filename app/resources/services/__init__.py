@@ -10,9 +10,8 @@ from app.service import RRNServiceAPIService
 
 sys.path.insert(0, '../rest_api_library')
 from response import make_api_response, make_error_request_response
-from api import ResourceAPI
+from api import ResourceAPI, APIResourceURL, APIException
 from response import APIResponseStatus, APIResponse
-from rest import APIResourceURL, APIException
 
 
 class RRNServicesAPI(ResourceAPI):

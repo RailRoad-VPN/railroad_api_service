@@ -8,11 +8,10 @@ from flask import Response, request
 from app.exception import RailRoadAPIError
 from app.policy import UserPolicy
 from app.service import VPNServerConnectionsAPIService
-from rest import APIException, APIResourceURL
 
 sys.path.insert(0, '../rest_api_library')
 from utils import check_uuid
-from api import ResourceAPI
+from api import ResourceAPI, APIResourceURL, APIException
 from response import APIResponseStatus, APIResponse, make_error_request_response, check_required_api_fields
 from response import make_api_response
 

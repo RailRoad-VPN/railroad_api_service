@@ -2,12 +2,11 @@ from typing import List
 
 from app.exception import UserPolicyException, RailRoadAPIError
 from app.model.vpn_conf_platform import VPNConfigurationPlatform
-from app.model.vpn_type import VPNType
+from app.model.vpnserver import VPNServerTypeEnum, VPNServerStatusEnum
 from app.service import *
 
 sys.path.insert(0, '../rest_api_library')
-from rest import APIException
-from api import ResourcePagination
+from api import ResourcePagination, APIException
 
 
 class UserPolicy(object):
@@ -157,10 +156,10 @@ class UserPolicy(object):
                                       developer_message=RailRoadAPIError.UNKNOWN_ERROR_CODE.developer_message)
 
         self.logger.debug(f"{self.__class__}: get openvpn user configs")
-        openvpn = user_configurations.get(VPNType.OPENVPN.text, None)
+        openvpn = user_configurations.get(VPNServerTypeEnum.OPENVPN.text, None)
 
         self.logger.debug(f"{self.__class__}: get ikev2 user configs")
-        ikev2 = user_configurations.get(VPNType.IKEV2.text, None)
+        ikev2 = user_configurations.get(VPNServerTypeEnum.IKEV2.text, None)
 
         openvpn_win_config = None
         openvpn_android_config = None
@@ -184,20 +183,20 @@ class UserPolicy(object):
             self._rrn_vpn_server_configurations_service.create(user_uuid=user_uuid,
                                                                configuration=openvpn_win_config,
                                                                vpn_device_platform_id=VPNConfigurationPlatform.WINDOWS.sid,
-                                                               vpn_type_id=VPNType.OPENVPN.sid)
+                                                               vpn_type_id=VPNServerTypeEnum.OPENVPN.sid)
         if openvpn_android_config is not None:
             self.logger.debug(f"{self.__class__}: we have openvpn for android configuration. save it")
             self._rrn_vpn_server_configurations_service.create(user_uuid=user_uuid,
                                                                configuration=openvpn_win_config,
                                                                vpn_device_platform_id=VPNConfigurationPlatform.ANDROID.sid,
-                                                               vpn_type_id=VPNType.OPENVPN.sid)
+                                                               vpn_type_id=VPNServerTypeEnum.OPENVPN.sid)
 
         if ikev2_ios_config is not None:
             self.logger.debug(f"{self.__class__}: we have ikev2 for ios configuration. save it")
             self._rrn_vpn_server_configurations_service.create(user_uuid=user_uuid,
                                                                configuration=ikev2_ios_config,
                                                                vpn_device_platform_id=VPNConfigurationPlatform.IOS.sid,
-                                                               vpn_type_id=VPNType.IKEV2.sid)
+                                                               vpn_type_id=VPNServerTypeEnum.IKEV2.sid)
         return user_api_response
 
     def update_user(self, user_dict: dict) -> None:
@@ -346,58 +345,33 @@ class VPNServerPolicy(object):
         api_response = self._rrn_vpn_servers_api_service.update_vpnserver(vpnserver=vpnserver)
         return api_response
 
-    def get_random_vpn_server(self, type_id: int = None) -> APIResponse:
+    def get_random_vpn_server(self, status_id: int = VPNServerStatusEnum.OP.sid, type_id: int = None) -> APIResponse:
         self.logger.debug(
-            f"{self.__class__}: get_random_vpn_server method with parameters type_id: {type_id}")
+            f"{self.__class__}: get_random_vpn_server method with parameters status_id: {status_id}, type_id: {type_id}")
         # TODO some logic to get random VPN server
 
-        if type_id is not None:
-            api_response = self._rrn_vpn_servers_api_service.get_vpnservers_by_type(type_id=type_id, pagination=None)
-        else:
-            api_response = self._rrn_vpn_servers_api_service.get_vpnservers()
+        server_list = self.get_vpn_server_list(status_id=status_id, type_id=type_id, short=True)
 
         from random import randint
-        rs = randint(0, len(api_response.data) - 1)
-        server = api_response.data[rs]
+        rs = randint(0, len(server_list) - 1)
+        server = server_list[rs]
 
         return server['uuid']
 
-    def get_vpn_server_list(self, pagination: ResourcePagination = None) -> List[dict]:
+    def get_vpn_server_list(self, status_id: int = None, type_id : int = None, short: bool = False,
+                            pagination: ResourcePagination = None) -> List[dict]:
         self.logger.debug(f"{self.__class__}: get_vpn_server_list method with parameters pagination: {pagination}")
-        api_response = self._rrn_vpn_servers_api_service.get_vpnservers(pagination=pagination)
 
-        servers_list = []
-        for server in api_response.data:
-            server_repr = self._get_vpn_server(server=server)
-            servers_list.append(server_repr)
+        api_response = self._rrn_vpn_servers_api_service.get_vpnservers(status_id=status_id, type_id=type_id, pagination=pagination)
 
-        return servers_list
-
-    def get_vpn_server_list_by_type(self, type_id: int, pagination: ResourcePagination) -> List[dict]:
-        self.logger.debug(
-            f"get_vpn_server_list_by_type method with parameters type_id: {type_id}, pagination: {pagination}")
-        api_response = self._rrn_vpn_servers_api_service.get_vpnservers_by_type(type_id=type_id, pagination=pagination)
-
-        servers_list = []
-        for server in api_response.data:
-            server_repr = self._get_vpn_server(server=server)
-            servers_list.append(server_repr)
-
-        return servers_list
-
-    def get_vpn_server_list_by_status(self, status_id: int, pagination: ResourcePagination) -> List[dict]:
-        self.logger.debug(
-            f"{self.__class__}: get_vpn_server_list_by_status method with parameters status_id: {status_id}, "
-            f"pagination: {pagination}")
-        api_response = self._rrn_vpn_servers_api_service.get_vpnservers_by_status(status_id=status_id,
-                                                                                  pagination=pagination)
-
-        servers_list = []
-        for server in api_response.data:
-            server_repr = self._get_vpn_server(server=server)
-            servers_list.append(server_repr)
-
-        return servers_list
+        if not short:
+            servers_list = []
+            for server in api_response.data:
+                server_repr = self._get_vpn_server(server=server)
+                servers_list.append(server_repr)
+            return servers_list
+        else:
+            return api_response.data
 
     def get_vpn_server_condition_list(self, pagination: ResourcePagination) -> List[dict]:
         self.logger.debug(

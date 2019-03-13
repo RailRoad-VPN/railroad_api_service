@@ -11,8 +11,7 @@ from utils import check_uuid
 
 sys.path.insert(0, '../rest_api_library')
 from response import make_api_response, make_error_request_response, APIResponse, APIResponseStatus
-from api import ResourceAPI
-from rest import APIResourceURL, APIException, APINotFoundException
+from api import ResourceAPI, APIResourceURL, APIException, APINotFoundException
 
 
 class UsersOrdersPaymentsAPI(ResourceAPI):

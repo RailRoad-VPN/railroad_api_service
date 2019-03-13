@@ -9,8 +9,7 @@ from app.exception import RailRoadAPIError
 from app.policy import VPNServerPolicy
 
 sys.path.insert(0, '../rest_api_library')
-from rest import APIException, APIResourceURL
-from api import ResourceAPI
+from api import ResourceAPI, APIResourceURL, APIException
 from response import APIResponseStatus, APIResponse
 from utils import check_uuid
 from response import make_api_response, make_error_request_response

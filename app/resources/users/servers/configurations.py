@@ -6,14 +6,13 @@ from typing import List
 
 from flask import Response, request
 
-from app import VPNType, VPNConfigurationPlatform, UserPolicy
+from app import VPNServerTypeEnum, VPNConfigurationPlatform, UserPolicy
 from app.exception import RailRoadAPIError
 from app.service import UsersVPNServersConfigurationsAPIService, VPNServersAPIService
-from rest import APIException, APIResourceURL
 from utils import check_uuid
 
 sys.path.insert(0, '../rest_api_library')
-from api import ResourceAPI
+from api import ResourceAPI, APIResourceURL, APIException
 from response import APIResponseStatus, APIResponse, make_error_request_response
 from response import make_api_response
 
@@ -68,7 +67,7 @@ class UsersServersConfigurationsAPI(ResourceAPI):
         vpn_type = request_json.get('vpn_type')
         platform = request_json.get('platform')
 
-        type_id = VPNType.find_by_text(text=vpn_type).sid
+        type_id = VPNServerTypeEnum.find_by_text(text=vpn_type).sid
         platform_id = VPNConfigurationPlatform.find_by_text(text=platform).sid
 
         user_json = self._user_policy.get_user(email=email).data

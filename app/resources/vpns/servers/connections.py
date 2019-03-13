@@ -11,8 +11,7 @@ from app.service import VPNServerConnectionsAPIService
 from utils import check_uuid
 
 sys.path.insert(0, '../rest_api_library')
-from rest import APIResourceURL, APIException, APINotFoundException
-from api import ResourceAPI
+from api import ResourceAPI, APIResourceURL, APIException, APINotFoundException
 from response import APIResponseStatus, APIResponse, make_error_request_response, check_required_api_fields
 from response import make_api_response
 

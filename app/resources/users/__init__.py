@@ -7,16 +7,13 @@ from typing import List
 from flask import request, Response
 
 from app.exception import RailRoadAPIError
-from app.model.vpn_conf_platform import VPNConfigurationPlatform
-from app.model.vpn_type import VPNType
 from app.policy import UserPolicy
 
 sys.path.insert(0, '../rest_api_library')
 from utils import check_uuid
 from response import make_api_response, make_error_request_response, check_required_api_fields
-from api import ResourceAPI
+from api import ResourceAPI, APIResourceURL, APIException, APINotFoundException
 from response import APIResponseStatus, APIResponse
-from rest import APIException, APIResourceURL, APINotFoundException
 
 
 class UsersAPI(ResourceAPI):

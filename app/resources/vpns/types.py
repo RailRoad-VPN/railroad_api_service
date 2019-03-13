@@ -7,10 +7,9 @@ from flask import Response, request
 
 from app.exception import RailRoadAPIError
 from app.service import VPNTypeAPIService
-from rest import APIResourceURL, APINotFoundException, APIException
 
 sys.path.insert(0, '../rest_api_library')
-from api import ResourceAPI
+from api import ResourceAPI, APIResourceURL, APIException, APINotFoundException
 from response import APIResponseStatus, APIResponse, make_error_request_response
 from response import make_api_response
 

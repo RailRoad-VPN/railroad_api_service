@@ -26,7 +26,7 @@ from app.resources.vpns.types import VPNSTypesAPI
 from app.service import *
 
 sys.path.insert(1, '../rest_api_library')
-from api import register_api
+from api import register_api, APIException
 from response import make_error_request_response
 
 logging.basicConfig(

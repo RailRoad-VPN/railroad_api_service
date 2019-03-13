@@ -15,15 +15,14 @@ from app.model.payment_status import PaymentStatus, PPGPaymentStatus
 from app.model.payment_type import PaymentType
 from app.model.user_subscription_status import UserSubscriptionStatus
 from app.model.vpn_conf_platform import VPNConfigurationPlatform
-from app.model.vpn_type import VPNType
+from app.model.vpnserver import VPNServerTypeEnum
 from app.service import OrderAPIService, UserRRNServiceAPIService, VPNMGMTUsersAPIService, \
     UsersVPNServersConfigurationsAPIService
 
 sys.path.insert(0, '../rest_api_library')
 from response import make_api_response, make_error_request_response
-from api import ResourceAPI
+from api import ResourceAPI, APIResourceURL, APINotFoundException
 from response import APIResponseStatus, APIResponse
-from rest import APIResourceURL, APINotFoundException
 
 
 class PaymentsAPI(ResourceAPI):
@@ -230,10 +229,10 @@ class PaymentsAPI(ResourceAPI):
         user_configurations = api_response.data
 
         self.logger.debug(f"{self.__class__}: get openvpn user configs")
-        openvpn = user_configurations.get(VPNType.OPENVPN.text, None)
+        openvpn = user_configurations.get(VPNServerTypeEnum.OPENVPN.text, None)
 
         self.logger.debug(f"{self.__class__}: get ikev2 user configs")
-        ikev2 = user_configurations.get(VPNType.IKEV2.text, None)
+        ikev2 = user_configurations.get(VPNServerTypeEnum.IKEV2.text, None)
 
         openvpn_win_config = None
         openvpn_android_config = None
@@ -259,27 +258,27 @@ class PaymentsAPI(ResourceAPI):
             self._vpn_server_confs_service.create(user_uuid=user_uuid,
                                                   configuration=openvpn_win_config,
                                                   vpn_device_platform_id=VPNConfigurationPlatform.WINDOWS.sid,
-                                                  vpn_type_id=VPNType.OPENVPN.sid)
+                                                  vpn_type_id=VPNServerTypeEnum.OPENVPN.sid)
         if openvpn_android_config is not None:
             self.logger.debug(f"{self.__class__}: we have openvpn for android configuration. save it")
             self._vpn_server_confs_service.create(user_uuid=user_uuid,
                                                   configuration=openvpn_win_config,
                                                   vpn_device_platform_id=VPNConfigurationPlatform.ANDROID.sid,
-                                                  vpn_type_id=VPNType.OPENVPN.sid)
+                                                  vpn_type_id=VPNServerTypeEnum.OPENVPN.sid)
 
         if ikev2_ios_config is not None:
             self.logger.debug(f"{self.__class__}: we have ikev2 for ios configuration. save it")
             self._vpn_server_confs_service.create(user_uuid=user_uuid,
                                                   configuration=ikev2_ios_config,
                                                   vpn_device_platform_id=VPNConfigurationPlatform.IOS.sid,
-                                                  vpn_type_id=VPNType.IKEV2.sid)
+                                                  vpn_type_id=VPNServerTypeEnum.IKEV2.sid)
 
         if ikev2_win_config is not None:
             self.logger.debug(f"{self.__class__}: we have ikev2 for windows configuration. save it")
             self._vpn_server_confs_service.create(user_uuid=user_uuid,
                                                   configuration=ikev2_win_config,
                                                   vpn_device_platform_id=VPNConfigurationPlatform.WINDOWS.sid,
-                                                  vpn_type_id=VPNType.IKEV2.sid)
+                                                  vpn_type_id=VPNServerTypeEnum.IKEV2.sid)
 
         response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK)
         resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)

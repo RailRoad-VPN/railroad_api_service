@@ -5,10 +5,9 @@ from typing import List
 from flask import Response, request
 
 from app.service import VPNServersMetaAPIService
-from rest import APIResourceURL
 
 sys.path.insert(0, '../rest_api_library')
-from api import ResourceAPI
+from api import ResourceAPI, APIResourceURL
 from response import APIResponseStatus, APIResponse, make_error_request_response
 from response import make_api_response
 
