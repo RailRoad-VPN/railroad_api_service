@@ -345,12 +345,12 @@ class VPNServerPolicy(object):
         api_response = self._rrn_vpn_servers_api_service.update_vpnserver(vpnserver=vpnserver)
         return api_response
 
-    def get_random_vpn_server(self, status_id: int = VPNServerStatusEnum.OP.sid, type_id: int = None) -> APIResponse:
+    def get_random_vpn_server(self, type_id: int = None) -> APIResponse:
         self.logger.debug(
             f"{self.__class__}: get_random_vpn_server method with parameters status_id: {status_id}, type_id: {type_id}")
         # TODO some logic to get random VPN server
 
-        server_list = self.get_vpn_server_list(status_id=status_id, type_id=type_id, short=True)
+        server_list = self.get_vpn_server_list(status_id=VPNServerStatusEnum.OP.sid, type_id=type_id, short=True)
 
         from random import randint
         rs = randint(0, len(server_list) - 1)

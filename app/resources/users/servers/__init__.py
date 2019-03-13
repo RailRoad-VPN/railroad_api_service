@@ -56,7 +56,7 @@ class UsersServersAPI(ResourceAPI):
         # TODO make business logic to retrieve only servers for user
         if is_get_random is not None:
             try:
-                server_uuid = self._vpn_policy.get_random_vpn_server(type_id=type_id, status_id=status_id)
+                server_uuid = self._vpn_policy.get_random_vpn_server(type_id=type_id)
 
                 response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK,
                                             data={'uuid': server_uuid})
