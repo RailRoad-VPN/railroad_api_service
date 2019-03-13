@@ -58,6 +58,11 @@ class UsersServersAPI(ResourceAPI):
             try:
                 server_uuid = self._vpn_policy.get_random_vpn_server(type_id=type_id)
 
+                if server_uuid is None:
+                    response_data = APIResponse(status=APIResponseStatus.failed.status, code=HTTPStatus.NOT_FOUND)
+                    resp = make_api_response(data=response_data, http_code=HTTPStatus.NOT_FOUND)
+                    return resp
+
                 response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.OK,
                                             data={'uuid': server_uuid})
                 resp = make_api_response(data=response_data, http_code=HTTPStatus.OK)

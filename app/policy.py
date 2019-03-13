@@ -352,9 +352,12 @@ class VPNServerPolicy(object):
 
         server_list = self.get_vpn_server_list(status_id=VPNServerStatusEnum.OP.sid, type_id=type_id, short=True)
 
-        from random import randint
-        rs = randint(0, len(server_list) - 1)
-        server = server_list[rs]
+        if len(server_list) > 0:
+            from random import randint
+            rs = randint(0, len(server_list) - 1)
+            server = server_list[rs]
+        else:
+            return None
 
         return server['uuid']
 
@@ -389,7 +392,7 @@ class VPNServerPolicy(object):
         self.logger.debug(
             f"{self.__class__}: get_vpn_server_condition_list_by_type method with parameters type_id: {type_id}. "
             f"pagination: {pagination}")
-        api_response = self._rrn_vpn_servers_api_service.get_vpnservers_by_type(type_id=type_id, pagination=pagination)
+        api_response = self._rrn_vpn_servers_api_service.get_vpnservers(type_id=type_id, pagination=pagination)
 
         servers_list = []
         for server in api_response.data:
@@ -402,8 +405,7 @@ class VPNServerPolicy(object):
         self.logger.debug(
             f"{self.__class__}: get_vpn_server_condition_list_by_status method with parameters status_id: {status_id}, "
             f"pagination: {pagination}")
-        api_response = self._rrn_vpn_servers_api_service.get_vpnservers_by_status(status_id=status_id,
-                                                                                  pagination=pagination)
+        api_response = self._rrn_vpn_servers_api_service.get_vpnservers(status_id=status_id, pagination=pagination)
 
         servers_list = []
         for server in api_response.data:
