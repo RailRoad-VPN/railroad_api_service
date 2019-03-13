@@ -347,7 +347,7 @@ class VPNServerPolicy(object):
 
     def get_random_vpn_server(self, type_id: int = None) -> APIResponse:
         self.logger.debug(
-            f"{self.__class__}: get_random_vpn_server method with parameters status_id: {status_id}, type_id: {type_id}")
+            f"{self.__class__}: get_random_vpn_server method with parameters: type_id: {type_id}")
         # TODO some logic to get random VPN server
 
         server_list = self.get_vpn_server_list(status_id=VPNServerStatusEnum.OP.sid, type_id=type_id, short=True)
