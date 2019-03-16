@@ -7,6 +7,7 @@ from app.exception import RailRoadAPIError
 from app.policy import *
 from app.resources.payments import PaymentsAPI
 from app.resources.services import RRNServicesAPI
+from app.resources.tickets import TicketsAPI
 from app.resources.users import UsersAPI
 from app.resources.users.devices import UsersDevicesAPI
 from app.resources.users.orders import UsersOrdersAPI
@@ -16,7 +17,6 @@ from app.resources.users.servers import UsersServersAPI
 from app.resources.users.servers.conditions import UsersServersConditionsAPI
 from app.resources.users.servers.configurations import UsersServersConfigurationsAPI
 from app.resources.users.servers.connections import UsersServersConnectionsAPI
-from app.resources.users.tickets import UserTicketsAPI
 from app.resources.vpns.apps import VPNAppsVersionAPI
 from app.resources.vpns.device_platforms import VPNSDevicePlatformsAPI
 from app.resources.vpns.servers import VPNServersAPI
@@ -94,9 +94,9 @@ rrn_geo_state_api_service = GeoStateAPIService(api_url=app_config['VPNC_SERVICE_
 rrn_user_api_service = UserAPIService(api_url=app_config['AUTH_SERVICE_URL'],
                                       resource_name=app_config['AUTH_SERVICE_USERS_RESOURCE_NAME'])
 
-rrn_user_tickets_api_service = UserTicketsAPIService(api_url=app_config['AUTH_SERVICE_URL'],
-                                                     resource_name=app_config[
-                                                         'AUTH_SERVICE_USER_TICKETS_RESOURCE_NAME'])
+rrn_tickets_api_service = TicketsAPIService(api_url=app_config['AUTH_SERVICE_URL'],
+                                            resource_name=app_config[
+                                                'AUTH_SERVICE_TICKETS_RESOURCE_NAME'])
 
 rrn_user_rrnservice_api_service = UserRRNServiceAPIService(api_url=app_config['BILLING_SERVICE_URL'],
                                                            resource_name=app_config[
@@ -119,7 +119,7 @@ rrn_order_api_service = OrderAPIService(api_url=app_config['BILLING_SERVICE_URL'
 user_policy = UserPolicy(rrn_user_rrnservice_api_service=rrn_user_rrnservice_api_service,
                          rrn_order_api_service=rrn_order_api_service,
                          rrn_user_api_service=rrn_user_api_service,
-                         rrn_user_tickets_api_service=rrn_user_tickets_api_service,
+                         rrn_user_tickets_api_service=rrn_tickets_api_service,
                          rrn_user_device_api_service=rrn_user_device_api_service,
                          rrn_vpn_servers_connections_api_service=rrn_vpn_server_connections_api_service,
                          rrn_vpn_mgmt_users_api_service=rrn_vpn_mgmt_users_api_service,
@@ -140,7 +140,7 @@ apis = [
     {'cls': UsersOrdersPaymentsAPI, 'args': [rrn_order_api_service, app_config, True]},
     {'cls': UsersServicesAPI, 'args': [user_policy, app_config, True]},
     {'cls': UsersDevicesAPI, 'args': [user_policy, app_config, True]},
-    {'cls': UserTicketsAPI, 'args': [user_policy, app_config, True]},
+    {'cls': TicketsAPI, 'args': [user_policy, app_config, True]},
     {'cls': PaymentsAPI,
      'args': [rrn_order_api_service, rrn_user_rrnservice_api_service, rrn_vpn_mgmt_users_api_service, user_policy,
               rrn_vpn_server_configurations_api_service, app_config]},

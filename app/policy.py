@@ -26,7 +26,7 @@ class UserPolicy(object):
     def __init__(self,
                  rrn_user_rrnservice_api_service: UserRRNServiceAPIService,
                  rrn_user_api_service: UserAPIService,
-                 rrn_user_tickets_api_service: UserTicketsAPIService,
+                 rrn_user_tickets_api_service: TicketsAPIService,
                  rrn_order_api_service: OrderAPIService,
                  rrn_user_device_api_service: UserDeviceAPIService,
                  rrn_vpn_servers_connections_api_service: VPNServerConnectionsAPIService,
@@ -41,20 +41,20 @@ class UserPolicy(object):
         self._rrn_vpn_mgmt_users_api_service = rrn_vpn_mgmt_users_api_service
         self._rrn_vpn_server_configurations_service = rrn_vpn_server_configurations_api_service
 
-    def create_user_ticket(self, user_uuid: str, contact_email: str, description: str, extra_info: dict,
-                           zipfile: bytearray = None) -> APIResponse:
+    def create_ticket(self, user_uuid: str, contact_email: str, description: str, extra_info: dict,
+                      zipfile: bytearray = None) -> APIResponse:
         extra_info_s = json.dumps(extra_info)
         api_response = self._rrn_user_tickets_api_service.create(user_uuid=user_uuid, contact_email=contact_email,
                                                                  extra_info=extra_info_s, description=description,
                                                                  zipfile=zipfile)
         return api_response
 
-    def get_user_ticket_by_number(self, user_uuid: str, ticket_number: int) -> APIResponse:
-        api_response = self._rrn_user_tickets_api_service.find(user_uuid=user_uuid, ticket_number=ticket_number)
+    def get_ticket_by_number(self, ticket_number: int) -> APIResponse:
+        api_response = self._rrn_user_tickets_api_service.find(ticket_number=ticket_number)
         return api_response
 
-    def get_user_ticket(self, user_uuid: str, ticket_uuid: str) -> APIResponse:
-        api_response = self._rrn_user_tickets_api_service.find(user_uuid=user_uuid, suuid=ticket_uuid)
+    def get_ticket_by_uuid(self, ticket_uuid: str) -> APIResponse:
+        api_response = self._rrn_user_tickets_api_service.find(suuid=ticket_uuid)
         return api_response
 
     def get_user_tickets(self, user_uuid: str) -> APIResponse:

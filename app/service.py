@@ -4,7 +4,7 @@ import logging
 import sys
 
 from app.model import VPNTypeEnum
-from app.model.user_ticket_status import UserTicketStatus
+from app.model.user_ticket_status import TicketStatus
 
 sys.path.insert(0, '../rest_api_library')
 from rest import RESTService
@@ -12,7 +12,7 @@ from response import APIResponse
 from api import ResourcePagination, APIException
 
 
-class UserTicketsAPIService(RESTService):
+class TicketsAPIService(RESTService):
     __version__ = 1
 
     logger = logging.getLogger(__name__)
@@ -24,15 +24,16 @@ class UserTicketsAPIService(RESTService):
         self.logger.debug(
             f"{self.__class__}: create method with parameters user_uuid: {user_uuid}, extra_info: {extra_info},"
             f"contact_email: {contact_email}, description len: {len(description)}, zipfile_exits: {zipfile is not None}")
-
+        # TODO CHANGE TICKET API
         data = {
-            'status_id': UserTicketStatus.NEW.sid,
+            'user_uuid': user_uuid,
+            'status_id': TicketStatus.NEW.sid,
             'contact_email': contact_email,
             'description': description,
             'extra_info': extra_info,
             'zipfile': zipfile
         }
-        url = self._url.replace("<string:user_uuid>", user_uuid)
+        url = self._url
         api_response = self._post(url=url, data=data, headers=self._headers)
         if 'Location' in api_response.headers:
             api_response = self._get(url=api_response.headers.get('Location'))
@@ -41,18 +42,21 @@ class UserTicketsAPIService(RESTService):
             self.logger.debug(api_response.serialize())
             raise APIException(http_code=api_response.code, errors=api_response.errors)
 
-    def find(self, user_uuid: str, suuid: str = None, ticket_number: int = None) -> APIResponse:
-        url = self._url.replace("<string:user_uuid>", user_uuid)
+    def find(self, suuid: str = None, ticket_number: int = None, user_uuid: str = None, ) -> APIResponse:
+        url = self._url
+
+        params = {}
         if suuid:
-            self.logger.debug(f"get user with uuid: {user_uuid} ticket by uuid: {suuid}")
+            self.logger.debug(f"get ticket by uuid: {suuid}")
             url = f"{url}/{suuid}"
         elif ticket_number:
-            self.logger.debug(f"get user with uuid: {user_uuid} ticket by ticket_number: {ticket_number}")
+            self.logger.debug(f"get ticket by ticket_number: {ticket_number}")
             url = f"{url}/{ticket_number}"
-        else:
-            self.logger.debug(f"get ALL user with uuid {user_uuid} tickets")
+        elif user_uuid:
+            self.logger.debug(f"get all user: {user_uuid} tickets")
             url = f"{url}"
-        api_response = self._get(url=url)
+            params['user_uuid'] = user_uuid
+        api_response = self._get(url=url, params=params)
         return api_response
 
 

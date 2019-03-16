@@ -15,19 +15,19 @@ from response import make_error_request_response, APIResponse, make_api_response
     check_required_api_fields
 
 
-class UserTicketsAPI(ResourceAPI):
+class TicketsAPI(ResourceAPI):
     __version__ = 1
 
     logger = logging.getLogger(__name__)
 
     __endpoint_name__ = __qualname__
-    __api_url__ = 'users/<string:user_uuid>/tickets'
+    __api_url__ = 'tickets'
 
     _user_policy = None
 
     @staticmethod
     def get_api_urls(base_url: str) -> List[APIResourceURL]:
-        url = f"{base_url}/{UserTicketsAPI.__api_url__}"
+        url = f"{base_url}/{TicketsAPI.__api_url__}"
         api_urls = [
             APIResourceURL(base_url=url, resource_name='', methods=['GET', 'POST']),
             APIResourceURL(base_url=url, resource_name='<string:suuid_or_number>', methods=['GET']),
@@ -38,16 +38,17 @@ class UserTicketsAPI(ResourceAPI):
         super().__init__(*args)
         self._user_policy = user_policy
 
-    def post(self, user_uuid: str) -> Response:
-        super(UserTicketsAPI, self).post(req=request)
+    def post(self) -> Response:
+        super(TicketsAPI, self).post(req=request)
 
         request_json = request.json
 
         if request_json is None:
             return make_error_request_response(HTTPStatus.BAD_REQUEST, err=RailRoadAPIError.REQUEST_NO_JSON)
 
-        contact_email = request_json.get('contact_email', None)
-        description = request_json.get('description', None)
+        user_uuid = request_json.get('user_uuid', None)
+        contact_email = request_json.get('contact_email', "anonymous")
+        description = request_json.get('description', "No description")
         extra_info = request_json.get('extra_info', None)
         zipfile = request_json.get('zipfile', None)
 
@@ -64,11 +65,11 @@ class UserTicketsAPI(ResourceAPI):
             return resp
 
         try:
-            api_response = self._user_policy.create_user_ticket(user_uuid=user_uuid, contact_email=contact_email,
-                                                                extra_info=extra_info, description=description,
-                                                                zipfile=zipfile)
+            api_response = self._user_policy.create_ticket(user_uuid=user_uuid, contact_email=contact_email,
+                                                           extra_info=extra_info, description=description,
+                                                           zipfile=zipfile)
 
-            api_url = self.__api_url__.replace('<string:user_uuid>', user_uuid)
+            api_url = self.__api_url__
 
             response_data = APIResponse(status=APIResponseStatus.success.status, code=HTTPStatus.CREATED)
             resp = make_api_response(data=response_data, http_code=HTTPStatus.CREATED)
@@ -84,14 +85,12 @@ class UserTicketsAPI(ResourceAPI):
         resp = make_error_request_response(http_code=HTTPStatus.METHOD_NOT_ALLOWED)
         return resp
 
-    def get(self, user_uuid: str, suuid_or_number: str = None) -> Response:
-        super(UserTicketsAPI, self).get(req=request)
+    def get(self, suuid_or_number: str = None) -> Response:
+        super(TicketsAPI, self).get(req=request)
 
-        is_valid = check_uuid(suuid=user_uuid)
-        if not is_valid:
-            return make_error_request_response(HTTPStatus.NOT_FOUND, err=RailRoadAPIError.BAD_IDENTITY_ERROR)
+        user_uuid = request.args.get("user_uuid", None)
 
-        if suuid_or_number is None:
+        if user_uuid:
             try:
                 self.logger.debug("find all user tickets")
                 api_response = self._user_policy.get_user_tickets(user_uuid=user_uuid)
@@ -111,11 +110,13 @@ class UserTicketsAPI(ResourceAPI):
                 except ValueError:
                     return make_error_request_response(HTTPStatus.NOT_FOUND,
                                                        err=RailRoadAPIError.BAD_IDENTITY_ERROR)
+                except TypeError:
+                    return make_error_request_response(HTTPStatus.NOT_FOUND,
+                                                       err=RailRoadAPIError.BAD_IDENTITY_ERROR)
 
                 try:
                     self.logger.debug("get user ticket by ticket number")
-                    api_response = self._user_policy.get_user_ticket_by_number(user_uuid=user_uuid,
-                                                                               ticket_number=ticket_number)
+                    api_response = self._user_policy.get_ticket_by_number(ticket_number=ticket_number)
                 except APIException as e:
                     self.logger.debug(e.serialize())
                     response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code,
@@ -125,7 +126,7 @@ class UserTicketsAPI(ResourceAPI):
             else:
                 try:
                     self.logger.debug(f"get user ticket by uuid: {suuid_or_number}")
-                    api_response = self._user_policy.get_user_ticket(user_uuid=user_uuid, ticket_uuid=suuid_or_number)
+                    api_response = self._user_policy.get_ticket_by_uuid(ticket_uuid=suuid_or_number)
                 except APIException as e:
                     self.logger.debug(e.serialize())
                     response_data = APIResponse(status=APIResponseStatus.failed.status, code=e.http_code,

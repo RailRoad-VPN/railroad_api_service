@@ -11,7 +11,7 @@ class Config(object):
     API_BASE_URI = '/api/%s' % VERSION
 
     AUTH_SERVICE_USERS_RESOURCE_NAME = 'users'
-    AUTH_SERVICE_USER_TICKETS_RESOURCE_NAME = 'users/<string:user_uuid>/tickets'
+    AUTH_SERVICE_TICKETS_RESOURCE_NAME = 'tickets'
     AUTH_SERVICE_USER_DEVICES_RESOURCE_NAME = 'users/<string:user_uuid>/devices'
     AUTH_SERVICE_USER_VPN_SERVER_CONFIGURATIONS_RESOURCE_NAME = 'users/<string:user_uuid>/vpnservers_configurations'
 
