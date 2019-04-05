@@ -151,9 +151,7 @@ class UserPolicy(object):
             self.logger.debug(f"{self.__class__}: user_configurations: {user_configurations}")
         except APIException as e:
             self.logger.debug(e.serialize())
-            raise UserPolicyException(error=RailRoadAPIError.UNKNOWN_ERROR_CODE.message,
-                                      error_code=RailRoadAPIError.UNKNOWN_ERROR_CODE.code,
-                                      developer_message=RailRoadAPIError.UNKNOWN_ERROR_CODE.developer_message)
+            user_configurations = {}
 
         self.logger.debug(f"{self.__class__}: get openvpn user configs")
         openvpn = user_configurations.get(VPNServerTypeEnum.OPENVPN.text, None)
