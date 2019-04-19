@@ -122,6 +122,7 @@ class UsersAPI(ResourceAPI):
         pin_code = request_json.get('pin_code', None)
         pin_code_expire_date = request_json.get('pin_code_expire_date', None)
         modify_reason = request_json.get('modify_reason', None)
+        is_email_confirmed = request_json.get('is_email_confirmed', False)
 
         user_dict = {
             'uuid': suuid,
@@ -154,6 +155,7 @@ class UsersAPI(ResourceAPI):
 
         user_dict['pin_code'] = pin_code
         user_dict['pin_code_expire_date'] = pin_code_expire_date
+        user_dict['is_email_confirmed'] = is_email_confirmed
 
         try:
             self._user_policy.update_user(user_dict=user_dict)
