@@ -53,7 +53,6 @@ class TicketsAPI(ResourceAPI):
         zipfile = request_json.get('zipfile', None)
 
         req_fields = {
-            'contact_email': contact_email,
             'description': description,
         }
 
